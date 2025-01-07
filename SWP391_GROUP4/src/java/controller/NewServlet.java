@@ -41,7 +41,7 @@ public class NewServlet extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet NewServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
-            out.println("</html>");
+            out.println("</aaaaaa>");
         }
     }
 
