@@ -128,9 +128,9 @@ public void signUp(User c) {
     User c = new User();  // Khởi tạo là null thay vì một đối tượng rỗng
     try {
         String sql = """
-                     SELECT id, fullname, email, phonenumber, username, password, role
-                     FROM Customers
-                     WHERE username = ? AND password = ?
+                    SELECT UserID, Name, email, Phone, RoleID
+                                          FROM Users
+                                          WHERE username = ? AND password = ?  
                      """;
 
         PreparedStatement st = connection.prepareStatement(sql);

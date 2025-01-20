@@ -54,7 +54,8 @@ public class LoginController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //processRequest(request, response);
-        response.sendRedirect("RegisterController");
+
+          request.getRequestDispatcher("/views/auth/Register.jsp").forward(request, response);
     }
 
     /**
@@ -86,8 +87,7 @@ public class LoginController extends HttpServlet {
             if (rememberme!=null && rememberme.equals("rem")) {
                 Cookie user = new Cookie("u", username);
                 Cookie pass = new Cookie("p", password);
-                user.setMaxAge(5 * 24 * 60 * 60);
-                pass.setMaxAge(5 * 24 * 60 * 60);
+         
                 response.addCookie(user);
                 response.addCookie(pass);
             } else {
@@ -100,12 +100,11 @@ public class LoginController extends HttpServlet {
                 }
             }
             if(c.getRole().equals("admin")){
-                response.sendRedirect("AdminController");
+                response.sendRedirect("/AdminController");
             }
             response.sendRedirect("HomeController");
         } else {
             request.setAttribute("wrong", "Username or password wrong! Enter again!");
-            request.getRequestDispatcher("Views/Register.jsp").forward(request, response);
         }
 
     }

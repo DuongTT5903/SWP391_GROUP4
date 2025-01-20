@@ -94,7 +94,7 @@
     <body class="hero-header body">
         <div class="container" style="margin-bottom: 300px">
             <div class="form-container">
-                <form id="loginForm" action="LoginController" method="post">
+                <form id="loginForm" action="login" method="post">
                     <h2>Login</h2>
                     <div class="form-group">
                         <label for="username">Username</label>
@@ -102,7 +102,7 @@
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" value="${requestScope.password}" maxlength="32" minlength="6" required>
+                        <input type="password" id="password" name="password" value="${requestScope.password}" maxlength="32" minlength="1" required>
                     </div>
                     <button type="submit" >Login</button>
                     <input type="checkbox" name="rememberme" id="remember" value="rem"> Remember me <a style="margin-left: 100px;" href="#" id="forgetLink">Forget password</a>
