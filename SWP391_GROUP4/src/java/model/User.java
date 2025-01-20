@@ -16,7 +16,7 @@ public class User {
     private String username;
     private String password;
     private String phone;
-    private Role role;
+    private String role;
     private String imageURL;
 
     // Default constructor
@@ -24,7 +24,7 @@ public class User {
     }
 
     // Parameterized constructor
-    public User(int userID, String name, boolean gender, String email, String username, String password, String phone, Role role, String imageURL) {
+    public User(int userID, String name, boolean gender, String email, String username, String password, String phone, String role, String imageURL) {
         this.userID = userID;
         this.name = name;
         this.gender = gender;
@@ -93,11 +93,11 @@ public class User {
         this.phone = phone;
     }
 
-    public Role getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(String role) {
         this.role = role;
     }
 
