@@ -4,17 +4,23 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dal.BlogDBContext;
+import model.Blog;
+
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
 /**
  *
  * @author admin
  */
+@WebServlet(name = "HomepageController", urlPatterns = {"/homepage"})
 public class HomepageController extends HttpServlet {
 
     /**
@@ -52,11 +58,28 @@ public class HomepageController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
+     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        BlogDBContext blogDB = new BlogDBContext();
+        List<Blog> blogs = null;
+
+        try {
+            blogs = blogDB.getAllBlogs();
+            if (blogs == null || blogs.isEmpty()) {
+                request.setAttribute("errorMessage", "No blogs available at the moment.");
+            } else {
+                request.setAttribute("blogs", blogs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
+        }
+
+        request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
+
+
 
     /**
      * Handles the HTTP <code>POST</code> method.
