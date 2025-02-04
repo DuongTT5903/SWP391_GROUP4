@@ -96,4 +96,12 @@
         <servlet-name>AdminUserList</servlet-name>
         <url-pattern>/admin/userList</url-pattern>
     </servlet-mapping>
+   <filter>
+    <filter-name>BaseRequiredFilter</filter-name>
+    <filter-class>auth.BaseRequiredFilter</filter-class>
+</filter>
+
+ 
+    
+    
 </web-app>
