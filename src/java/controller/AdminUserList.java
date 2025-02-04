@@ -4,12 +4,15 @@
  */
 package controller;
 
+import dal.UserDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.User;
 
 /**
  *
@@ -53,10 +56,31 @@ public class AdminUserList extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        UserDBContext db = new UserDBContext();
+        List<User> users = db.getUsers();
+        
+        int pageSize = 10;
+        int totalUsers = users.size();
+        int totalPages = (int) Math.ceil(totalUsers / (double) pageSize);
+        int currentPage = 1;
+
+        if (request.getParameter("page") != null) {
+            currentPage = Integer.parseInt(request.getParameter("page"));
+        }
+        
+        int startIndex = (currentPage - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalUsers);
+        List<User> userPage = users.subList(startIndex, endIndex);
+        
+        request.setAttribute("users", users);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", currentPage);
+        request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
     }
+
+    
 
     /**
      * Handles the HTTP <code>POST</code> method.
