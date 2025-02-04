@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/dal/UserDBContext.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/web/view/homepage.jsp</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/model/Role.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/web/admin/userDetail.jsp</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/controller/AdminUserList.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/web/admin/userList.jsp</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/controller/AdminUserDetailController.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/web/WEB-INF/web.xml</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/dal/BlogDBContext.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/model/User.java</file>
+            <file>file:/D:/SWP%20prj/SWP391_GROUP4/src/java/dal/DBContext.java</file>
+        </group>
+    </open-files>
+</project-private>
