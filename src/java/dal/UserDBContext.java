@@ -9,6 +9,91 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDBContext {
+     public User checkAccountExisted(String username) throws SQLException {
+    String sql = "SELECT * FROM Users WHERE Username = ?";
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, username);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                // Tạo đối tượng User mới và thiết lập giá trị cho các thuộc tính
+                User user = new User();
+                user.setUserID(rs.getInt("UserID"));
+                user.setName(rs.getString("Name"));
+                user.setGender(rs.getBoolean("Gender"));
+                user.setEmail(rs.getString("Email"));
+                user.setUsername(rs.getString("Username"));
+                user.setPassword(rs.getString("Password"));
+                user.setPhone(rs.getString("Phone"));
+                Role role = new Role();
+                role.setRoleID(rs.getInt("RoleID"));
+                role.setRoleName(rs.getString("RoleName"));
+                user.setRole("role");
+                return user;
+            }
+        }
+    } catch (SQLException ex) {
+        // Xử lý ngoại lệ hoặc ghi log chi tiết
+        System.out.println("Lỗi khi kiểm tra tài khoản tồn tại: " + ex.getMessage());
+        throw ex;
+    }
+    return null;
+}
+       public User checkEmailExisted(String email) throws Exception {
+    try {
+        // Mở kết nối
+        Connection conn = new DBContext().getConnection();
+        String sql = "SELECT * FROM Users WHERE Email = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            // Tạo đối tượng User mới và thiết lập giá trị cho các thuộc tính
+            User user = new User();
+            user.setUserID(rs.getInt("UserID"));
+            user.setName(rs.getString("Name"));
+            user.setGender(rs.getBoolean("Gender"));
+            user.setEmail(rs.getString("Email"));
+            user.setUsername(rs.getString("Username"));
+            user.setPassword(rs.getString("Password"));
+            user.setPhone(rs.getString("Phone"));
+            // Thiết lập Role cho User
+            Role role = new Role();
+            role.setRoleID(rs.getInt("roleID"));
+            role.setRoleName(rs.getString("roleName"));
+            user.setRole("role");
+            return user;    
+        }
+    } catch (SQLException ex) {
+        System.out.println("Lỗi khi kiểm tra email tồn tại: " + ex.getMessage());
+        // Bạn có thể ghi log lỗi chi tiết hơn hoặc ném ngoại lệ để xử lý ở cấp cao hơn
+        throw ex;
+    }
+    return null;
+}
+       public void signup(String name, String gender, String email, String user, String pass, String phone) {
+    try {
+        // Connect to MySQL database
+        Connection conn = new DBContext().getConnection();
+        String sql = "INSERT INTO Users\n"
+                + "           (Name, Gender, Email, Username, Password, Phone, RoleID)\n"
+                + "     VALUES\n"
+                + "           (?, ?, ?, ?, ?, ?, 4)";
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, name);
+        ps.setString(2, gender);
+        ps.setString(3, email);
+        ps.setString(4, user);
+        ps.setString(5, pass);
+        ps.setString(6, phone);
+        ps.executeUpdate();
+    } catch (Exception ex) {
+        ex.printStackTrace(System.out);
+    }
+}
+
     private static Connection connection = DBContext.getConnection();
 
     public User getUserByUsername(String username, String password) {

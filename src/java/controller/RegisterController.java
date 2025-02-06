@@ -10,6 +10,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import dal.UserDBContext;
+import jakarta.servlet.http.HttpSession;
+import model.User;
 
 /**
  *
@@ -55,7 +60,8 @@ public class RegisterController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+                request.getRequestDispatcher("views/register.jsp").forward(request, response);
+
     }
 
     /**
@@ -69,8 +75,47 @@ public class RegisterController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+       request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        String user = request.getParameter("user");
+        String email = request.getParameter("email");
+        String gender = request.getParameter("gender");
+        String fullname = request.getParameter("fullname");
+        String phone = request.getParameter("phone");
+   String pass = request.getParameter("pass");
+
+        
+        
+        
+            try {
+                UserDBContext account = new UserDBContext();
+                User acc = account.checkAccountExisted(user);
+                User acc2 = account.checkEmailExisted(email);
+                if (acc != null) { // signup enable
+                    request.setAttribute("e", "Tài khoản đã tồn tại");
+                    request.getRequestDispatcher("view/register.jsp").forward(request, response);
+                }
+                if (acc2 != null) {
+
+                    request.setAttribute("e", "Email đã tồn tại");
+                    request.getRequestDispatcher("view/register.jsp").forward(request, response);
+
+                } else { // signup again
+                   
+                    HttpSession session = request.getSession();
+                    session.setAttribute("email", email);
+
+                    
+                account.signup(fullname, gender, email, user, pass, phone);
+                request.getRequestDispatcher("views/welcome.jsp").forward(request, response);
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(RegisterController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+
     }
+    
 
     /**
      * Returns a short description of the servlet.
