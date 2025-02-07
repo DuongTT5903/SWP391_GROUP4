@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebFilter("/*") // Áp dụng cho tất cả request
 public class BaseRequiredFilter implements Filter {
@@ -19,7 +21,13 @@ public class BaseRequiredFilter implements Filter {
                 // Giới thiệu
             // Thư mục hình ảnh
     );
-
+    private static final Map<String, String> ROLE_ALLOWED_PATHS = new HashMap<>();
+    static {
+        ROLE_ALLOWED_PATHS.put("1", "/admin");
+        ROLE_ALLOWED_PATHS.put("2", "/manager");
+        ROLE_ALLOWED_PATHS.put("3", "/staff");
+        ROLE_ALLOWED_PATHS.put("4", "/customer");
+    }
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
@@ -29,7 +37,7 @@ public class BaseRequiredFilter implements Filter {
         // Lấy thông tin user và roleID từ session
         Object user = (session != null) ? session.getAttribute("user") : null;
         String roleID = (session != null) ? (String) session.getAttribute("roleID") : null;
-
+        
         // Lấy đường dẫn hiện tại
         String path = req.getRequestURI().replace(req.getContextPath(), ""); // Xóa context path để so sánh chính xác
 
@@ -74,5 +82,9 @@ public class BaseRequiredFilter implements Filter {
 
         // Tiếp tục xử lý request nếu hợp lệ
         chain.doFilter(request, response);
+    }
+    private boolean hasAccess(String roleID, String path) {
+        String allowedPath = ROLE_ALLOWED_PATHS.get(roleID);
+        return allowedPath != null && path.startsWith(allowedPath);
     }
 }

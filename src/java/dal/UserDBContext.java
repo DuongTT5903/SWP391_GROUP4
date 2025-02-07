@@ -132,8 +132,8 @@ public class UserDBContext {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL " +
                      "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID";
-
-        try (PreparedStatement stm = connection.prepareStatement(sql);
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stm = conn.prepareStatement(sql);
              ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
@@ -143,7 +143,7 @@ public class UserDBContext {
                     rs.getBoolean("gender"),
                     rs.getString("email"),
                     rs.getString("username"),
-                    null,  // Không lưu password vào danh sách user
+                    null, // Không lưu mật khẩu
                     rs.getString("phone"),
                     rs.getString("roleName"),
                     rs.getString("imageURL")
@@ -251,5 +251,67 @@ public class UserDBContext {
             Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching roles", ex);
         }
         return roles;
+    }
+    public List<User> getUsers(int pageIndex, int pageSize) {
+    List<User> users = new ArrayList<>();
+    String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL " +
+                 "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID " +
+                 "LIMIT ? OFFSET ?";
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stm = conn.prepareStatement(sql)) {
+
+        stm.setInt(1, pageSize);
+        stm.setInt(2, (pageIndex - 1) * pageSize);
+        try (ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                User user = new User(
+                    rs.getInt("userID"),
+                    rs.getString("name"),
+                    rs.getBoolean("gender"),
+                    rs.getString("email"),
+                    rs.getString("username"),
+                    null, // Không lưu mật khẩu
+                    rs.getString("phone"),
+                    rs.getString("roleName"),
+                    rs.getString("imageURL")
+                );
+                users.add(user);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching users with pagination", ex);
+    }
+    return users;
+}
+
+public int getTotalUserCount() {
+    String sql = "SELECT COUNT(*) AS total FROM Users";
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stm = conn.prepareStatement(sql);
+         ResultSet rs = stm.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt("total");
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching total user count", ex);
+    }
+    return 0;
+}
+    public void addUser(User user) {
+        String sql = "INSERT INTO Users (name, gender, email, username, password, phone, roleID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, user.getName());
+            stm.setBoolean(2, user.isGender());
+            stm.setString(3, user.getEmail());
+            stm.setString(4, user.getUsername());
+            stm.setString(5, user.getPassword());
+            stm.setString(6, user.getPhone());
+            stm.setInt(7, Integer.parseInt(user.getRole())); // Chuyển đổi roleID thành số nguyên
+
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error adding new user", ex);
+        }
     }
 }
