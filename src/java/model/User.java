@@ -110,17 +110,5 @@ public class User {
     }
 
     // Override toString() for debugging or display purposes
-    @Override
-    public String toString() {
-        return "User{" +
-                "userID=" + userID +
-                ", name='" + name + '\'' +
-                ", gender=" + gender +
-                ", email='" + email + '\'' +
-                ", username='" + username + '\'' +
-                ", phone='" + phone + '\'' +
-                ", role=" + role +
-                ", imageURL='" + imageURL + '\'' +
-                '}';
-    }
+  
 }

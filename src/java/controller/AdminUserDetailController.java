@@ -4,12 +4,16 @@
  */
 package controller;
 
+import dal.UserDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.Role;
+import model.User;
 
 /**
  *
@@ -53,9 +57,16 @@ public class AdminUserDetailController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        int userID = Integer.parseInt(request.getParameter("id"));
+        UserDBContext db = new UserDBContext();
+        User user = db.getUserByID(userID);
+        List<Role> roles = db.getRoles();
+        
+        request.setAttribute("user", user);
+        request.setAttribute("roles", roles);
+        request.getRequestDispatcher("userDetails.jsp").forward(request, response);
     }
 
     /**
@@ -69,7 +80,19 @@ public class AdminUserDetailController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+               int userID = Integer.parseInt(request.getParameter("userID"));
+        String name = request.getParameter("name");
+        boolean gender = Boolean.parseBoolean(request.getParameter("gender"));
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String role = request.getParameter("role");
+
+        User user = new User(userID, name, gender, email, null, null, phone, role, null);
+
+        UserDBContext db = new UserDBContext();
+        db.updateUser(user);
+
+        response.sendRedirect("userList");
     }
 
     /**
