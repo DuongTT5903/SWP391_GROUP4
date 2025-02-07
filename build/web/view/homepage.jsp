@@ -3,8 +3,7 @@
     Created on : Jan 20, 2025, 7:59:05 AM
     Author     : yugio
 --%>
- 
-<%@page import="model.Blog"%>
+
 <%@page import="model.Blog"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" language="java"%>
@@ -33,16 +32,6 @@
                 
                 <!-- Có thể chèn phần login vào đây -->
  <c:choose>
-<<<<<<< Updated upstream:SWP391_GROUP4/web/view/homepage.jsp
-    <c:when test="${sessionScope.userRole == 'customer'}">
-        <!-- Content for customer role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Customer</a></b>
-        </h3>
-        <a href="customerDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-        <c:when test="${sessionScope.userRole == 'manager'}">
-=======
         <c:when test="${sessionScope.roleID == '4'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/customer" style="text-decoration: none">${sessionScope.user.username}</a></b>
@@ -104,7 +93,6 @@
 
  <c:choose>
         <c:when test="${sessionScope.roleID == '4'}">
->>>>>>> Stashed changes:web/view/homepage.jsp
             <h3 class="w3-wide public"> 
                 <b><a href="/customer" style="text-decoration: none">${sessionScope.user.username}</a></b>
             </h3>
@@ -135,97 +123,6 @@
         </c:otherwise>
     </c:choose>
 
-<<<<<<< Updated upstream:SWP391_GROUP4/web/view/homepage.jsp
-    <c:when test="${sessionScope.userRole == 'staff'}">
-        <!-- Content for staff role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Staff</a></b>
-        </h3>
-        <a href="staffDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-
-    <c:when test="${sessionScope.userRole == 'admin'}">
-        <!-- Content for admin role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Admin</a></b>
-        </h3>
-        <a href="adminDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-
-    <c:otherwise>
-        <!-- Default content if userRole is not recognized -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="login.jsp" style="text-decoration: none">LOGIN</a></b>
-        </h3>
-    </c:otherwise>
-</c:choose>
-   
-              </div>
-              <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-                <a href="#" class="w3-bar-item w3-button">Blogs</a>
-                <a href="#" class="w3-bar-item w3-button">Services</a>
-                <!--
-                <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
-                  Jeans <i class="fa fa-caret-down"></i>
-                </a>
-                <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-                  <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Skinny</a>
-                  <a href="#" class="w3-bar-item w3-button">Exa1</a>
-                  <a href="#" class="w3-bar-item w3-button">Bootcut</a>
-                  <a href="#" class="w3-bar-item w3-button">Straight</a>
-                </div>
-                -->
-                <a href="#" class="w3-bar-item w3-button">Reservations</a>
-              </div>
-              <a href="#footer" class="w3-bar-item w3-button w3-padding">Contact</a> 
-              <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Newsletter</a> 
-              <a href="#footer"  class="w3-bar-item w3-button w3-padding">Subscribe</a>
-            </nav>
-
-            <!-- Top menu on small screens -->
-            <header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
-                <div class="w3-bar-item w3-padding-24 w3-wide">
-                    
-<c:choose>
-    <c:when test="${sessionScope.userRole == 'customer'}">
-        <!-- Content for customer role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Customer</a></b>
-        </h3>
-        <a href="customerDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-        <c:when test="${sessionScope.userRole == 'manager'}">
-            <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Manager</a></b>
-        </h3>
-        <a href="customerDashboard.jsp">Go to Dashboard</a> 
-    </c:when>
-
-    <c:when test="${sessionScope.userRole == 'staff'}">
-        <!-- Content for staff role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Staff</a></b>
-        </h3>
-        <a href="staffDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-
-    <c:when test="${sessionScope.userRole == 'admin'}">
-        <!-- Content for admin role -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="#" style="text-decoration: none">Admin</a></b>
-        </h3>
-        <a href="adminDashboard.jsp">Go to Dashboard</a>
-    </c:when>
-
-    <c:otherwise>
-        <!-- Default content if userRole is not recognized -->
-        <h3 class="w3-wide public"> 
-                    <b><a href="login.jsp" style="text-decoration: none">LOGIN</a></b>
-        </h3>
-    </c:otherwise>
-</c:choose>
-=======
->>>>>>> Stashed changes:web/view/homepage.jsp
                     
                 </div>
               <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>

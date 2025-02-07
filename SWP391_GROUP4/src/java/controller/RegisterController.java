@@ -50,6 +50,7 @@ public class RegisterController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+<<<<<<< Updated upstream:SWP391_GROUP4/src/java/controller/RegisterController.java
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
@@ -67,6 +68,40 @@ public class RegisterController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         processRequest(request, response);
+=======
+     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        UserDBContext db = new UserDBContext();
+        List<User> users = db.getUsers();
+        request.setAttribute("users", users);
+        request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String roleID = request.getParameter("role");
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setRole(roleID); // Thiết lập roleID
+
+        UserDBContext db = new UserDBContext();
+        db.addUser(user);
+
+        // Sau khi thêm người dùng mới, lấy danh sách người dùng cập nhật
+        List<User> users = db.getUsers();
+        request.setAttribute("users", users);
+        request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
+>>>>>>> Stashed changes:src/java/controller/AdminUserList.java
     }
 
     /**

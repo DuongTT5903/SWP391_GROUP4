@@ -74,7 +74,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ServiceDetailController</servlet-name>
-        <url-pattern>/serivceDetail</url-pattern>
+        <url-pattern>/serviceDetail</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UserProfileController</servlet-name>
@@ -96,4 +96,17 @@
         <servlet-name>AdminUserList</servlet-name>
         <url-pattern>/admin/userList</url-pattern>
     </servlet-mapping>
+<<<<<<< Updated upstream:build/web/WEB-INF/web.xml
+=======
+   <filter>
+    <filter-name>BaseRequiredFilter</filter-name>
+    <filter-class>auth.BaseRequiredFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>BaseRequiredFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    
+>>>>>>> Stashed changes:web/WEB-INF/web.xml
 </web-app>
