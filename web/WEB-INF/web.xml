@@ -48,6 +48,10 @@
         <servlet-name>AdminUserList</servlet-name>
         <servlet-class>controller.AdminUserList</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ServiceListController</servlet-name>
+        <servlet-class>controller.ServiceListController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -96,14 +100,16 @@
         <servlet-name>AdminUserList</servlet-name>
         <url-pattern>/admin/userList</url-pattern>
     </servlet-mapping>
-   <filter>
-    <filter-name>BaseRequiredFilter</filter-name>
-    <filter-class>auth.BaseRequiredFilter</filter-class>
+    <filter>
+        <filter-name>BaseRequiredFilter</filter-name>
+        <filter-class>auth.BaseRequiredFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>BaseRequiredFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
-    
+    <servlet-mapping>
+        <servlet-name>ServiceListController</servlet-name>
+        <url-pattern>/serviceList</url-pattern>
+    </servlet-mapping>
 </web-app>
