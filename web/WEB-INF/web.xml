@@ -52,6 +52,10 @@
         <servlet-name>ServiceListController</servlet-name>
         <servlet-class>controller.ServiceListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerFeedbackListController</servlet-name>
+        <servlet-class>controller.ManagerFeedbackListController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -111,5 +115,9 @@
     <servlet-mapping>
         <servlet-name>ServiceListController</servlet-name>
         <url-pattern>/serviceList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerFeedbackListController</servlet-name>
+        <url-pattern>/manager/feedbackList</url-pattern>
     </servlet-mapping>
 </web-app>
