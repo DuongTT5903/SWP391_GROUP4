@@ -361,4 +361,27 @@ public int getTotalUserCount() {
             Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error updating user", ex);
         }
     }
+    public void updateUser1(User updateU) {
+    String sql = "UPDATE Users SET name = ?, username = ?, gender = ?, email = ?, phone = ? WHERE userID = ?";
+    
+    try (Connection conn = new DBContext().getConnection(); // Lấy kết nối mới
+         PreparedStatement stm = conn.prepareStatement(sql)) {
+
+        stm.setString(1, updateU.getName());
+        stm.setString(2, updateU.getUsername());
+        stm.setBoolean(3, updateU.isGender());
+        stm.setString(4, updateU.getEmail());
+        stm.setString(5, updateU.getPhone());
+        stm.setInt(6, updateU.getUserID());
+
+        int rowsUpdated = stm.executeUpdate();
+        if (rowsUpdated == 0) {
+            throw new SQLException("No user was updated. Check if the userID exists.");
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error updating user", ex);
+        throw new RuntimeException("Database update failed", ex);
+    }
+}
+
 }
