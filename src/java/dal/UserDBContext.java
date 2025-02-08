@@ -203,22 +203,6 @@ public class UserDBContext {
         return roleID;
     }
 
-    public void updateUser(User user) {
-        String sql = "UPDATE Users SET name = ?, gender = ?, email = ?, phone = ?, roleID = (SELECT roleID FROM Roles WHERE roleName = ?) " +
-                     "WHERE userID = ?";
-
-        try (PreparedStatement stm = connection.prepareStatement(sql)) {
-            stm.setString(1, user.getName());
-            stm.setBoolean(2, user.isGender());
-            stm.setString(3, user.getEmail());
-            stm.setString(4, user.getPhone());
-            stm.setString(5, user.getRole());
-            stm.setInt(6, user.getUserID());
-            stm.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error updating user", ex);
-        }
-    }
 
     public Role getRole(int roleID) {
         Role role = null;
@@ -312,6 +296,69 @@ public int getTotalUserCount() {
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error adding new user", ex);
+        }
+    }
+    public User getUserByIDUserDetail(int userID) {
+        User user = null;
+        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.password, u.phone, r.roleName " +
+                     "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID WHERE u.userID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setInt(1, userID);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    user = new User(
+                        userID,
+                        rs.getString("name"),
+                        rs.getBoolean("gender"),
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("phone"),
+                        rs.getString("roleName"),
+                        null
+                    );
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching user by ID", ex);
+        }
+        return user;
+    }
+
+    public void updateUser(User user) {
+        String sql = "UPDATE Users SET name = ?, gender = ?, email = ?, phone = ?, roleID = (SELECT roleID FROM Roles WHERE roleName = ?) " +
+                     "WHERE userID = ?";
+
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setString(1, user.getName());
+            stm.setBoolean(2, user.isGender());
+            stm.setString(3, user.getEmail());
+            stm.setString(4, user.getPhone());
+            stm.setString(5, user.getRole());
+            stm.setInt(6, user.getUserID());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error updating user", ex);
+        }
+    }
+    public void updateUserDetail(User user) {
+        String sql = "UPDATE Users SET name = ?, gender = ?, email = ?, username = ?, password = ?, phone = ?, roleID = (SELECT roleID FROM Roles WHERE roleName = ?) " +
+                     "WHERE userID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, user.getName());
+            stm.setBoolean(2, user.isGender());
+            stm.setString(3, user.getEmail());
+            stm.setString(4, user.getUsername());
+            stm.setString(5, user.getPassword());
+            stm.setString(6, user.getPhone());
+            stm.setString(7, user.getRole());
+            stm.setInt(8, user.getUserID());
+
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error updating user", ex);
         }
     }
 }

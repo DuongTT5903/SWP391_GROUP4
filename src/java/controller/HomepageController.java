@@ -5,6 +5,7 @@
 package controller;
 
 import dal.BlogDBContext;
+import dal.ServiceDBContext;
 import model.Blog;
 
 import jakarta.servlet.ServletException;
@@ -12,9 +13,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.PageContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import model.Service;
 
 /**
  *
@@ -63,6 +66,8 @@ public class HomepageController extends HttpServlet {
             throws ServletException, IOException {
         BlogDBContext blogDB = new BlogDBContext();
         List<Blog> blogs = null;
+        ServiceDBContext serviceDB  = new ServiceDBContext();
+        List<Service> services = null;
 
         try {
             blogs = blogDB.getAllBlogs();
@@ -71,6 +76,7 @@ public class HomepageController extends HttpServlet {
             } else {
                 request.setAttribute("blogs", blogs);
             }
+            
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
@@ -92,17 +98,20 @@ public class HomepageController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        ServiceDBContext serviceDB  = new ServiceDBContext();
+        List<Service> services = null;
+        try{
+            services = serviceDB.getServices();
+            request.setAttribute("services", services);
+        }catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
+        }
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    
 }

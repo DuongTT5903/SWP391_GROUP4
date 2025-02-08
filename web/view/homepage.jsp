@@ -308,7 +308,24 @@ function showSlides(n) {
   dots[slideIndex-1].className += " active";
 }
 </script>
+<div class="w3-container w3-text-grey" id="services">
+    <p>${services.size()} items</p>
+</div>
 
+<!-- Product grid -->
+<div class="w3-row w3-grayscale">
+    <c:forEach var="service" items="${services}">
+        <div class="w3-col l3 s6">
+            <div class="w3-container">
+                <img src="${service.imageURL}" style="width:100%">
+                <p>${service.serviceName}<br><b>$${service.servicePrice}</b></p>
+            </div>
+        </div>
+    </c:forEach>
+</div>
+
+
+  
 <!--               
               <div class="w3-container w3-text-grey" id="jeans">
                 <p>8 items</p>
