@@ -9,6 +9,45 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserDBContext {
+    public void changePassword(String pass, String Username) {
+    String sql = "UPDATE Users SET Password = ? WHERE Username = ?";
+    try {
+        int result = 0;
+        Connection conn = new DBContext().getConnection();
+        PreparedStatement st = conn.prepareStatement(sql);
+        
+        st.setString(1, pass);
+        st.setString(2, Username);
+        st.executeUpdate();
+    } catch (Exception e) {
+        System.out.println(e);
+    }
+}
+  public String getPasswordByUsername(String username) {
+    String password = null;
+    String sql = "SELECT password FROM users WHERE username = ?";
+    
+    try {
+        Connection conn = new DBContext().getConnection();
+        PreparedStatement st = conn.prepareStatement(sql);
+        st.setString(1, username);
+        
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            password = rs.getString("password");
+        }
+        
+        rs.close();
+        st.close();
+        conn.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    
+    return password;
+}
+
+
      public User checkAccountExisted(String username) throws SQLException {
     String sql = "SELECT * FROM Users WHERE Username = ?";
     try (Connection conn = new DBContext().getConnection();

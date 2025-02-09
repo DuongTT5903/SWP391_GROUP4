@@ -22,7 +22,7 @@
                             <div class="card-body p-5">
 
                                 <h1 class="fs-4 card-title fw-bold mb-4">Đổi mật khẩu</h1>
-                                <form action="changepass" method="POST" class="needs-validation"  autocomplete="off">
+                                <form action="change" method="POST" class="needs-validation"  autocomplete="off">
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="username">Mật khẩu cũ</label>
                                         <input id="username" type="password" class="form-control" name="oldpass"  required>
