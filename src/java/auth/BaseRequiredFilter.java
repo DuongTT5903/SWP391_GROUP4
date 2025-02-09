@@ -17,7 +17,9 @@ public class BaseRequiredFilter implements Filter {
     private static final List<String> PUBLIC_PAGES = Arrays.asList(
         "/login",         // Trang đăng nhập
         "/register",      // Trang đăng ký
-        "/homepage"       // Trang chủ
+        "/homepage",
+        "/serviceList"
+        // Trang chủ
                 // Giới thiệu
             // Thư mục hình ảnh
     );

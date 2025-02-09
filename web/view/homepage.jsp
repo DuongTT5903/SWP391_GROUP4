@@ -67,7 +67,7 @@
               </div>
               <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
                 <a href="#" class="w3-bar-item w3-button">Blogs</a>
-                <a href="#" class="w3-bar-item w3-button">Services</a>
+                <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
                 <!--
                 <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
                   Jeans <i class="fa fa-caret-down"></i>
