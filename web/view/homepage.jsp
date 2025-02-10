@@ -34,25 +34,33 @@
  <c:choose>
         <c:when test="${sessionScope.roleID == '4'}">
             <h3 class="w3-wide public"> 
-                <b><a href="/customer" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                               <br>
+ <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="customerDashboard.jsp">Go to Dashboard</a>
         </c:when>
         <c:when test="${sessionScope.roleID == '2'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/manager" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                               <br>
+ <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="managerDashboard.jsp">Go to Dashboard</a> 
         </c:when>
         <c:when test="${sessionScope.roleID == '3'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                               <br>
+ <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="staffDashboard.jsp">Go to Dashboard</a>
         </c:when>
         <c:when test="${sessionScope.roleID == '1'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                              <br>
+  <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="admin/userList">Go to User List</a>
         </c:when>
@@ -62,6 +70,7 @@
             </h3>
         </c:otherwise>
     </c:choose>
+            <br>
 
    
               </div>
@@ -94,35 +103,47 @@
  <c:choose>
         <c:when test="${sessionScope.roleID == '4'}">
             <h3 class="w3-wide public"> 
-                <b><a href="/customer" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="customerDashboard.jsp">Go to Dashboard</a>
+            
         </c:when>
         <c:when test="${sessionScope.roleID == '2'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/manager" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
+
+                <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="managerDashboard.jsp">Go to Dashboard</a> 
         </c:when>
         <c:when test="${sessionScope.roleID == '3'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
+
+                <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="staffDashboard.jsp">Go to Dashboard</a>
         </c:when>
         <c:when test="${sessionScope.roleID == '1'}">
             <h3 class="w3-wide public"> 
                 <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                <br>
+                <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
             <a href="admin/userList">Go to User List</a>
         </c:when>
         <c:otherwise>
             <h3 class="w3-wide public"> 
+                                <br>
+
                 <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
             </h3>
         </c:otherwise>
     </c:choose>
-
+            <br>
                     
                 </div>
               <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>

@@ -20,7 +20,14 @@ public class Blog {
 
     public Blog() {
     }
-
+public Blog(int blogID, String blogTitle, String blogDetail, String Category, boolean status, String imageLink) {
+        this.blogID = blogID;
+        this.blogTitle = blogTitle;
+        this.blogDetail = blogDetail;
+        this.Category = Category;
+        this.status = status;
+        this.imageLink = imageLink;
+    }
     public Blog(int blogID, String blogTitle, String blogDetail, String Category, boolean status, String imageLink, User author) {
         this.blogID = blogID;
         this.blogTitle = blogTitle;

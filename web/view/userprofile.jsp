@@ -64,6 +64,20 @@
         .form-container button.edit {
             background-color: #ff9800;
         }
+        .form-container .change-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 10px;
+}
+.form-container .change-link:hover {
+    background-color: #0056b3;
+}
+
     </style>
     <script>
         function toggleEdit() {
@@ -100,10 +114,12 @@
                 <option value="false" <%= user != null && !user.isGender() ? "selected" : "" %>>Nữ</option>
             </select><br>
 
+
             <div class="button-container">
-                <button type="button" onclick="toggleEdit()" class="edit">Chỉnh sửa</button>
-                <button type="submit">Lưu thay đổi</button>
-            </div>
+    <button type="button" onclick="toggleEdit()" class="edit">Chỉnh sửa</button>
+    <button type="submit">Lưu thay đổi</button>
+    <a href="<%= request.getContextPath() %>/change" class="change-link">Đổi mật khẩu</a>
+</div>
         </form>
     </div>
 </body>
