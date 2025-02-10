@@ -162,8 +162,13 @@
                                 <h3>${service.serviceName}</h3>
                             </a>
                             <p>${service.serviceDetail}</p>
-                            <p><span class="price">${service.servicePrice}00VNĐ</span> <span class="sale-price">${service.servicePrice*(100-service.salePrice)/100}
-                                    00VNĐ</span></p>
+                            <c:choose> <c:when test="${service.servicePrice != service.servicePrice*(100-service.salePrice)/100}">
+                                    <p><span class="price">${service.servicePrice}00VNĐ</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                    </c:otherwise>
+                                </c:choose>
+                                <span class="sale-price">${service.servicePrice*(100-service.salePrice)/100}00VNĐ</span></p>
                             <div class="buttons">
                                 <button class="btn btn-success" name="action" value="buy" onclick="addToCart(${service.serviceName})">Mua</button>
                                 <button class="btn btn-outline-secondary" name="action" value="feedback" onclick="giveFeedback(${service.serviceID})">Phản
