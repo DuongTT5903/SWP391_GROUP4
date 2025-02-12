@@ -1,4 +1,4 @@
-  /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -139,37 +139,29 @@ public class ServiceDBContext {
         return services;
     }
 
-    public Service getServiceByID(int ID) {
-        UserDBContext u = new UserDBContext();
+    public void addService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int authorID) {
         PreparedStatement stm = null;
-        ResultSet rs = null;
-        Service service = null;
-
         try {
-            String sql = "SELECT * FROM services WHERE ServiceID = ?;";
+            String sql = "INSERT INTO services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, imageURL, status, authorID)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, 1, ?);";
             stm = connection.prepareStatement(sql);
-            stm.setInt(1, ID);
-            rs = stm.executeQuery();
+            stm.setString(1, serviceName);
+            stm.setString(2, serviceDetail);
+            stm.setInt(3, categoryID);
+            stm.setFloat(4, servicePrice);
+            stm.setFloat(5, salePrice);
+            stm.setString(6, imageURL);
+            stm.setInt(7, authorID);
 
-            while (rs.next()) {
-                int serviceID = rs.getInt("ServiceID");
-                String serviceName = rs.getString("ServiceName");
-                String serviceDetail = rs.getString("ServiceDetail");
-                int categoryID = rs.getInt("CategoryID");
-                float servicePrice = rs.getFloat("ServicePrice");
-                float salePrice = rs.getFloat("SalePrice");
-                String imageURL = rs.getString("ImageURL");
-                boolean status = rs.getBoolean("status");
-                int authorID = rs.getInt("AuthorID");
-                service = new Service(serviceID, serviceName, serviceDetail, getServiceCategoryByID(categoryID), servicePrice, salePrice, imageURL, status, u.getUserByID(authorID));
+            // ✅ Use executeUpdate() instead
+            int rowsInserted = stm.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Service added successfully!");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error fetching users", ex);
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding service", ex);
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
                 if (stm != null) {
                     stm.close();
                 }
@@ -177,42 +169,7 @@ public class ServiceDBContext {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
             }
         }
-
-        return service;
     }
-
- public void addService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int authorID) {
-    PreparedStatement stm = null;
-    try {
-        String sql = "INSERT INTO services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, imageURL, status, authorID)"
-                   + " VALUES (?, ?, ?, ?, ?, ?, 1, ?);";
-        stm = connection.prepareStatement(sql);
-        stm.setString(1, serviceName);
-        stm.setString(2, serviceDetail);
-        stm.setInt(3, categoryID);
-        stm.setFloat(4, servicePrice);
-        stm.setFloat(5, salePrice);
-        stm.setString(6, imageURL);
-        stm.setInt(7, authorID);
-
-        // ✅ Use executeUpdate() instead
-        int rowsInserted = stm.executeUpdate();  
-        if (rowsInserted > 0) {
-            System.out.println("Service added successfully!");
-        }
-    } catch (SQLException ex) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding service", ex);
-    } finally {
-        try {
-            if (stm != null) {
-                stm.close();
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
-        }
-    }
-}
-
 
     public void updateService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int serviceID) {
         PreparedStatement stm = null;
@@ -247,44 +204,44 @@ public class ServiceDBContext {
     }
 
     public void deleteService(int ID) {
-    PreparedStatement stm = null;
+        PreparedStatement stm = null;
 
-    try {
-        String sql = "DELETE FROM services WHERE ServiceID = ?;";
-        stm = connection.prepareStatement(sql);
-        stm.setInt(1, ID);
-
-        int rowsAffected = stm.executeUpdate();
-
-        if (rowsAffected > 0) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Service ID {0} deleted successfully.", ID);
-        } else {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.WARNING, "No service found with ID {0}.", ID);
-        }
-
-    } catch (SQLException ex) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error deleting service with ID " + ID, ex);
-    } finally {
         try {
-            if (stm != null) {
-                stm.close();
+            String sql = "DELETE FROM services WHERE ServiceID = ?;";
+            stm = connection.prepareStatement(sql);
+            stm.setInt(1, ID);
+
+            int rowsAffected = stm.executeUpdate();
+
+            if (rowsAffected > 0) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Service ID {0} deleted successfully.", ID);
+            } else {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.WARNING, "No service found with ID {0}.", ID);
             }
+
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing statement", ex);
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error deleting service with ID " + ID, ex);
+        } finally {
+            try {
+                if (stm != null) {
+                    stm.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing statement", ex);
+            }
         }
     }
-}
-public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
+
+    public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
         List<Service> services = new ArrayList<>();
         String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
-                   + "JOIN servicecategories c ON s.categoryID = c.categoryID "
-                   + "JOIN users u ON s.authorID = u.userID "
-                   + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
-                   + "AND (? = 0 OR s.categoryID = ?) "
-                   + "LIMIT ?, ?";
+                + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+                + "JOIN users u ON s.authorID = u.userID "
+                + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
+                + "AND (? = 0 OR s.categoryID = ?) "
+                + "LIMIT ?, ?";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, search.isEmpty() ? null : "%" + search + "%");
             stmt.setString(2, search.isEmpty() ? null : "%" + search + "%");
@@ -297,7 +254,7 @@ public List<Service> getServices(String search, int categoryID, int page, int pa
             while (rs.next()) {
                 ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
                 User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
-                
+
                 Service service = new Service(
                         rs.getInt("serviceID"),
                         rs.getString("serviceName"),
@@ -316,9 +273,44 @@ public List<Service> getServices(String search, int categoryID, int page, int pa
         }
         return services;
     }
+
+    public Service getServiceByID(int ID) {
+        Service service = new Service();
+        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
+                + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+                + "JOIN users u ON s.authorID = u.userID "
+                + "WHERE (s.serviceID LIKE ?) ";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ID);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
+                User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+
+                service = new Service(
+                        rs.getInt("serviceID"),
+                        rs.getString("serviceName"),
+                        rs.getString("serviceDetail"),
+                        category,
+                        rs.getFloat("servicePrice"),
+                        rs.getFloat("salePrice"),
+                        rs.getString("imageURL"),
+                        rs.getBoolean("status"),
+                        author
+                );
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return service;
+    }
+
     public static void main(String[] args) {
         ServiceDBContext s = new ServiceDBContext();
         System.out.println(s.getServiceByID(1).getAuthor().getName());
     }
 }
-

@@ -56,6 +56,18 @@
         <servlet-name>ManagerFeedbackListController</servlet-name>
         <servlet-class>controller.ManagerFeedbackListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AddCart</servlet-name>
+        <servlet-class>controller.AddCart</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteCart</servlet-name>
+        <servlet-class>controller.DeleteCart</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ShoppingCartController</servlet-name>
+        <servlet-class>controller.ShoppingCartController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -119,5 +131,17 @@
     <servlet-mapping>
         <servlet-name>ManagerFeedbackListController</servlet-name>
         <url-pattern>/manager/feedbackList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AddCart</servlet-name>
+        <url-pattern>/AddCart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteCart</servlet-name>
+        <url-pattern>/DeleteCart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ShoppingCartController</servlet-name>
+        <url-pattern>/shoppingCart</url-pattern>
     </servlet-mapping>
 </web-app>

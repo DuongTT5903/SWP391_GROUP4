@@ -18,7 +18,11 @@ public class BaseRequiredFilter implements Filter {
         "/login",         // Trang đăng nhập
         "/register",      // Trang đăng ký
         "/homepage",
-        "/serviceList"
+        "/serviceList",
+        "/shoppingCart",
+            "/AddCart",
+            "/DeleteCart"
+        // Trang chủ
         // Trang chủ
                 // Giới thiệu
             // Thư mục hình ảnh
