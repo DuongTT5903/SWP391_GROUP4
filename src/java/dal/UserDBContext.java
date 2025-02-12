@@ -65,10 +65,7 @@ public class UserDBContext {
                 user.setUsername(rs.getString("Username"));
                 user.setPassword(rs.getString("Password"));
                 user.setPhone(rs.getString("Phone"));
-                Role role = new Role();
-                role.setRoleID(rs.getInt("RoleID"));
-                role.setRoleName(rs.getString("RoleName"));
-                user.setRole("role");
+              
                 return user;
             }
         }
@@ -97,11 +94,7 @@ public class UserDBContext {
             user.setUsername(rs.getString("Username"));
             user.setPassword(rs.getString("Password"));
             user.setPhone(rs.getString("Phone"));
-            // Thiết lập Role cho User
-            Role role = new Role();
-            role.setRoleID(rs.getInt("roleID"));
-            role.setRoleName(rs.getString("roleName"));
-            user.setRole("role");
+          
             return user;    
         }
     } catch (SQLException ex) {

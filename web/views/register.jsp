@@ -78,6 +78,7 @@
 
                             <div class="card-footer py-3 border-0 text-center" style="color: red; font-weight: bold;">
                                 <label  class="">${e}</label>
+                                   <label  class="">${message}</label>
                             </div>
 
 
