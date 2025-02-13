@@ -69,56 +69,56 @@ public class DeleteCart extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
- @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    String deleteID = request.getParameter("DeleteID");
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String deleteID = request.getParameter("DeleteID");
 
-    // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
-    if (deleteID == null || deleteID.trim().isEmpty()) {
-        response.sendRedirect(request.getContextPath() + "/shoppingCart");
-        return;
-    }
+        // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
+        if (deleteID == null || deleteID.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/shoppingCart");
+            return;
+        }
 
-    String cartData = "";
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("cart")) {
-                cartData = cookie.getValue();
-                break;
+        String cartData = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("cart")) {
+                    cartData = cookie.getValue();
+                    break;
+                }
             }
         }
-    }
 
-    // Nếu giỏ hàng trống, chuyển hướng luôn
-    if (cartData.isEmpty()) {
+        // Nếu giỏ hàng trống, chuyển hướng luôn
+        if (cartData.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/shoppingCart");
+            return;
+        }
+
+        // Chuyển dữ liệu giỏ hàng thành danh sách
+        ArrayList<String> cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
+
+        // Xóa phần tử có ID tương ứng
+        boolean removed = cartItems.removeIf(item -> item.equals(deleteID));
+
+        // Nếu không xóa được (tức là không tìm thấy ID), chuyển hướng lại
+        if (!removed) {
+            response.sendRedirect(request.getContextPath() + "/shoppingCart");
+            return;
+        }
+
+        // Cập nhật giỏ hàng mới
+        String updatedCartData = cartItems.isEmpty() ? "" : String.join("-", cartItems);
+
+        // Nếu giỏ hàng trống, xóa cookie
+        Cookie cartCookie = new Cookie("cart", updatedCartData);
+        cartCookie.setMaxAge(cartItems.isEmpty() ? 0 : 60 * 60 * 24);
+        response.addCookie(cartCookie);
+
+        // Chuyển hướng về trang giỏ hàng
         response.sendRedirect(request.getContextPath() + "/shoppingCart");
-        return;
     }
-
-    // Chuyển dữ liệu giỏ hàng thành danh sách
-    ArrayList<String> cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
-
-    // Xóa phần tử có ID tương ứng
-    boolean removed = cartItems.removeIf(item -> item.equals(deleteID));
-
-    // Nếu không xóa được (tức là không tìm thấy ID), chuyển hướng lại
-    if (!removed) {
-        response.sendRedirect(request.getContextPath() + "/shoppingCart");
-        return;
-    }
-
-    // Cập nhật giỏ hàng mới
-    String updatedCartData = cartItems.isEmpty() ? "" : String.join("-", cartItems);
-
-    // Nếu giỏ hàng trống, xóa cookie
-    Cookie cartCookie = new Cookie("cart", updatedCartData);
-    cartCookie.setMaxAge(cartItems.isEmpty() ? 0 : 60 * 60 * 24); 
-    response.addCookie(cartCookie);
-
-    // Chuyển hướng về trang giỏ hàng
-    response.sendRedirect(request.getContextPath() + "/shoppingCart");
-}
 
 }

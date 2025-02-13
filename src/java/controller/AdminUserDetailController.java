@@ -38,7 +38,7 @@ public class AdminUserDetailController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminUserDetailController</title>");            
+            out.println("<title>Servlet AdminUserDetailController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet AdminUserDetailController at " + request.getContextPath() + "</h1>");
@@ -82,6 +82,7 @@ public class AdminUserDetailController extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/admin/userList");
     }
+
     /**
      * Returns a short description of the servlet.
      *

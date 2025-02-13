@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import dal.UserDBContext;
 import model.User;
 
-
 public class RegisterController extends HttpServlet {
 
     @Override
@@ -32,7 +31,7 @@ public class RegisterController extends HttpServlet {
         String pass = request.getParameter("pass");
 
         UserDBContext account = new UserDBContext();
-        
+
         try {
             // Kiểm tra tài khoản hoặc email đã tồn tại chưa
             if (account.checkEmailExisted(email) != null) {
@@ -46,18 +45,16 @@ public class RegisterController extends HttpServlet {
                 return;
             }
 
-           
-
             // Nếu tài khoản & email chưa tồn tại, tiến hành đăng ký
             account.signup(fullname, gender, email, user, pass, phone);
             request.setAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
             request.getRequestDispatcher("views/register.jsp").forward(request, response);
 
         } catch (Exception ex) {
-    Logger.getLogger(RegisterController.class.getName()).log(Level.SEVERE, "Lỗi khi đăng ký: ", ex);
-    request.setAttribute("e", "Lỗi hệ thống: " + ex.getMessage()); // Gán nội dung lỗi vào e
-    request.getRequestDispatcher("views/register.jsp").forward(request, response);
-}
+            Logger.getLogger(RegisterController.class.getName()).log(Level.SEVERE, "Lỗi khi đăng ký: ", ex);
+            request.setAttribute("e", "Lỗi hệ thống: " + ex.getMessage()); // Gán nội dung lỗi vào e
+            request.getRequestDispatcher("views/register.jsp").forward(request, response);
+        }
 
     }
 

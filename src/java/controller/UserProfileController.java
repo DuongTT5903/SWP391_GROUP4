@@ -14,10 +14,10 @@ public class UserProfileController extends HttpServlet {
     private UserDBContext userDB = new UserDBContext(); // Khai báo biến toàn cục
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-          String service = request.getParameter("service");
+
+        String service = request.getParameter("service");
         if (service == null) {
             service = "profile";
         }
@@ -41,16 +41,16 @@ public class UserProfileController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String service = request.getParameter("service");
 
         if ("edit".equals(service)) {
             // Lấy dữ liệu từ request
-           String idParam = request.getParameter("id");
-             int id = Integer.parseInt(idParam);
+            String idParam = request.getParameter("id");
+            int id = Integer.parseInt(idParam);
             String name = request.getParameter("name");
             String genderParam = request.getParameter("gender");
-            String username=request.getParameter("username");
+            String username = request.getParameter("username");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
 
@@ -60,23 +60,21 @@ public class UserProfileController extends HttpServlet {
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
 
-  if (user != null) {
-        
-    user.setName(name);
-    user.setUsername(username);
-    user.setGender(gender);
-    user.setEmail(email);
-    user.setPhone(phone);
-   user.setUserID(id);
- 
-userDB.updateUser1(user);
- response.sendRedirect(request.getContextPath() + "/userProfile");
-    
+            if (user != null) {
 
-     
-}    else {
-    response.sendRedirect(request.getContextPath() + "/userProfile");
-}
+                user.setName(name);
+                user.setUsername(username);
+                user.setGender(gender);
+                user.setEmail(email);
+                user.setPhone(phone);
+                user.setUserID(id);
+
+                userDB.updateUser1(user);
+                response.sendRedirect(request.getContextPath() + "/userProfile");
+
+            } else {
+                response.sendRedirect(request.getContextPath() + "/userProfile");
+            }
         }
     }
 

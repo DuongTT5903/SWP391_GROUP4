@@ -22,7 +22,9 @@ import model.Service;
  * @author admin
  */
 public class ServiceListController extends HttpServlet {
- private static final int PAGE_SIZE = 6; 
+
+    private static final int PAGE_SIZE = 6;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -61,7 +63,7 @@ public class ServiceListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
+        String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         int categoryID = request.getParameter("category") != null ? Integer.parseInt(request.getParameter("category")) : 0;
         int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
 
@@ -76,8 +78,6 @@ public class ServiceListController extends HttpServlet {
         request.getRequestDispatcher("/view/serviceList.jsp").forward(request, response);
     }
 
-    
-
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -89,12 +89,12 @@ public class ServiceListController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    // Default behavior: Load service list
-       ServiceDBContext s=new ServiceDBContext();
-    List<Service> services = s.getServices(); // Fetch services from DAO
-    request.setAttribute("services", services); // Set it in the request scope
-   request.getRequestDispatcher("/view/serviceList.jsp").forward(request, response);
-}
+        // Default behavior: Load service list
+        ServiceDBContext s = new ServiceDBContext();
+        List<Service> services = s.getServices(); // Fetch services from DAO
+        request.setAttribute("services", services); // Set it in the request scope
+        request.getRequestDispatcher("/view/serviceList.jsp").forward(request, response);
+    }
 
     /**
      * Returns a short description of the servlet.

@@ -18,7 +18,7 @@ public class DBContext {
                 String user = "root"; // Database username
                 String pass = "123456"; // Database password
                 String url = "jdbc:mysql://localhost:3306/childrencare?autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true";
-                
+
                 // Load MySQL JDBC driver (MySQL 8.x)
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connection = DriverManager.getConnection(url, user, pass);

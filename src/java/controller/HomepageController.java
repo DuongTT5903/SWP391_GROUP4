@@ -43,7 +43,7 @@ public class HomepageController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet HomepageController</title>");            
+            out.println("<title>Servlet HomepageController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet HomepageController at " + request.getContextPath() + "</h1>");
@@ -61,13 +61,13 @@ public class HomepageController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-     @Override
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         BlogDBContext blogDB = new BlogDBContext();
         List<Blog> blogs = null;
-        ServiceDBContext serviceDB  = new ServiceDBContext();
-        List<Service> services = null;
+        ServiceDBContext serviceDB = new ServiceDBContext();
+        
 
         try {
             blogs = blogDB.getAllBlogs();
@@ -76,16 +76,24 @@ public class HomepageController extends HttpServlet {
             } else {
                 request.setAttribute("blogs", blogs);
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
+        }
+        
+        List<Service> services = serviceDB.getServicesHomepage();
+        
+        if (services == null || services.isEmpty()) {
+            request.setAttribute("errorMessage", "No services available at the moment.");
+        } else {
+            request.setAttribute("services", services);
         }
 
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 
-
+        
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -98,12 +106,12 @@ public class HomepageController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServiceDBContext serviceDB  = new ServiceDBContext();
+        ServiceDBContext serviceDB = new ServiceDBContext();
         List<Service> services = null;
-        try{
+        try {
             services = serviceDB.getServices();
             request.setAttribute("services", services);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
         }
@@ -113,5 +121,5 @@ public class HomepageController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-    
+
 }

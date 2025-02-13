@@ -20,27 +20,23 @@ import model.User;
  * @author admin
  */
 public class BlogDBContext {
-    
+
     private static Connection connection = DBContext.getConnection();
 
     public List<Blog> getAllBlogs() {
         List<Blog> blogs = new ArrayList<>();
-        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name " +
-                     "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stm = conn.prepareStatement(sql);
-             ResultSet rs = stm.executeQuery()) {
+        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
+                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
                 Blog blog = new Blog(
-                    rs.getInt("BlogID"),
-                    rs.getString("BlogTitle"),
-                    rs.getString("BlogDetail"),
-                    rs.getString("Category"),
-                    rs.getBoolean("status"),
-                    rs.getString("imglink")
-
-
+                        rs.getInt("BlogID"),
+                        rs.getString("BlogTitle"),
+                        rs.getString("BlogDetail"),
+                        rs.getString("Category"),
+                        rs.getBoolean("status"),
+                        rs.getString("imglink")
                 );
                 blogs.add(blog);
             }
@@ -48,6 +44,6 @@ public class BlogDBContext {
             Logger.getLogger(BlogDBContext.class.getName()).log(Level.SEVERE, "Error fetching blogs", ex);
         }
         return blogs;
-    
-}
+
+    }
 }

@@ -4,6 +4,7 @@
  */
 package dal;
 
+import static dal.DBContext.getConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -308,7 +309,31 @@ public class ServiceDBContext {
         }
         return service;
     }
+    public List<Service> getServicesHomepage() {
+        List<Service> services = new ArrayList<>();
+        String sql = "SELECT serviceID, serviceName, serviceDetail, servicePrice, salePrice, imageURL, status FROM Service";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
+            while (rs.next()) {
+                Service service = new Service();
+                service.setServiceID(rs.getInt("serviceID"));
+                service.setServiceName(rs.getString("serviceName"));
+                service.setServiceDetail(rs.getString("serviceDetail"));
+                service.setServicePrice(rs.getFloat("servicePrice"));
+                service.setSalePrice(rs.getFloat("salePrice"));
+                service.setImageURL(rs.getString("imageURL"));
+                service.setStatus(rs.getBoolean("status"));
+
+                services.add(service);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return services;
+    }
     public static void main(String[] args) {
         ServiceDBContext s = new ServiceDBContext();
         System.out.println(s.getServiceByID(1).getAuthor().getName());

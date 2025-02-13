@@ -38,7 +38,7 @@ public class LoginController extends HttpServlet {
             session.setAttribute("roleID", roleID); // Lưu roleID vào session
 
             // Redirect to the welcome page or a user dashboard after login
-         response.sendRedirect(request.getContextPath() + "/homepage");
+            response.sendRedirect(request.getContextPath() + "/homepage");
 
         } else {
             // If login fails, set an error message and return to the login page

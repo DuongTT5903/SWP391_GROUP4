@@ -34,7 +34,7 @@ public class ForgetPasswordController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ForgetPasswordController</title>");            
+            out.println("<title>Servlet ForgetPasswordController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ForgetPasswordController at " + request.getContextPath() + "</h1>");

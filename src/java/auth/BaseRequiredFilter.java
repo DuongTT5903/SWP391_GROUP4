@@ -15,25 +15,27 @@ import java.util.Map;
 public class BaseRequiredFilter implements Filter {
 
     private static final List<String> PUBLIC_PAGES = Arrays.asList(
-        "/login",         // Trang đăng nhập
-        "/register",      // Trang đăng ký
-        "/homepage",
-        "/serviceList",
-        "/shoppingCart",
+            "/login", // Trang đăng nhập
+            "/register", // Trang đăng ký
+            "/homepage",
+            "/serviceList",
+            "/shoppingCart",
             "/AddCart",
             "/DeleteCart"
-        // Trang chủ
-        // Trang chủ
-                // Giới thiệu
-            // Thư mục hình ảnh
+    // Trang chủ
+    // Trang chủ
+    // Giới thiệu
+    // Thư mục hình ảnh
     );
     private static final Map<String, String> ROLE_ALLOWED_PATHS = new HashMap<>();
+
     static {
         ROLE_ALLOWED_PATHS.put("1", "/admin");
         ROLE_ALLOWED_PATHS.put("2", "/manager");
         ROLE_ALLOWED_PATHS.put("3", "/staff");
         ROLE_ALLOWED_PATHS.put("4", "/customer");
     }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
@@ -43,7 +45,7 @@ public class BaseRequiredFilter implements Filter {
         // Lấy thông tin user và roleID từ session
         Object user = (session != null) ? session.getAttribute("user") : null;
         String roleID = (session != null) ? (String) session.getAttribute("roleID") : null;
-        
+
         // Lấy đường dẫn hiện tại
         String path = req.getRequestURI().replace(req.getContextPath(), ""); // Xóa context path để so sánh chính xác
 
@@ -55,7 +57,7 @@ public class BaseRequiredFilter implements Filter {
             res.sendRedirect(req.getContextPath() + "/homepage");
             return;
         }
-           if (path.endsWith(".jsp")) {
+        if (path.endsWith(".jsp")) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Truy cập bị từ chối");
             return;
         }
@@ -67,19 +69,19 @@ public class BaseRequiredFilter implements Filter {
                 return;
             }
         }
-         if (user != null && (roleID == null || !"2".equals(roleID))) {
+        if (user != null && (roleID == null || !"2".equals(roleID))) {
             if (path.startsWith("/manager")) { // Kiểm tra nếu truy cập trang admin
                 res.sendRedirect(req.getContextPath() + "/homepage"); // Chuyển về trang user
                 return;
             }
         }
-                  if (user != null && (roleID == null || !"3".equals(roleID))) {
+        if (user != null && (roleID == null || !"3".equals(roleID))) {
             if (path.startsWith("/staff")) { // Kiểm tra nếu truy cập trang admin
                 res.sendRedirect(req.getContextPath() + "/homepage"); // Chuyển về trang user
                 return;
             }
         }
-                           if (user != null && (roleID == null || !"4".equals(roleID))) {
+        if (user != null && (roleID == null || !"4".equals(roleID))) {
             if (path.startsWith("/customer")) { // Kiểm tra nếu truy cập trang admin
                 res.sendRedirect(req.getContextPath() + "/homepage"); // Chuyển về trang user
                 return;
@@ -89,6 +91,7 @@ public class BaseRequiredFilter implements Filter {
         // Tiếp tục xử lý request nếu hợp lệ
         chain.doFilter(request, response);
     }
+
     private boolean hasAccess(String roleID, String path) {
         String allowedPath = ROLE_ALLOWED_PATHS.get(roleID);
         return allowedPath != null && path.startsWith(allowedPath);

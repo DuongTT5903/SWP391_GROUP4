@@ -37,7 +37,7 @@ public class ChangePasswordController extends HttpServlet {
 
         HttpSession session = request.getSession();
         User u = (User) session.getAttribute("user");
-        
+
         if (u == null) {
             response.sendRedirect("login.jsp");
             return;

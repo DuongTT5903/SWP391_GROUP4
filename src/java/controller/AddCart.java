@@ -74,42 +74,43 @@ public class AddCart extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-     String serviceID = request.getParameter("serviceID");
+        String serviceID = request.getParameter("serviceID");
 
-    // Retrieve current cart data from cookies
-    String cartData = "";
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("cart")) {
-                cartData = cookie.getValue();
-                break;
+        // Retrieve current cart data from cookies
+        String cartData = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("cart")) {
+                    cartData = cookie.getValue();
+                    break;
+                }
             }
+        }
+
+        // Add serviceID to the cart data
+        if (!cartData.isEmpty()) {
+            cartData += "-";
+        }
+        cartData += serviceID;
+
+        // Create a new cart cookie
+        Cookie cartCookie = new Cookie("cart", cartData);
+        cartCookie.setMaxAge(60 * 60 * 24); // Cookie lasts 1 day
+        response.addCookie(cartCookie);
+
+        // Redirect back to the page where the form was submitted from
+        String referer = request.getHeader("Referer");
+        if (referer != null) {
+            response.sendRedirect(referer);
+        } else {
+
+            // Chuyển hướng về trang danh sách dịch vụ hoặc hiển thị thông báo thành công
+            response.sendRedirect(request.getContextPath() + "/serviceList");
+
         }
     }
 
-    // Add serviceID to the cart data
-    if (!cartData.isEmpty()) {
-        cartData += "-";
-    }
-    cartData += serviceID;
-
-    // Create a new cart cookie
-    Cookie cartCookie = new Cookie("cart", cartData);
-    cartCookie.setMaxAge(60 * 60 * 24); // Cookie lasts 1 day
-    response.addCookie(cartCookie);
-
-    // Redirect back to the page where the form was submitted from
-    String referer = request.getHeader("Referer");
-    if (referer != null) {
-        response.sendRedirect(referer);
-    } else {
-
-        // Chuyển hướng về trang danh sách dịch vụ hoặc hiển thị thông báo thành công
-        response.sendRedirect(request.getContextPath() + "/serviceList");
-    
-    }
-    }
     /**
      * Returns a short description of the servlet.
      *
