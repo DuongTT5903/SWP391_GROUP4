@@ -42,11 +42,11 @@
         </c:when>
         <c:when test="${sessionScope.roleID == '2'}">
             <h3 class="w3-wide public"> 
-                <b><a href="/manager" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
                                <br>
  <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
-            <a href="managerDashboard.jsp">Go to Dashboard</a> 
+             <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to feedback</a> 
         </c:when>
         <c:when test="${sessionScope.roleID == '3'}">
             <h3 class="w3-wide public"> 
@@ -116,7 +116,7 @@
 
                 <a href="${pageContext.request.contextPath}/logout">Logout</a>
             </h3>
-            <a href="managerDashboard.jsp">Go to Dashboard</a> 
+            <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to feedback</a> 
         </c:when>
         <c:when test="${sessionScope.roleID == '3'}">
             <h3 class="w3-wide public"> 
