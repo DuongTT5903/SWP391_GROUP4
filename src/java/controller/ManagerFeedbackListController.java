@@ -5,12 +5,16 @@
 
 package controller;
 
+import dal.FeedbackDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+import model.Feedback;
 
 /**
  *
@@ -51,10 +55,27 @@ public class ManagerFeedbackListController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    FeedbackDBContext feedbackDB = new FeedbackDBContext();
+    String userIDParam = request.getParameter("userID");
+    List<Feedback> feedbacks;
+
+    if (userIDParam != null && !userIDParam.isEmpty()) {
+        try {
+            int userID = Integer.parseInt(userIDParam);
+            feedbacks = feedbackDB.getFeedbacksByUser(userID);
+        } catch (NumberFormatException e) {
+            feedbacks = new ArrayList<>();
+            request.setAttribute("error", "Invalid User ID format!");
+        }
+    } else {
+        feedbacks = feedbackDB.getAllFeedbacks();
     }
+
+    request.setAttribute("feedbacks", feedbacks);
+    request.getRequestDispatcher("view/managerlistfeedback.jsp").forward(request, response);
+}
+
 
     /**
      * Handles the HTTP <code>POST</code> method.
