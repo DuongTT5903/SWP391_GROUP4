@@ -69,47 +69,56 @@ public class DeleteCart extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String deleteID = request.getParameter("DeleteID");
-        String cartData = "";
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("cart")) {
-                    cartData = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        // Convert cart data to ArrayList
-        ArrayList<String> cartItems = new ArrayList<>();
-        if (!cartData.isEmpty()) {
-            cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
-        }
-        cartItems.remove(deleteID);
+ @Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    String deleteID = request.getParameter("DeleteID");
 
-        String updatedCartData = "";
-        for (int i = 0; i < cartItems.size() - 1; i++) {
-            updatedCartData += cartItems.get(i) + "-";
-        }
-        updatedCartData += cartItems.get(cartItems.size() - 1);
-        Cookie cartCookie = new Cookie("cart", updatedCartData);
-        cartCookie.setMaxAge(60 * 60 * 24); // Cookie expires in 1 day
-        response.addCookie(cartCookie);
+    // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
+    if (deleteID == null || deleteID.trim().isEmpty()) {
         response.sendRedirect(request.getContextPath() + "/shoppingCart");
-    
+        return;
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    String cartData = "";
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("cart")) {
+                cartData = cookie.getValue();
+                break;
+            }
+        }
+    }
+
+    // Nếu giỏ hàng trống, chuyển hướng luôn
+    if (cartData.isEmpty()) {
+        response.sendRedirect(request.getContextPath() + "/shoppingCart");
+        return;
+    }
+
+    // Chuyển dữ liệu giỏ hàng thành danh sách
+    ArrayList<String> cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
+
+    // Xóa phần tử có ID tương ứng
+    boolean removed = cartItems.removeIf(item -> item.equals(deleteID));
+
+    // Nếu không xóa được (tức là không tìm thấy ID), chuyển hướng lại
+    if (!removed) {
+        response.sendRedirect(request.getContextPath() + "/shoppingCart");
+        return;
+    }
+
+    // Cập nhật giỏ hàng mới
+    String updatedCartData = cartItems.isEmpty() ? "" : String.join("-", cartItems);
+
+    // Nếu giỏ hàng trống, xóa cookie
+    Cookie cartCookie = new Cookie("cart", updatedCartData);
+    cartCookie.setMaxAge(cartItems.isEmpty() ? 0 : 60 * 60 * 24); 
+    response.addCookie(cartCookie);
+
+    // Chuyển hướng về trang giỏ hàng
+    response.sendRedirect(request.getContextPath() + "/shoppingCart");
+}
 
 }
