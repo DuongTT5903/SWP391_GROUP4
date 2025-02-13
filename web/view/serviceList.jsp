@@ -193,7 +193,7 @@
                 <ul class="pagination justify-content-center">
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                         <a class="page-link"
-                           href="${pageContext.request.contextPath}\serviceList?page=0&search=&category=0">« Trang
+                           href="${pageContext.request.contextPath}\serviceList?page=1&search=&category=0">« Trang
                             trước</a>
                     </li>
                     <li class="page-item">
