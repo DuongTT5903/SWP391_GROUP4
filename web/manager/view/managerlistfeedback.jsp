@@ -11,24 +11,34 @@
         th { background-color: #f2f2f2; }
         .search-box { margin-bottom: 20px; }
     </style>
+    <script>
+        function searchFeedbacks() {
+            let input = document.getElementById('username').value.toLowerCase();
+            let table = document.getElementById('feedbackTable');
+            let rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName('td');
+                let username = cells[7].textContent.toLowerCase();
+                if (username.indexOf(input) > -1) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Feedback List</h1>
 
     <!-- Search Form -->
-    <form action="/manager/feedbackList" method="GET" class="search-box">
-        <label for="userID">Search by User ID:</label>
-        <input type="text" id="userID" name="userID" placeholder="Enter User ID">
-        <button type="submit">Search</button>
-        <a href="/manager/feedbackList"><button type="button">Reset</button></a>
-    </form>
+    <div class="search-box">
+        <label for="username">Search by Username:</label>
+        <input type="text" id="username" name="username" onkeyup="searchFeedbacks()" placeholder="Enter Username">
+    </div>
 
-    <!-- Error Message -->
-    <c:if test="${not empty error}">
-        <p style="color: red;">${error}</p>
-    </c:if>
-
-    <table>
+    <table id="feedbackTable">
         <thead>
             <tr>
                 <th>Feedback ID</th>
@@ -42,27 +52,18 @@
             </tr>
         </thead>
         <tbody>
-            <c:choose>
-                <c:when test="${empty feedbacks}">
-                    <tr>
-                        <td colspan="8" style="text-align:center;">No feedbacks found.</td>
-                    </tr>
-                </c:when>
-                <c:otherwise>
-                    <c:forEach var="feedback" items="${feedbacks}">
-                        <tr>
-                            <td>${feedback.id}</td>
-                            <td>${feedback.feedbackDetail}</td>
-                            <td>${feedback.customerID}</td>
-                            <td>${feedback.rated}</td>  
-                            <td>${feedback.services.serviceID}</td>
-                            <td>${feedback.creationDate}</td>
-                            <td>${feedback.status ? 'Active' : 'Inactive'}</td>
-                            <td>${feedback.user.name}</td>
-                        </tr>
-                    </c:forEach>
-                </c:otherwise>
-            </c:choose>
+            <c:forEach var="feedback" items="${feedbacks}">
+                <tr>
+                    <td>${feedback.id}</td>
+                    <td>${feedback.feedbackDetail}</td>
+                    <td>${feedback.customerID}</td>
+                    <td>${feedback.rated}</td>  
+                    <td>${feedback.services.serviceID}</td>
+                    <td>${feedback.creationDate}</td>
+                    <td>${feedback.status ? 'Active' : 'Inactive'}</td>
+                    <td>${feedback.user.name}</td>
+                </tr>
+            </c:forEach>
         </tbody>
     </table>
 </body>
