@@ -309,24 +309,40 @@ public class ServiceDBContext {
         }
         return service;
     }
+    
+
+    // Lấy tất cả dịch vụ để hiển thị trên trang homepage
     public List<Service> getServicesHomepage() {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT serviceID, serviceName, serviceDetail, servicePrice, salePrice, imageURL, status FROM Service";
-        
+        String sql = """
+                     SELECT s.ServiceID, s.ServiceName, s.ServiceDetail,sc.CategoryID, sc.CategoryName, sc.CategoryDetail, s.ServicePrice,s.ImageURL, 
+                     s.status, s.SalePrice, s.authorID FROM services s Inner join servicecategories sc on s.CategoryID = sc.CategoryID""";
+
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Service service = new Service();
-                service.setServiceID(rs.getInt("serviceID"));
-                service.setServiceName(rs.getString("serviceName"));
-                service.setServiceDetail(rs.getString("serviceDetail"));
-                service.setServicePrice(rs.getFloat("servicePrice"));
-                service.setSalePrice(rs.getFloat("salePrice"));
-                service.setImageURL(rs.getString("imageURL"));
-                service.setStatus(rs.getBoolean("status"));
-
+                ServiceCategory category = new ServiceCategory(
+                rs.getInt("CategoryID"),
+                rs.getString("CategoryDetail"),
+                rs.getString("CategoryName")
+                );
+                
+                User author = new User();
+                author.setUserID(rs.getInt("authorID")); 
+                
+                Service service = new Service(
+                rs.getInt("ServiceID"),
+                rs.getString("ServiceName"),
+                rs.getString("ServiceDetail"),
+                category,
+                rs.getFloat("ServicePrice"),
+                rs.getFloat("SalePrice"),
+                rs.getString("ImageURL"),
+                rs.getBoolean("status"),
+                author
+                );
                 services.add(service);
             }
         } catch (SQLException e) {

@@ -66,8 +66,6 @@ public class HomepageController extends HttpServlet {
             throws ServletException, IOException {
         BlogDBContext blogDB = new BlogDBContext();
         List<Blog> blogs = null;
-        ServiceDBContext serviceDB = new ServiceDBContext();
-        
 
         try {
             blogs = blogDB.getAllBlogs();
@@ -81,19 +79,22 @@ public class HomepageController extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
         }
-        
-        List<Service> services = serviceDB.getServicesHomepage();
-        
-        if (services == null || services.isEmpty()) {
-            request.setAttribute("errorMessage", "No services available at the moment.");
-        } else {
-            request.setAttribute("services", services);
-        }
 
+        List<Service> services = null;
+        ServiceDBContext serviceDB = new ServiceDBContext();
+        try {
+            services = serviceDB.getServicesHomepage();
+            if (services == null || services.isEmpty()) {
+                request.setAttribute("errorMessage", "No services available at the moment.");
+            } else {
+                request.setAttribute("services", services);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching services.");
+        }
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
-
-        
 
     /**
      * Handles the HTTP <code>POST</code> method.
@@ -107,14 +108,10 @@ public class HomepageController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ServiceDBContext serviceDB = new ServiceDBContext();
-        List<Service> services = null;
-        try {
-            services = serviceDB.getServices();
-            request.setAttribute("services", services);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "An error occurred while fetching blogs.");
-        }
+        List<Service> services = serviceDB.getServicesHomepage();
+
+        request.setAttribute("services", services);
+        request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 
     @Override
