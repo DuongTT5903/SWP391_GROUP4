@@ -164,9 +164,9 @@
                 <p class="w3-left">Children Care</p>
                 <p class="w3-right">
 
-                    <!--
-                    <i class="fa fa-search"></i>
-                    -->
+                    
+                    <i class="tamthoi" ><a href="${pageContext.request.contextPath}/shoppingCart">Your Cart</a></i>
+                    
 
 
             </header>
@@ -361,11 +361,17 @@
                     <div class="w3-col l3 s6">
                         <div class="w3-container">
                             <img src="${service.imageURL}" style="width:100%">
-                            <p>${service.serviceName}<br><b>$${service.servicePrice}</b></p>
+                            <p>${service.serviceName}<br><b>${service.servicePrice}00 VND</b></p>
+                            <form action="AddCart" method="post">
+                                <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                <button type="submit" class="w3-button w3-black">Add to Cart</button>
+                            </form>
                         </div>
                     </div>
                 </c:forEach>
             </div>
+            <br>
+            
 
 
 

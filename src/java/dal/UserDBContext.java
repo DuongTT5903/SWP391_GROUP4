@@ -410,5 +410,21 @@ public class UserDBContext {
             throw new RuntimeException("Database update failed", ex);
         }
     }
+   public boolean isUserExists(String username, String email) {
+    try (Connection conn = DBContext.getConnection()) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, username);
+        stmt.setString(2, email);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return false;
+}
+
 
 }
