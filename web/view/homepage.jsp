@@ -164,9 +164,9 @@
                 <p class="w3-left">Children Care</p>
                 <p class="w3-right">
 
-                    
+
                     <i class="tamthoi" ><a href="${pageContext.request.contextPath}/shoppingCart">Your Cart</a></i>
-                    
+
 
 
             </header>
@@ -292,8 +292,8 @@
 
             <div class="slideshow-container">
                 <% if (blogs != null && !blogs.isEmpty()) { %>
-                <% for (int i = 0; i < blogs.size(); i++) { %>
-                <% String imgFileName = "homepage_slider1." + (i + 1) + ".jpg";%>
+                <% for (int i = 0; i < blogs.size(); i++) {%>
+
                 <div class="mySlides fade">
                     <a href="${pageContext.request.contextPath}/blog?blogID=<%= blogs.get(i).getBlogID()%>">
                         <img src="<%= blogs.get(i).getImageLink()%>" alt="" style="width:100%; height: 600px;"/>
@@ -360,8 +360,11 @@
                 <c:forEach var="service" items="${services}">
                     <div class="w3-col l3 s6">
                         <div class="w3-container">
-                            <img src="${service.imageURL}" style="width:100%">
-                            <p>${service.serviceName}<br><b>${service.servicePrice}00 VND</b></p>
+                            <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}">
+                                <img src="${service.imageURL}" style="width:100%">
+                                <p>${service.serviceName}<br><b>${service.servicePrice}00 VND</b></p>
+                            </a>
+
                             <form action="AddCart" method="post">
                                 <input type="hidden" name="serviceID" value="${service.serviceID}">
                                 <button type="submit" class="w3-button w3-black">Add to Cart</button>
@@ -370,8 +373,9 @@
                     </div>
                 </c:forEach>
             </div>
+
             <br>
-            
+
 
 
 
