@@ -23,6 +23,10 @@ public class BlogDBContext {
 
     private static Connection connection = DBContext.getConnection();
 
+    /**
+     *
+     * @return
+     */
     public List<Blog> getAllBlogs() {
         List<Blog> blogs = new ArrayList<>();
         String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
@@ -45,5 +49,84 @@ public class BlogDBContext {
         }
         return blogs;
 
+    }
+//    public List<Blog> getAllPosts() {
+//        List<Blog> posts = new ArrayList<>();
+//        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
+//                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID";
+//        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+//           
+//            while (rs.next()) {
+//                User author = new User(rs.getInt("UserID"), rs.getString("Name"));
+//                Blog post = new Blog(
+//                        rs.getInt("BlogID"),
+//                        rs.getString("BlogTitle"),
+//                        rs.getString("BlogDetail"),
+//                        rs.getString("Category"),
+//                        rs.getBoolean("status"),
+//                        rs.getString("imglink"),
+//                         author
+//                );
+//                
+//                
+//                posts.add(post);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return posts;
+//    }
+
+    /**
+     *
+     * @param blogID
+     * @return
+     */
+//    public Blog getBlogById(int blogID) {
+//        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
+//                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE BlogID=?";
+//        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+//            stmt.setInt(1, blogID);
+//            try (ResultSet rs = stmt.executeQuery()) {
+//                if (rs.next()) {
+//                    return new Blog(
+//                            rs.getInt("BlogID"),
+//                            rs.getString("BlogTitle"),
+//                            rs.getString("BlogDetail"),
+//                            rs.getString("Category"),
+//                            rs.getBoolean("status"),
+//                            rs.getString("imglink"),
+//                            new User(rs.getInt("AuthorID"))
+//                    );
+//                }
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+    public Blog getBlogById(int blogID) {
+        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
+                   + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE b.BlogID = ?";
+        try (PreparedStatement stm = connection.prepareStatement(sql)) {
+            stm.setInt(1, blogID);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    User author = new User(rs.getInt("UserID"), rs.getString("Name"));
+                    return new Blog(
+                            rs.getInt("BlogID"),
+                            rs.getString("BlogTitle"),
+                            rs.getString("BlogDetail"),
+                            rs.getString("Category"),
+                            rs.getBoolean("status"),
+                            rs.getString("imglink"),
+                            author
+                    );
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 }

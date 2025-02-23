@@ -14,6 +14,13 @@ import jakarta.servlet.http.HttpSession;
  */
 public class ChangePasswordController extends HttpServlet {
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -25,12 +32,26 @@ public class ChangePasswordController extends HttpServlet {
         }
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("views/changepassword.jsp").forward(request, response);
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -63,6 +84,10 @@ public class ChangePasswordController extends HttpServlet {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getServletInfo() {
         return "Servlet xử lý đổi mật khẩu.";

@@ -8,8 +8,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author yugio
+ */
 public class UserDBContext {
 
+    /**
+     *
+     * @param pass
+     * @param Username
+     */
     public void changePassword(String pass, String Username) {
         String sql = "UPDATE Users SET Password = ? WHERE Username = ?";
         try {
@@ -25,6 +34,11 @@ public class UserDBContext {
         }
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
     public String getPasswordByUsername(String username) {
         String password = null;
         String sql = "SELECT password FROM users WHERE username = ?";
@@ -49,6 +63,12 @@ public class UserDBContext {
         return password;
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     * @throws SQLException
+     */
     public User checkAccountExisted(String username) throws SQLException {
         String sql = "SELECT * FROM Users WHERE Username = ?";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -77,6 +97,12 @@ public class UserDBContext {
         return null;
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     * @throws Exception
+     */
     public User checkEmailExisted(String email) throws Exception {
         try {
             // Mở kết nối
@@ -106,6 +132,15 @@ public class UserDBContext {
         return null;
     }
 
+    /**
+     *
+     * @param name
+     * @param gender
+     * @param email
+     * @param user
+     * @param pass
+     * @param phone
+     */
     public void signup(String name, String gender, String email, String user, String pass, String phone) {
         try {
             // Connect to MySQL database
@@ -130,6 +165,12 @@ public class UserDBContext {
 
     private static Connection connection = DBContext.getConnection();
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @return
+     */
     public User getUserByUsername(String username, String password) {
         User user = null;
         String query = "SELECT userID, name, gender, email, username, phone, roleID, imageURL "
@@ -161,6 +202,10 @@ public class UserDBContext {
         return user;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<User> getUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL "
@@ -187,6 +232,11 @@ public class UserDBContext {
         return users;
     }
 
+    /**
+     *
+     * @param userID
+     * @return
+     */
     public User getUserByID(int userID) {
         User user = null;
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL "
@@ -215,6 +265,12 @@ public class UserDBContext {
         return user;
     }
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @return
+     */
     public String getRoleIDByUsernameAndPassword(String username, String password) {
         String roleID = null;
         String query = "SELECT roleID FROM users WHERE BINARY username = ? AND BINARY password = ?";
@@ -233,6 +289,11 @@ public class UserDBContext {
         return roleID;
     }
 
+    /**
+     *
+     * @param roleID
+     * @return
+     */
     public Role getRole(int roleID) {
         Role role = null;
         String sql = "SELECT roleID, roleName FROM Roles WHERE roleID = ?";
@@ -250,6 +311,10 @@ public class UserDBContext {
         return role;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Role> getRoles() {
         List<Role> roles = new ArrayList<>();
         String sql = "SELECT roleID, roleName FROM Roles";
@@ -265,6 +330,12 @@ public class UserDBContext {
         return roles;
     }
 
+    /**
+     *
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
     public List<User> getUsers(int pageIndex, int pageSize) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL "
@@ -296,6 +367,10 @@ public class UserDBContext {
         return users;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getTotalUserCount() {
         String sql = "SELECT COUNT(*) AS total FROM Users";
         try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
@@ -308,6 +383,10 @@ public class UserDBContext {
         return 0;
     }
 
+    /**
+     *
+     * @param user
+     */
     public void addUser(User user) {
         String sql = "INSERT INTO Users (name, gender, email, username, password, phone, roleID) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
@@ -325,6 +404,11 @@ public class UserDBContext {
         }
     }
 
+    /**
+     *
+     * @param userID
+     * @return
+     */
     public User getUserByIDUserDetail(int userID) {
         User user = null;
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.password, u.phone, r.roleName "
@@ -352,6 +436,10 @@ public class UserDBContext {
         return user;
     }
 
+    /**
+     *
+     * @param user
+     */
     public void updateUser(User user) {
         String sql = "UPDATE Users SET name = ?, gender = ?, email = ?, phone = ?, roleID = (SELECT roleID FROM Roles WHERE roleName = ?) "
                 + "WHERE userID = ?";
@@ -369,6 +457,10 @@ public class UserDBContext {
         }
     }
 
+    /**
+     *
+     * @param user
+     */
     public void updateUserDetail(User user) {
         String sql = "UPDATE Users SET name = ?, gender = ?, email = ?, username = ?, password = ?, phone = ?, roleID = (SELECT roleID FROM Roles WHERE roleName = ?) "
                 + "WHERE userID = ?";
@@ -388,6 +480,10 @@ public class UserDBContext {
         }
     }
 
+    /**
+     *
+     * @param updateU
+     */
     public void updateUser1(User updateU) {
         String sql = "UPDATE Users SET name = ?, username = ?, gender = ?, email = ?, phone = ? WHERE userID = ?";
 
@@ -410,7 +506,14 @@ public class UserDBContext {
             throw new RuntimeException("Database update failed", ex);
         }
     }
-   public boolean isUserExists(String username, String email) {
+
+    /**
+     *
+     * @param username
+     * @param email
+     * @return
+     */
+    public boolean isUserExists(String username, String email) {
     try (Connection conn = DBContext.getConnection()) {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
         PreparedStatement stmt = conn.prepareStatement(sql);

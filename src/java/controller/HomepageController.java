@@ -114,6 +114,10 @@ public class HomepageController extends HttpServlet {
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getServletInfo() {
         return "Short description";

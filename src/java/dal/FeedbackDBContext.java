@@ -12,8 +12,16 @@ import model.Feedback;
 import model.Service;
 import model.User;
 
+/**
+ *
+ * @author yugio
+ */
 public class FeedbackDBContext {
 
+    /**
+     *
+     * @return
+     */
     public List<Feedback> getAllFeedbacks() {
         List<Feedback> feedbackList = new ArrayList<>();
         String sql = "SELECT f.FeedbackID, f.FeedbackDetail, f.CustomerID, f.Rated, f.imglink, "
@@ -42,6 +50,11 @@ public class FeedbackDBContext {
         return feedbackList;
     }
 
+    /**
+     *
+     * @param userID
+     * @return
+     */
     public List<Feedback> getFeedbacksByUser(int userID) {
         List<Feedback> feedbackList = new ArrayList<>();
         String sql = "SELECT f.FeedbackID, f.FeedbackDetail, f.CustomerID, f.Rated, f.imglink, "

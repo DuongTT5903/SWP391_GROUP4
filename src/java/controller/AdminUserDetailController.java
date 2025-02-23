@@ -65,6 +65,13 @@ public class AdminUserDetailController extends HttpServlet {
         request.getRequestDispatcher("/admin/userDetail.jsp").forward(request, response);
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int userID = Integer.parseInt(request.getParameter("userID"));

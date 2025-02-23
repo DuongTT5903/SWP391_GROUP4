@@ -68,6 +68,10 @@
         <servlet-name>ShoppingCartController</servlet-name>
         <servlet-class>controller.ShoppingCartController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerPostListController</servlet-name>
+        <servlet-class>controller.ManagerPostListController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -143,5 +147,9 @@
     <servlet-mapping>
         <servlet-name>ShoppingCartController</servlet-name>
         <url-pattern>/shoppingCart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerPostListController</servlet-name>
+        <url-pattern>/manager/postList</url-pattern>
     </servlet-mapping>
 </web-app>

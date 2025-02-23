@@ -6,11 +6,23 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author yugio
+ */
 public class DBContext {
 
+    /**
+     *
+     */
     protected static Connection connection;
 
     // Ensure that the method is static and public
+
+    /**
+     *
+     * @return
+     */
     public static Connection getConnection() {
         try {
             // Check if the connection is null or closed

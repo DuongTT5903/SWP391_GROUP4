@@ -26,6 +26,10 @@ public class ServiceDBContext {
 
     private static Connection connection = DBContext.getConnection();
 
+    /**
+     *
+     * @return
+     */
     public List<ServiceCategory> getServiceCategories() {
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -63,6 +67,11 @@ public class ServiceDBContext {
         return serviceCategories;
     }
 
+    /**
+     *
+     * @param ID
+     * @return
+     */
     public ServiceCategory getServiceCategoryByID(int ID) {
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -97,6 +106,10 @@ public class ServiceDBContext {
         return serviceCategory;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Service> getServices() {
         UserDBContext u = new UserDBContext();
         PreparedStatement stm = null;
@@ -140,6 +153,16 @@ public class ServiceDBContext {
         return services;
     }
 
+    /**
+     *
+     * @param serviceName
+     * @param serviceDetail
+     * @param categoryID
+     * @param servicePrice
+     * @param salePrice
+     * @param imageURL
+     * @param authorID
+     */
     public void addService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int authorID) {
         PreparedStatement stm = null;
         try {
@@ -172,6 +195,16 @@ public class ServiceDBContext {
         }
     }
 
+    /**
+     *
+     * @param serviceName
+     * @param serviceDetail
+     * @param categoryID
+     * @param servicePrice
+     * @param salePrice
+     * @param imageURL
+     * @param serviceID
+     */
     public void updateService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int serviceID) {
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -204,6 +237,10 @@ public class ServiceDBContext {
         }
     }
 
+    /**
+     *
+     * @param ID
+     */
     public void deleteService(int ID) {
         PreparedStatement stm = null;
 
@@ -233,6 +270,14 @@ public class ServiceDBContext {
         }
     }
 
+    /**
+     *
+     * @param search
+     * @param categoryID
+     * @param page
+     * @param pageSize
+     * @return
+     */
     public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
         List<Service> services = new ArrayList<>();
         String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
@@ -275,6 +320,11 @@ public class ServiceDBContext {
         return services;
     }
 
+    /**
+     *
+     * @param ID
+     * @return
+     */
     public Service getServiceByID(int ID) {
         Service service = new Service();
         String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
@@ -312,6 +362,11 @@ public class ServiceDBContext {
     
 
     // Lấy tất cả dịch vụ để hiển thị trên trang homepage
+
+    /**
+     *
+     * @return
+     */
     public List<Service> getServicesHomepage() {
         List<Service> services = new ArrayList<>();
         String sql = """
@@ -350,6 +405,11 @@ public class ServiceDBContext {
         }
         return services;
     }
+
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         ServiceDBContext s = new ServiceDBContext();
         System.out.println(s.getServiceByID(1).getAuthor().getName());

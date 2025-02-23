@@ -11,25 +11,52 @@ package model;
 public class Role {
    private int roleID;
     private String roleName;
-     public Role() {
+
+    /**
+     *
+     */
+    public Role() {
        
     }
+
+    /**
+     *
+     * @param roleid
+     * @param rolename
+     */
     public Role(int roleid, String rolename) {
         this.roleID = roleid;
         this.roleName = rolename;
     }
+
+    /**
+     *
+     * @return
+     */
     public int getRoleID() {
         return roleID;
     }
 
+    /**
+     *
+     * @param roleID
+     */
     public void setRoleID(int roleID) {
         this.roleID = roleID;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getRoleName() {
         return roleName;
     }
 
+    /**
+     *
+     * @param roleName
+     */
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }

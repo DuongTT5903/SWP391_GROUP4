@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @author yugio
+ */
 @WebFilter("/*") // Áp dụng cho tất cả request
 public class BaseRequiredFilter implements Filter {
 
@@ -36,6 +40,14 @@ public class BaseRequiredFilter implements Filter {
         ROLE_ALLOWED_PATHS.put("4", "/customer");
     }
 
+    /**
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @throws IOException
+     * @throws ServletException
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;

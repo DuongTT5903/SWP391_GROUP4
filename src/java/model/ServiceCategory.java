@@ -10,34 +10,68 @@ package model;
  */
 public class ServiceCategory {
 
+    /**
+     *
+     * @param categoryID
+     * @param categoryDetail
+     * @param categoryName
+     */
     public ServiceCategory(int categoryID, String categoryDetail, String categoryName) {
         this.categoryID = categoryID;
         this.categoryDetail = categoryDetail;
         this.categoryName = categoryName;
     }
-public ServiceCategory() {
+
+    /**
+     *
+     */
+    public ServiceCategory() {
     }
 
+    /**
+     *
+     * @return
+     */
     public int getCategoryID() {
         return categoryID;
     }
 
+    /**
+     *
+     * @param categoryID
+     */
     public void setCategoryID(int categoryID) {
         this.categoryID = categoryID;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCategoryDetail() {
         return categoryDetail;
     }
 
+    /**
+     *
+     * @param categoryDetail
+     */
     public void setCategoryDetail(String categoryDetail) {
         this.categoryDetail = categoryDetail;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getCategoryName() {
         return categoryName;
     }
 
+    /**
+     *
+     * @param categoryName
+     */
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }

@@ -7,12 +7,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
+/**
+ *
+ * @author yugio
+ */
 public class LoginController extends HttpServlet {
 
     // Create an instance of UserDBContext to interact with the database
     private UserDBContext userDBContext = new UserDBContext();
 
     // Handle GET requests, typically used to display the login page
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Forward to the login page
@@ -20,6 +32,14 @@ public class LoginController extends HttpServlet {
     }
 
     // Handle POST requests for processing the login
+
+    /**
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Get username and password from the form submission

@@ -20,10 +20,46 @@ public class User {
     private String imageURL;
 
     // Default constructor
+
+    /**
+     *
+     */
     public User() {
     }
 
+    /**
+     *
+     * @param userID
+     */
+    public User(int userID) {
+        this.userID = userID;
+    }
+
+    public User(int userID, String name) {
+        this.userID = userID;
+        this.name = name;
+    }
+    public User(int userID, String name, String role) {
+        this.userID = userID;
+        this.name = name;
+        this.role = role;
+    }
+
+    
     // Parameterized constructor
+
+    /**
+     *
+     * @param userID
+     * @param name
+     * @param gender
+     * @param email
+     * @param username
+     * @param password
+     * @param phone
+     * @param role
+     * @param imageURL
+     */
     public User(int userID, String name, boolean gender, String email, String username, String password, String phone, String role, String imageURL) {
         this.userID = userID;
         this.name = name;
@@ -37,74 +73,147 @@ public class User {
     }
 
     // Getters and setters
+
+    /**
+     *
+     * @return
+     */
     public int getUserID() {
         return userID;
     }
 
+    /**
+     *
+     * @param userID
+     */
     public void setUserID(int userID) {
         this.userID = userID;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isGender() {
         return gender;
     }
 
+    /**
+     *
+     * @param gender
+     */
     public void setGender(boolean gender) {
         this.gender = gender;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     *
+     * @param email
+     */
     public void setEmail(String email) {
         this.email = email;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     *
+     * @param username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     *
+     * @param password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPhone() {
         return phone;
     }
 
+    /**
+     *
+     * @param phone
+     */
     public void setPhone(String phone) {
         this.phone = phone;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getRole() {
         return role;
     }
 
+    /**
+     *
+     * @param role
+     */
     public void setRole(String role) {
         this.role = role;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getImageURL() {
         return imageURL;
     }
 
+    /**
+     *
+     * @param imageURL
+     */
     public void setImageURL(String imageURL) {
         this.imageURL = imageURL;
     }
