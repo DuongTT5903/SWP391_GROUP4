@@ -70,21 +70,69 @@
                         </span>
                     </td>
                     <td>
-                        <a href="editPost.jsp?id=<%= p.getId()%>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="viewPost.jsp?id=<%= p.getId()%>" class="btn btn-info btn-sm">View</a>
+
+                        <a href="postDetail?action=view&id=<%= p.getId()%>" class="btn btn-info btn-sm">View</a>
                         <% if (p.isStatus()) {%>
-                        <a href="hidePost.jsp?id=<%= p.getId()%>" class="btn btn-danger btn-sm">Hide</a>
+                        <a href="postList?action=hide&id=<%= p.getId()%>" class="btn btn-danger btn-sm">Hide</a>
                         <% } else {%>
-                        <a href="showPost.jsp?id=<%= p.getId()%>" class="btn btn-success btn-sm">Show</a>
+                        <a href="postList?action=show&id=<%= p.getId()%>" class="btn btn-success btn-sm">Show</a>
                         <% } %>
                     </td>
                 </tr>
                 <% }%>
             </tbody>
         </table>
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    <%
+                        int currentPage = (request.getAttribute("currentPage") != null)
+                                ? (int) request.getAttribute("currentPage") : 1;
+                        int totalPages = (request.getAttribute("totalPages") != null)
+                                ? (int) request.getAttribute("totalPages") : 1;
+                        String queryString = "";
+                        // Giả sử bạn cần nối thêm các tham số filter vào liên kết, có thể xử lý thêm nếu cần.
+                    %>
+                    <% if (currentPage > 1) {%>
+                    <li class="page-item">
+                        <a class="page-link" href="postList?page=<%= currentPage - 1%><%= queryString%>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <% } else { %>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <% } %>
+
+                    <% for (int i = 1; i <= totalPages; i++) {%>
+                    <li class="page-item <%= (i == currentPage) ? "active" : ""%>">
+                        <a class="page-link" href="postList?page=<%= i%><%= queryString%>"><%= i%></a>
+                    </li>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) {%>
+                    <li class="page-item">
+                        <a class="page-link" href="postList?page=<%= currentPage + 1%><%= queryString%>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <% } else { %>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <% }%>
+                </ul>
+            </nav>
+        </div>
+
 
         <div class="text-end">
-            <a href="addPost.jsp" class="btn btn-success">Add New Post</a>
+            <a href="addPost" class="btn btn-success">Add New Post</a>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

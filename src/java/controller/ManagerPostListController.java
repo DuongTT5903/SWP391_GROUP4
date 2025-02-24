@@ -18,6 +18,23 @@ public class ManagerPostListController extends HttpServlet {
         List<String> categories = postDAO.getCategories();
         List<String> authors = postDAO.getAuthors();
 
+//        String idParam = request.getParameter("id");
+//        Integer postId = (idParam != null && !idParam.isEmpty()) ? Integer.parseInt(idParam) : null;
+        String action = request.getParameter("action");
+        String idParam = request.getParameter("id");
+        if (action != null && idParam != null && !idParam.isEmpty()) {
+            int postId = Integer.parseInt(idParam);
+            // "view" và "show" đều đặt trạng thái là Active (true)
+            if ("view".equalsIgnoreCase(action) || "show".equalsIgnoreCase(action)) {
+                postDAO.updatePostStatus(postId, true);
+            } else if ("hide".equalsIgnoreCase(action)) {
+                postDAO.updatePostStatus(postId, false);
+            }
+            // Chuyển hướng lại để tránh việc lặp lại thao tác khi refresh trang
+            response.sendRedirect(request.getContextPath() + "/manager/postList");
+            return;
+        }
+
         // Lấy các tham số lọc từ request
         String filterCategory = request.getParameter("category");
         String filterAuthor = request.getParameter("author");
@@ -35,6 +52,10 @@ public class ManagerPostListController extends HttpServlet {
         } catch (NumberFormatException e) {
             page = 1; // Nếu có lỗi, mặc định về trang 1
         }
+        int totalPosts = postDAO.countPosts(filterCategory, filterAuthor, filterStatus, searchTitle); // phương thức đếm bài viết
+        int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
+
+        request.setAttribute("totalPages", totalPages);
 
         // Gọi DAO để lấy danh sách bài viết
         List<Post> posts = postDAO.getPosts(filterCategory, filterAuthor, filterStatus, searchTitle, sortBy, page, pageSize);
@@ -45,6 +66,7 @@ public class ManagerPostListController extends HttpServlet {
         request.setAttribute("posts", posts);
         request.setAttribute("currentPage", page);
         request.setAttribute("pageSize", pageSize);
+
         request.getRequestDispatcher("postList.jsp").forward(request, response);
     }
 

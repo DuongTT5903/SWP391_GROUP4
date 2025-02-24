@@ -67,8 +67,12 @@
 
     <body style="padding: 50px;">
 
-        <h2>Danh sách người dùng</h2>
-
+        
+                <div class="d-flex justify-content-between">
+                    <h2>Danh sách người dùng</h2>
+                    <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary" style="margin-bottom:10px">Quay lại</a>
+                        
+                </div>
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm kiếm tên người dùng.." title="Nhập tên người dùng">
         <div id="table-container" style="max-height: 500px; overflow-y: auto;">
 

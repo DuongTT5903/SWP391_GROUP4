@@ -72,6 +72,10 @@
         <servlet-name>ManagerPostListController</servlet-name>
         <servlet-class>controller.ManagerPostListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerAddPost</servlet-name>
+        <servlet-class>controller.ManagerAddPost</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -151,5 +155,9 @@
     <servlet-mapping>
         <servlet-name>ManagerPostListController</servlet-name>
         <url-pattern>/manager/postList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerAddPost</servlet-name>
+        <url-pattern>/manager/addPost</url-pattern>
     </servlet-mapping>
 </web-app>
