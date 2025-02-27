@@ -9,8 +9,8 @@
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ForgetPasswordController</servlet-name>
-        <servlet-class>controller.ForgetPasswordController</servlet-class>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <servlet-class>controller.ResetPasswordController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LoginController</servlet-name>
@@ -85,8 +85,8 @@
         <url-pattern>/change</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ForgetPasswordController</servlet-name>
-        <url-pattern>/forget</url-pattern>
+        <servlet-name>ResetPasswordController</servlet-name>
+        <url-pattern>/reset</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
