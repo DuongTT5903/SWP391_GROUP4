@@ -62,6 +62,21 @@ public class RegisterController extends HttpServlet {
                 request.getRequestDispatcher("views/register.jsp").forward(request, response);
                 return;
             }
+           if (user.contains(" ") || pass.contains(" ") ) {
+    // Nếu có khoảng trắng, trả về thông báo lỗi
+            request.setAttribute("e", "Tài khoản hoặc Mật khẩu không được chứa dấu cách");
+            request.getRequestDispatcher("views/register.jsp").forward(request, response);
+                return;
+    
+           }
+           // Biểu thức chính quy để kiểm tra email có domain là @gmail.com
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@gmail\\.com$";
+
+        if (!email.matches(emailRegex)) {
+            request.setAttribute("e","Email không hợp lệ! Phải có domain @gmail.com.");
+             request.getRequestDispatcher("views/register.jsp").forward(request, response);
+                return;
+        }
 
             // Nếu tài khoản & email chưa tồn tại, tiến hành đăng ký
             account.signup(fullname, gender, email, user, pass, phone);
@@ -75,6 +90,8 @@ public class RegisterController extends HttpServlet {
         }
 
     }
+
+
 
     /**
      *
