@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import model.Service;
 import model.ServiceCategory;
 import dal.UserDBContext;
+import java.util.Arrays;
 import model.User;
 
 /**
@@ -278,48 +279,58 @@ public class ServiceDBContext {
      * @param pageSize
      * @return
      */
-    public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
-        List<Service> services = new ArrayList<>();
-        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
-                + "JOIN servicecategories c ON s.categoryID = c.categoryID "
-                + "JOIN users u ON s.authorID = u.userID "
-                + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
-                + "AND (? = 0 OR s.categoryID = ?) "
-                + "LIMIT ?, ?";
-
-        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, search.isEmpty() ? null : "%" + search + "%");
-            stmt.setString(2, search.isEmpty() ? null : "%" + search + "%");
-            stmt.setInt(3, categoryID);
-            stmt.setInt(4, categoryID);
-            stmt.setInt(5, (page - 1) * pageSize);
-            stmt.setInt(6, pageSize);
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
-                User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
-
-                Service service = new Service(
-                        rs.getInt("serviceID"),
-                        rs.getString("serviceName"),
-                        rs.getString("serviceDetail"),
-                        category,
-                        rs.getFloat("servicePrice"),
-                        rs.getFloat("salePrice"),
-                        rs.getString("imageURL"),
-                        rs.getBoolean("status"),
-                        author
-                );
-                services.add(service);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return services;
+   public List<Service> getServices(String search, int categoryID, int page, int pageSize, String type, String sort) {
+    List<Service> services = new ArrayList<>();
+    
+    // Validate sorting input
+    List<String> validSortColumns = Arrays.asList("serviceName", "servicePrice", "salePrice", "serviceid"); // Allowed columns
+    List<String> validSortOrders = Arrays.asList("ASC", "DESC"); // Allowed sorting orders
+    
+   
+    if (!validSortOrders.contains(sort)) {
+        sort = "DESC"; // Default sorting order
     }
 
+    // Dynamic SQL (Avoiding ORDER BY placeholder issue)
+    String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
+            + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+            + "JOIN users u ON s.authorID = u.userID "
+            + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
+            + "AND (? = 0 OR s.categoryID = ?) "
+            + "ORDER BY " + type + " " + sort + " " // Safe dynamic ORDER BY
+            + "LIMIT ?, ?";
+
+    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        stmt.setString(1, search.isEmpty() ? null : "%" + search + "%");
+        stmt.setString(2, search.isEmpty() ? null : "%" + search + "%");
+        stmt.setInt(3, categoryID);
+        stmt.setInt(4, categoryID);
+        stmt.setInt(5, (page - 1) * pageSize);
+        stmt.setInt(6, pageSize);
+        
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
+            User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+
+            Service service = new Service(
+                    rs.getInt("serviceID"),
+                    rs.getString("serviceName"),
+                    rs.getString("serviceDetail"),
+                    category,
+                    rs.getFloat("servicePrice"),
+                    rs.getFloat("salePrice"),
+                    rs.getString("imageURL"),
+                    rs.getBoolean("status"),
+                    author
+            );
+            services.add(service);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return services;
+}
     /**
      *
      * @param ID
