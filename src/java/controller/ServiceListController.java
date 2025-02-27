@@ -66,9 +66,47 @@ public class ServiceListController extends HttpServlet {
         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         int categoryID = request.getParameter("category") != null ? Integer.parseInt(request.getParameter("category")) : 0;
         int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-
+        String t=request.getParameter("sort");
+        String sort;
+        String type;
+        if(t==null){
+            sort="ASC";
+            type="serviceid";
+        }else{
+         switch (t) {
+            case "servicename1" -> {
+                sort="ASC";
+                type="servicename";
+            }
+            case "servicename2" -> {
+                sort="DESC";
+                type="servicename";
+            }
+            case "price1" -> {
+                sort="ASC";
+                type="serviceprice";
+            }
+            case "price2" -> {
+                sort="DESC";
+                type="serviceprice";
+            }
+            case "saleprice1" -> {
+                sort="ASC";
+                type="saleprice";
+            }
+            case "saleprice2" -> {
+                sort="DESC";
+                type="saleprice";
+            }
+            default -> {
+                sort="ASC";
+                type="serviceid";
+            }
+        }
+        }
         ServiceDBContext serviceDAO = new ServiceDBContext();
-        List<Service> services = serviceDAO.getServices(search, categoryID, page, PAGE_SIZE);
+        
+        List<Service> services = serviceDAO.getServices(search, categoryID, page, PAGE_SIZE,type,sort);
 
         request.setAttribute("services", services);
         request.setAttribute("currentPage", page);

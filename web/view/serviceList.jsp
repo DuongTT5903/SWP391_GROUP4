@@ -144,11 +144,19 @@
             <!-- Hộp tìm kiếm -->
             <form action="serviceList" method="GET" class="mb-4 d-flex gap-2">
 
-                <select name="category" class="form-select " style="width: 500px;">
+                <select name="category" class="form-select " style="width: 250px;">
                     <option value="0">Tất cả loại</option>
                     <option value="1">Nha Khoa</option>
                     <option value="2">Y tế tổng quát</option>
                     <option value="3">Tiêm chủng</option>
+                </select>
+                 <select name="sort" class="form-select " style="width: 250px;">
+                    <option value="servicename1">A->Z</option>
+                    <option value="servicename2">Z->A</option>
+                    <option value="price1">Giá tăng dần</option>
+                    <option value="price2">Giá giảm dần</option>
+                    <option value="saleprice1">Sale tăng dần</option>
+                    <option value="saleprice2">Sale giảm dần</option>
                 </select>
                 <div class="input-group ">
                     <input type="text" name="search" class="form-control" placeholder="Tìm kiếm..." value="">
