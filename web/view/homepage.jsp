@@ -76,7 +76,7 @@
 
             </div>
             <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
-                <a href="#" class="w3-bar-item w3-button">Blogs</a>
+                <a href="${pageContext.request.contextPath}/blogList" class="w3-bar-item w3-button">Blogs</a>
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
                 <!--
                 <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
@@ -296,7 +296,7 @@
                 <% for (int i = 0; i < blogs.size(); i++) {%>
 
                 <div class="mySlides fade">
-                    <a href="${pageContext.request.contextPath}/blog?blogID=<%= blogs.get(i).getBlogID()%>">
+                    <a href="${pageContext.request.contextPath}/blogDetail?blogID=<%= blogs.get(i).getBlogID()%>">
                         <img src="<%= blogs.get(i).getImageLink()%>" alt="" style="width:100%; height: 600px;"/>
                         <div class="text" style="color: black; background-color: #f2f2f2; " ><%= blogs.get(i).getBlogTitle()%></div>
                     </a>
