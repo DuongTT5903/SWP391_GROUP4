@@ -30,7 +30,8 @@ public class BlogDBContext {
     public List<Blog> getAllBlogs() {
         List<Blog> blogs = new ArrayList<>();
         String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
-                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID";
+                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE b.status = 1";
+
         try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {

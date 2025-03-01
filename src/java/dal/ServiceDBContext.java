@@ -280,12 +280,14 @@ public class ServiceDBContext {
      */
     public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
         List<Service> services = new ArrayList<>();
-        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
-                + "JOIN servicecategories c ON s.categoryID = c.categoryID "
-                + "JOIN users u ON s.authorID = u.userID "
-                + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
-                + "AND (? = 0 OR s.categoryID = ?) "
-                + "LIMIT ?, ?";
+        
+        String sql = """
+             SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, sc.CategoryID, sc.CategoryName, sc.CategoryDetail, 
+             s.ServicePrice, s.ImageURL, s.status, s.SalePrice, s.authorID 
+             FROM services s 
+             INNER JOIN servicecategories sc ON s.CategoryID = sc.CategoryID
+             WHERE s.status = 1""";
+
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 

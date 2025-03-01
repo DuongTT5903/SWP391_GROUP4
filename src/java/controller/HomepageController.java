@@ -6,6 +6,7 @@ package controller;
 
 import dal.BlogDBContext;
 import dal.ServiceDBContext;
+import dal.SliderDBContext;
 import model.Blog;
 
 import jakarta.servlet.ServletException;
@@ -18,10 +19,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import model.Service;
+import model.Slider;
 
 /**
  *
  * @author admin
+ *
+ * thay đỏi blog slider thành phần slider và để blog làm hot post theo thanh
+ * trượt ngang ở bên trái với giới hạn là 5 và có yêu cầu status là 1.
+ *
+ *
  */
 @WebServlet(name = "HomepageController", urlPatterns = {"/homepage"})
 public class HomepageController extends HttpServlet {
@@ -93,6 +100,20 @@ public class HomepageController extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching services.");
         }
+        SliderDBContext sliderDB = new SliderDBContext();
+        List<Slider> sliders = null;
+        try {
+            sliders = sliderDB.getActiveSliders();
+            if (sliders == null || sliders.isEmpty()) {
+                request.setAttribute("errorMessage", "No slider available at the moment.");
+            } else {
+                request.setAttribute("sliders", sliders);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching sliders.");
+        }
+
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 
