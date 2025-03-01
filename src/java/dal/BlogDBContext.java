@@ -130,4 +130,38 @@ public class BlogDBContext {
         }
         return null;
     }
+     public List<Blog> getBlogByBlogID(int blogID) {
+    List<Blog> blogs = new ArrayList<>();
+    String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name " +
+                 "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE b.BlogID = ?";
+
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stm = conn.prepareStatement(sql)) {
+        
+        // Thiết lập tham số cho truy vấn
+        stm.setInt(1, blogID);
+        
+        try (ResultSet rs = stm.executeQuery()) {
+            while (rs.next()) {
+                Blog blog = new Blog(
+                        rs.getInt("BlogID"),
+                        rs.getString("BlogTitle"),
+                        rs.getString("BlogDetail"),
+                        rs.getString("Category"),
+                        rs.getBoolean("status"),
+                        rs.getString("imglink")
+                );
+                User user = new User(
+                        rs.getInt("UserID"),
+                        rs.getString("Name")
+                );
+                blog.setAuthor(user); // Setting the user to the blog
+                blogs.add(blog);
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(BlogDBContext.class.getName()).log(Level.SEVERE, "Error fetching blogs", ex);
+    }
+    return blogs;
+}
 }

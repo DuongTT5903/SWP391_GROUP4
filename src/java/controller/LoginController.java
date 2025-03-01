@@ -45,10 +45,10 @@ public class LoginController extends HttpServlet {
         // Get username and password from the form submission
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
+          
         UserDBContext db = new UserDBContext();
         User user = db.getUserByUsername(username, password);
-
+       
         if (user != null) {
             // If login is successful, store the user in the session
             HttpSession session = request.getSession();
@@ -62,8 +62,8 @@ public class LoginController extends HttpServlet {
 
         } else {
             // If login fails, set an error message and return to the login page
-            request.setAttribute("error", "Invalid username or password");
+            request.setAttribute("e", "Sai tài khoản hoặc mật khẩu");
             request.getRequestDispatcher("views/login.jsp").forward(request, response);
         }
-    }
+              }
 }
