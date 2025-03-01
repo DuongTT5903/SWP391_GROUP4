@@ -130,7 +130,7 @@ public class BlogDBContext {
         }
         return null;
     }
-     public List<Blog> getBlogByBlogID(int blogID) {
+    public List<Blog> getBlogByBlogID(int blogID) {
     List<Blog> blogs = new ArrayList<>();
     String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name " +
                  "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE b.BlogID = ?";

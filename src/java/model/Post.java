@@ -23,6 +23,16 @@ public class Post {
         this.author = author;
     }
 
+    public Post(int id, String title, String detail, String category, boolean status, String imageLink) {
+        this.id = id;
+        this.title = title;
+        this.detail = detail;
+        this.category = category;
+        this.status = status;
+        this.imageLink = imageLink;
+    }
+    
+
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

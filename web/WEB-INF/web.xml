@@ -84,6 +84,10 @@
         <servlet-name>BlogListController</servlet-name>
         <servlet-class>controller.BlogListController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerPostDetailController</servlet-name>
+        <servlet-class>controller.ManagerPostDetailController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -175,5 +179,9 @@
     <servlet-mapping>
         <servlet-name>BlogListController</servlet-name>
         <url-pattern>/blogList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerPostDetailController</servlet-name>
+        <url-pattern>/manager/postDetail</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -22,6 +22,7 @@ public class ManagerPostListController extends HttpServlet {
 //        Integer postId = (idParam != null && !idParam.isEmpty()) ? Integer.parseInt(idParam) : null;
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
+        String currentPage = request.getParameter("page");
         if (action != null && idParam != null && !idParam.isEmpty()) {
             int postId = Integer.parseInt(idParam);
             // "view" và "show" đều đặt trạng thái là Active (true)
@@ -31,7 +32,7 @@ public class ManagerPostListController extends HttpServlet {
                 postDAO.updatePostStatus(postId, false);
             }
             // Chuyển hướng lại để tránh việc lặp lại thao tác khi refresh trang
-            response.sendRedirect(request.getContextPath() + "/manager/postList");
+            response.sendRedirect(request.getContextPath() + "/manager/postList?page=" + (currentPage != null ? currentPage : "1"));
             return;
         }
 

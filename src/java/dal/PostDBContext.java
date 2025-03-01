@@ -3,6 +3,9 @@ package dal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import model.Blog;
 import model.Post;
 import model.User;
 
@@ -113,12 +116,12 @@ public class PostDBContext extends DBContext {
             e.printStackTrace();
         }
     }
+
     public void addPost(Post post) {
         String sql = "INSERT INTO blogs (BlogTitle, BlogDetail, Category, status, imglink, AuthorID) "
-                   + "VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-             
+                + "VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, post.getTitle());
             stmt.setString(2, post.getDetail());
             stmt.setString(3, post.getCategory());
@@ -126,61 +129,111 @@ public class PostDBContext extends DBContext {
             stmt.setString(5, post.getImageLink());
             // Giả sử đối tượng User có phương thức getId() trả về ID của tác giả
             stmt.setInt(6, post.getAuthor().getUserID());
-            
+
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException("Error adding post to blogs", e);
         }
     }
+
     public int countPosts(String filterCategory, String filterAuthor, String filterStatus, String searchTitle) {
-    int count = 0;
-    String sql = "SELECT COUNT(*) AS total FROM blogs p INNER JOIN users u ON p.AuthorID = u.UserID WHERE 1=1";
-    List<Object> params = new ArrayList<>();
+        int count = 0;
+        String sql = "SELECT COUNT(*) AS total FROM blogs p INNER JOIN users u ON p.AuthorID = u.UserID WHERE 1=1";
+        List<Object> params = new ArrayList<>();
 
-    if (filterCategory != null && !filterCategory.isEmpty()) {
-        sql += " AND p.Category = ?";
-        params.add(filterCategory);
-    }
-    if (filterAuthor != null && !filterAuthor.isEmpty()) {
-        sql += " AND u.name = ?";
-        params.add(filterAuthor);
-    }
-    if ("true".equalsIgnoreCase(filterStatus)) {
-        sql += " AND p.status = ?";
-        params.add(true);
-    } else if ("false".equalsIgnoreCase(filterStatus)) {
-        sql += " AND p.status = ?";
-        params.add(false);
-    }
-    if (searchTitle != null && !searchTitle.isEmpty()) {
-        sql += " AND p.BlogTitle LIKE ?";
-        params.add("%" + searchTitle + "%");
-    }
+        if (filterCategory != null && !filterCategory.isEmpty()) {
+            sql += " AND p.Category = ?";
+            params.add(filterCategory);
+        }
+        if (filterAuthor != null && !filterAuthor.isEmpty()) {
+            sql += " AND u.name = ?";
+            params.add(filterAuthor);
+        }
+        if ("true".equalsIgnoreCase(filterStatus)) {
+            sql += " AND p.status = ?";
+            params.add(true);
+        } else if ("false".equalsIgnoreCase(filterStatus)) {
+            sql += " AND p.status = ?";
+            params.add(false);
+        }
+        if (searchTitle != null && !searchTitle.isEmpty()) {
+            sql += " AND p.BlogTitle LIKE ?";
+            params.add("%" + searchTitle + "%");
+        }
 
-    try (Connection conn = getConnection(); 
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-         
-        // Đặt các tham số cho PreparedStatement
-        for (int i = 0; i < params.size(); i++) {
-            Object param = params.get(i);
-            if (param instanceof Integer) {
-                stmt.setInt(i + 1, (Integer) param);
-            } else if (param instanceof Boolean) {
-                stmt.setBoolean(i + 1, (Boolean) param);
-            } else {
-                stmt.setString(i + 1, param.toString());
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Đặt các tham số cho PreparedStatement
+            for (int i = 0; i < params.size(); i++) {
+                Object param = params.get(i);
+                if (param instanceof Integer) {
+                    stmt.setInt(i + 1, (Integer) param);
+                } else if (param instanceof Boolean) {
+                    stmt.setBoolean(i + 1, (Boolean) param);
+                } else {
+                    stmt.setString(i + 1, param.toString());
+                }
             }
-        }
 
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            count = rs.getInt("total");
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error counting posts", e);
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Error counting posts", e);
+        return count;
     }
-    return count;
-}
+
+    public List<Post> getPostByPostID(int postID) {
+        List<Post> posts = new ArrayList<>();
+        String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "
+                + "FROM Blogs b INNER JOIN Users u ON b.AuthorID = u.UserID WHERE b.BlogID = ?";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
+
+            // Thiết lập tham số cho truy vấn
+            stm.setInt(1, postID);
+
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    Post post = new Post(
+                            rs.getInt("BlogID"),
+                            rs.getString("BlogTitle"),
+                            rs.getString("BlogDetail"),
+                            rs.getString("Category"),
+                            rs.getBoolean("status"),
+                            rs.getString("imglink")
+                    );
+                    User user = new User(
+                            rs.getInt("UserID"),
+                            rs.getString("Name")
+                    );
+                    post.setAuthor(user); // Setting the user to the blog
+                    posts.add(post);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(BlogDBContext.class.getName()).log(Level.SEVERE, "Error fetching blogs", ex);
+        }
+        return posts;
+    }
+
+    public void updatePost(Post post) {
+        String sql = "UPDATE blogs SET BlogTitle = ?, BlogDetail = ?, Category = ?, status = ?, imglink = ? WHERE BlogID = ?";
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, post.getTitle());
+            stmt.setString(2, post.getDetail());
+            stmt.setString(3, post.getCategory());
+            stmt.setBoolean(4, post.isStatus());
+            stmt.setString(5, post.getImageLink());
+            stmt.setInt(6, post.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error updating post", e);
+        }
+    }
 }

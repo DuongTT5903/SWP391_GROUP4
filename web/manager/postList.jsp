@@ -71,11 +71,13 @@
                     </td>
                     <td>
 
-                        <a href="postDetail?action=view&id=<%= p.getId()%>" class="btn btn-info btn-sm">View</a>
+                        <a href="postDetail?id=<%= p.getId()%>" class="btn btn-info btn-sm">View</a>
+                       
                         <% if (p.isStatus()) {%>
-                        <a href="postList?action=hide&id=<%= p.getId()%>" class="btn btn-danger btn-sm">Hide</a>
+                       
+                        <a href="postList?action=hide&id=<%= p.getId()%>&page=${currentPage}" class="btn btn-danger btn-sm">Hide</a>
                         <% } else {%>
-                        <a href="postList?action=show&id=<%= p.getId()%>" class="btn btn-success btn-sm">Show</a>
+                        <a href="postList?action=show&id=<%= p.getId()%>&page=${currentPage}" class="btn btn-success btn-sm">Show</a>
                         <% } %>
                     </td>
                 </tr>
