@@ -18,7 +18,7 @@ import java.util.Arrays;
  *
  * @author trung
  */
-public class DeleteCart extends HttpServlet {
+public class UpdateCart extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +37,10 @@ public class DeleteCart extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet DeleteCart</title>");
+            out.println("<title>Servlet UpdateCart</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet DeleteCart at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet UpdateCart at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -72,10 +72,10 @@ public class DeleteCart extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String deleteID = request.getParameter("DeleteID");
-
+        String updateID = request.getParameter("UpdateID");
+        String update = request.getParameter("update");
         // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
-        if (deleteID == null || deleteID.trim().isEmpty()) {
+        if (updateID == null || updateID.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/shoppingCart");
             return;
         }
@@ -91,7 +91,6 @@ public class DeleteCart extends HttpServlet {
             }
         }
         String newCartData = new String();
-        boolean found = false;
         for (String item : cartData.split("-")) {
             if (item.isEmpty()) {
                 continue;
@@ -106,11 +105,26 @@ public class DeleteCart extends HttpServlet {
             int quantity = Integer.parseInt(info[2]);
             int numberOfPeople = Integer.parseInt(parts[1]);
 
-            if (!existingServiceID.equals(deleteID)) {
-                newCartData += "~" + existingServiceID + "~" + quantity + "/" + numberOfPeople + "-";
+            if (existingServiceID.equals(updateID)) {
+                if (update.equals("increase")) {
+                    quantity += 1;
+                } else if (update.equals("decrease")) {
+                     if(quantity!=1)
+                    {
+                   quantity -= 1;
+                    }
+                } else if (update.equals("increasePersons")) {
+                    numberOfPeople += 1;
+                } else if (update.equals("decreasePersons")) {
+                    if(numberOfPeople!=1)
+                    {
+                    numberOfPeople -= 1;
+                    }
+                }
             }
-            
-        } 
+            newCartData += "~" + existingServiceID + "~" + quantity + "/" + numberOfPeople + "-";
+
+        }
         // Nếu giỏ hàng trống, chuyển hướng luôn
         if (cartData.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/shoppingCart");
@@ -125,5 +139,15 @@ public class DeleteCart extends HttpServlet {
         // Chuyển hướng về trang giỏ hàng
         response.sendRedirect(request.getContextPath() + "/shoppingCart");
     }
+
+/**
+ * Returns a short description of the servlet.
+ *
+ * @return a String containing servlet description
+ */
+ @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
 
 }

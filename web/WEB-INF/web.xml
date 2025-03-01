@@ -88,6 +88,14 @@
         <servlet-name>ManagerPostDetailController</servlet-name>
         <servlet-class>controller.ManagerPostDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateCart</servlet-name>
+        <servlet-class>controller.UpdateCart</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReservationController</servlet-name>
+        <servlet-class>controller.ReservationController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -183,5 +191,13 @@
     <servlet-mapping>
         <servlet-name>ManagerPostDetailController</servlet-name>
         <url-pattern>/manager/postDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateCart</servlet-name>
+        <url-pattern>/UpdateCart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReservationController</servlet-name>
+        <url-pattern>/reservation</url-pattern>
     </servlet-mapping>
 </web-app>

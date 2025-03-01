@@ -7,18 +7,15 @@ package controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  *
  * @author trung
  */
-public class DeleteCart extends HttpServlet {
+public class ReservationController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +34,10 @@ public class DeleteCart extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet DeleteCart</title>");
+            out.println("<title>Servlet ReservationController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet DeleteCart at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ReservationController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,7 +55,7 @@ public class DeleteCart extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+       request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
     }
 
     /**
@@ -72,58 +69,17 @@ public class DeleteCart extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String deleteID = request.getParameter("DeleteID");
-
-        // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
-        if (deleteID == null || deleteID.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/shoppingCart");
-            return;
-        }
-
-        String cartData = "";
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("cart")) {
-                    cartData = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        String newCartData = new String();
-        boolean found = false;
-        for (String item : cartData.split("-")) {
-            if (item.isEmpty()) {
-                continue;
-            }
-
-            String[] parts = item.split("/");
-            if (parts.length < 2) {
-                continue;
-            }
-            String[] info = parts[0].split("~");
-            String existingServiceID = info[1];
-            int quantity = Integer.parseInt(info[2]);
-            int numberOfPeople = Integer.parseInt(parts[1]);
-
-            if (!existingServiceID.equals(deleteID)) {
-                newCartData += "~" + existingServiceID + "~" + quantity + "/" + numberOfPeople + "-";
-            }
-            
-        } 
-        // Nếu giỏ hàng trống, chuyển hướng luôn
-        if (cartData.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/shoppingCart");
-            return;
-        }
-
-        ArrayList<String> cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
-        Cookie cartCookie = new Cookie("cart", newCartData);
-        cartCookie.setMaxAge(cartItems.isEmpty() ? 0 : 60 * 60 * 24);
-        response.addCookie(cartCookie);
-
-        // Chuyển hướng về trang giỏ hàng
-        response.sendRedirect(request.getContextPath() + "/shoppingCart");
+        request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
     }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
 
 }

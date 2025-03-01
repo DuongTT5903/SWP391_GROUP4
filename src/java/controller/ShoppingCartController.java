@@ -3,13 +3,13 @@ package controller;
 import dal.ServiceDBContext;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.ReservationDetail;
 import model.Service;
 
 /**
@@ -38,36 +38,47 @@ public class ShoppingCartController extends HttpServlet {
             }
         }
 
-        // Nếu giỏ hàng trống, gửi danh sách rỗng và hiển thị thông báo
+        // If cart is empty, show an empty message
         if (cartData.isEmpty()) {
-            request.setAttribute("cartItems", new ArrayList<>()); // Danh sách rỗng
+            request.setAttribute("cartItems", new ArrayList<>());            
             request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
             request.getRequestDispatcher("view/shoppingCart.jsp").forward(request, response);
             return;
         }
-
-        // Tách chuỗi cartData thành danh sách serviceID
-        List<Service> cartItems = new ArrayList<>();
-        ServiceDBContext serviceDAO = new ServiceDBContext(); // DAO để truy vấn thông tin dịch vụ
+        
+        List<ReservationDetail> cartItems = new ArrayList<>();
+        ServiceDBContext serviceDAO = new ServiceDBContext();
+        int total = 0;
         for (String item : cartData.split("-")) {
             try {
-                int serviceID = Integer.parseInt(item);
+                String[] parts = item.split("/");
+                if (parts.length < 2) {
+                    continue;
+                }
+                String[] info = parts[0].split("~");
+                int serviceID = Integer.parseInt(info[1]);
+                int amount = Integer.parseInt(info[2]);
+                int numberOfPeople = Integer.parseInt(parts[1]);
+                
                 Service service = serviceDAO.getServiceByID(serviceID);
+                
                 if (service != null) {
-                    cartItems.add(service);
+                    ReservationDetail reservationDetail = new ReservationDetail(0, 0, service, amount, numberOfPeople);
+                    cartItems.add(reservationDetail);
+                    total += service.getServicePrice() * (100 - service.getSalePrice()) * 10 * amount * numberOfPeople;
                 }
             } catch (NumberFormatException e) {
-                // Bỏ qua nếu dữ liệu không hợp lệ
-                System.err.println("Lỗi parse serviceID: " + item);
+                System.err.println("Lỗi parse dữ liệu giỏ hàng: " + item);
             }
+            
         }
-
-        // Nếu không có dịch vụ hợp lệ, hiển thị giỏ hàng trống
+        
         if (cartItems.isEmpty()) {
             request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
         }
-
+        request.setAttribute("total", total);
         request.setAttribute("cartItems", cartItems);
         request.getRequestDispatcher("view/shoppingCart.jsp").forward(request, response);
     }
+    
 }
