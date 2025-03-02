@@ -4,6 +4,7 @@
  */
 package dal;
 
+import static dal.DBContext.getConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,6 +28,31 @@ public class BlogDBContext {
      *
      * @return
      */
+    public List<Blog> searchBlogsByTitle(String keyword) {
+    List<Blog> blogs = new ArrayList<>();
+    String sql = "SELECT * FROM childrencare.blogs WHERE LOWER(BlogTitle) LIKE LOWER(?)";
+
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, "%" + keyword + "%"); // Đặt giá trị cho placeholder `?`
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Blog blog = new Blog(
+                       rs.getInt("BlogID"),
+                        rs.getString("BlogTitle"),
+                        rs.getString("BlogDetail"),
+                        rs.getString("Category"),
+                        rs.getBoolean("status"),
+                        rs.getString("imglink")
+                );
+                blogs.add(blog);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return blogs;
+}
     public List<Blog> getAllBlogs() {
         List<Blog> blogs = new ArrayList<>();
         String sql = "SELECT b.BlogID, b.BlogTitle, b.BlogDetail, b.Category, b.status, b.imglink, u.UserID, u.Name "

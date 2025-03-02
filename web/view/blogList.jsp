@@ -1,6 +1,6 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.List" %>
-<%@page import="model.Blog" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="model.Blog" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html>
@@ -45,29 +45,37 @@
     </style>
 </head>
 <body>
+
+    <!-- Form tìm kiếm -->
+    <form action="blogList" method="get">
+        <input type="text" name="search" value="${param.search}" placeholder="Nhập tên blog">
+        <button type="submit">Tìm kiếm</button>
+    </form>
+
     <div class="blog-container">
         <h2>📰 Danh sách Blog</h2>
-        <%
-            List<Blog> blogs = (List<Blog>) request.getAttribute("blogs");
-            if (blogs != null && !blogs.isEmpty()) {
-                for (Blog blog : blogs) {
-        %>
-        <div class="blog-item">
-            <% if (blog.getImageLink() != null && !blog.getImageLink().isEmpty()) { %>
-                <img class="blog-image" src="<%= blog.getImageLink() %>" alt="Blog Image">
-            <% } %>
-            <div>
-                <a class="blog-title" href="${pageContext.request.contextPath}/blogDetail?blogID=<%= blog.getBlogID() %>"><%= blog.getBlogTitle() %></a>
-            </div>
-        </div>
-        <%
-                }
-            } else {
-        %>
-        <p><em>Không có bài viết nào.</em></p>
-        <%
-            }
-        %>
+
+        <!-- Hiển thị danh sách blog -->
+        <c:choose>
+            <c:when test="${not empty blogs}">
+                <c:forEach var="blog" items="${blogs}">
+                    <div class="blog-item">
+                        <c:if test="${not empty blog.imageLink}">
+                            <img class="blog-image" src="${blog.imageLink}" alt="Blog Image">
+                        </c:if>
+                        <div>
+                            <a class="blog-title" href="${pageContext.request.contextPath}/blogDetail?blogID=${blog.blogID}">
+                                ${blog.blogTitle}
+                            </a>
+                        </div>
+                    </div>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <p><em>Không có bài viết nào.</em></p>
+            </c:otherwise>
+        </c:choose>
     </div>
+
 </body>
 </html>

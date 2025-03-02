@@ -96,6 +96,14 @@
         <servlet-name>ManagerServiceController</servlet-name>
         <servlet-class>controller.ManagerServiceController</servlet-class>
     </servlet>
+     <servlet>
+        <servlet-name>ManagerCustomerList</servlet-name>
+        <servlet-class>controller.ManagerCustomerList</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerCustomerDetailController</servlet-name>
+        <servlet-class>controller.ManagerCustomerDetailController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -224,5 +232,13 @@
     <servlet-mapping>
         <servlet-name>resetService</servlet-name>
         <url-pattern>/resetService</url-pattern>
+    </servlet-mapping>
+      <servlet-mapping>
+        <servlet-name>ManagerCustomerList</servlet-name>
+        <url-pattern>/manager/customerList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerCustomerDetailController</servlet-name>
+        <url-pattern>/manager/customerDetail</url-pattern>
     </servlet-mapping>
 </web-app>
