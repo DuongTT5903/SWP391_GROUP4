@@ -1,5 +1,6 @@
 package dal;
 
+import static dal.DBContext.getConnection;
 import model.User;
 import model.Role;
 import java.sql.*;
@@ -528,6 +529,112 @@ public class UserDBContext {
     }
     return false;
 }
+      public User getUserByEmail(String email) {
+    String sql = "SELECT * FROM Users WHERE email = ?";
+    
+    try (Connection conn = new DBContext().getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        ps.setString(1, email);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                User user = new User(); // Khởi tạo đối tượng User        
+                user.setUserID(rs.getInt("UserID"));
+                user.setName(rs.getString("Name"));
+                user.setGender(rs.getBoolean("Gender"));
+                user.setEmail(rs.getString("Email"));
+                user.setUsername(rs.getString("Username"));
+                user.setPassword(rs.getString("Password"));
+                user.setPhone(rs.getString("Phone"));
+                return user;
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace(); // In lỗi ra console để dễ debug
+    }
+    return null;
+}
+      public User getUserById1(int userId) {
+    Connection connection = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        connection = getConnection();  // Ensure this method returns a valid connection
+        if (connection == null || connection.isClosed()) {
+            throw new SQLException("Connection is not available");
+        }
+
+        String sql = "SELECT * FROM Users WHERE UserID = ?";
+        ps = connection.prepareStatement(sql);
+        ps.setInt(1, userId);
+        rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            User user = new User();  // Khởi tạo đối tượng User
+            user.setUserID(rs.getInt("UserID"));
+            user.setName(rs.getString("Name"));
+            user.setGender(rs.getBoolean("Gender"));
+            user.setEmail(rs.getString("Email"));
+            user.setUsername(rs.getString("Username"));
+            user.setPassword(rs.getString("Password"));
+            user.setPhone(rs.getString("Phone"));
+            return user;
+        }
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error fetching user by ID", e);
+    } finally {
+        // Close resources safely
+        try {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (connection != null && !connection.isClosed()) connection.close();
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error closing resources", e);
+        }
+    }
+    return null;  // Return null if no user found or an error occurred
+}
+      public boolean updatePassword1(String email, String password) {
+    Connection connection = null;
+    PreparedStatement ps = null;
+    try {
+        connection = getConnection();  // Ensure this method returns a valid connection
+        if (connection == null || connection.isClosed()) {
+            throw new SQLException("Connection is not available");
+        }
+
+        String sql = "UPDATE Users SET Password = ? WHERE Email = ?";
+        ps = connection.prepareStatement(sql);
+        ps.setString(1, password);
+        ps.setString(2, email);
+        
+        int rowsUpdated = ps.executeUpdate();
+        return rowsUpdated > 0;  // Return true if the password was updated successfully
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error updating password", e);
+    } finally {
+        // Close resources safely
+        try {
+            if (ps != null) ps.close();
+            if (connection != null && !connection.isClosed()) connection.close();
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error closing resources", e);
+        }
+    }
+    return false;  // Return false if there was an error or no rows were updated
+}
+
+          private static class LOGGER {
+
+        private static void log(Level WARNING, String error_closing_resources, SQLException e) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        public LOGGER() {
+        }
+    }
+
+          
 
 
 }

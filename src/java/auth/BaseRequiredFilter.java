@@ -18,7 +18,7 @@ import java.util.Map;
 @WebFilter("/*") // Áp dụng cho tất cả request
 public class BaseRequiredFilter implements Filter {
 
-    private static final List<String> PUBLIC_PAGES = Arrays.asList(
+   private static final List<String> PUBLIC_PAGES = Arrays.asList(
             "/login", // Trang đăng nhập
             "/register", // Trang đăng ký
             "/homepage",
@@ -26,9 +26,10 @@ public class BaseRequiredFilter implements Filter {
             "/shoppingCart",
             "/AddCart",
             "/DeleteCart",
-            "/UpdateCart",
-            "/reservation"
-            
+            "/blogDetail",
+            "/blogList",
+            "/reset",
+            "/request"
     // Trang chủ
     // Trang chủ
     // Giới thiệu
