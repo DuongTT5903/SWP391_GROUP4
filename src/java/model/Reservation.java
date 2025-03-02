@@ -4,6 +4,8 @@
  */
 package model;
 
+import java.util.Date;
+
 /**
  *
  * @author admin
@@ -11,111 +13,108 @@ package model;
 public class Reservation {
 
     private int reservationID;
-    private String description;
-    private String creationDate;
-    private User customerID;
+    private String customerName;
+    private String email;
+    private String address;
+    private String phone;
+    private Date creationDate;
+    private User userID;
+    private int status;
+    private int paymentMethod;
     private float totalPrice;
-
-    /**
-     *
-     */
     public Reservation() {
     }
 
-    /**
-     *
-     * @param reservationID
-     * @param description
-     * @param creationDate
-     * @param customerID
-     * @param totalPrice
-     */
-    public Reservation(int reservationID, String description, String creationDate, User customerID, float totalPrice) {
+    public Reservation(int reservationID, String customerName, String email, String address, String phone, Date creationDate, User userID, int status, int paymentMethod, float totalPrice) {
         this.reservationID = reservationID;
-        this.description = description;
+        this.customerName = customerName;
+        this.email = email;
+        this.address = address;
+        this.phone = phone;
         this.creationDate = creationDate;
-        this.customerID = customerID;
+        this.userID = userID;
+        this.status = status;
+        this.paymentMethod = paymentMethod;
         this.totalPrice = totalPrice;
     }
-    
-    /**
-     *
-     * @return
-     */
+
     public int getReservationID() {
         return reservationID;
     }
 
-    /**
-     *
-     * @param reservationID
-     */
     public void setReservationID(int reservationID) {
         this.reservationID = reservationID;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getDescription() {
-        return description;
+    public String getCustomerName() {
+        return customerName;
     }
 
-    /**
-     *
-     * @param description
-     */
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String getCreationDate() {
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getCreationDate() {
         return creationDate;
     }
 
-    /**
-     *
-     * @param creationDate
-     */
-    public void setCreationDate(String creationDate) {
+    public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
-    /**
-     *
-     * @return
-     */
-    public User getCustomerID() {
-        return customerID;
+    public User getUserID() {
+        return userID;
     }
 
-    /**
-     *
-     * @param customerID
-     */
-    public void setCustomerID(User customerID) {
-        this.customerID = customerID;
+    public void setUserID(User userID) {
+        this.userID = userID;
     }
 
-    /**
-     *
-     * @return
-     */
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(int paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     public float getTotalPrice() {
         return totalPrice;
     }
 
-    /**
-     *
-     * @param totalPrice
-     */
     public void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
     }
-   
 }

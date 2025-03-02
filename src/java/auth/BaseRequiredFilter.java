@@ -27,7 +27,9 @@ public class BaseRequiredFilter implements Filter {
             "/AddCart",
             "/DeleteCart",
             "/blogDetail",
-            "/blogList"
+            "/blogList",
+            "/reset",
+            "/request"
     // Trang chủ
     // Trang chủ
     // Giới thiệu

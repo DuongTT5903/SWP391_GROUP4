@@ -66,7 +66,7 @@
                                     Bạn không có tài khoản? <a href="register" class="text-dark">Đăng ký</a>
                                 </div>
                                 <div class="text-center">
-                                    Bạn quên mật khẩu? <a href="forget" class="text-dark">Lấy lại mật khẩu</a>
+                                    Bạn quên mật khẩu? <a href="request" class="text-dark">Lấy lại mật khẩu</a>
                                 </div>
                             </div>
                         </div>

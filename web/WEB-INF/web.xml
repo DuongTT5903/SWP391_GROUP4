@@ -9,10 +9,6 @@
         <servlet-class>controller.ChangePasswordController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ResetPasswordController</servlet-name>
-        <servlet-class>controller.ResetPasswordController</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>LoginController</servlet-name>
         <servlet-class>controller.LoginController</servlet-class>
     </servlet>
@@ -88,6 +84,18 @@
         <servlet-name>ManagerPostDetailController</servlet-name>
         <servlet-class>controller.ManagerPostDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateCart</servlet-name>
+        <servlet-class>controller.UpdateCart</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReservationController</servlet-name>
+        <servlet-class>controller.ReservationController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerServiceController</servlet-name>
+        <servlet-class>controller.ManagerServiceController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -96,10 +104,7 @@
         <servlet-name>ChangePasswordController</servlet-name>
         <url-pattern>/change</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ResetPasswordController</servlet-name>
-        <url-pattern>/reset</url-pattern>
-    </servlet-mapping>
+   
     <servlet-mapping>
         <servlet-name>LoginController</servlet-name>
         <url-pattern>/login</url-pattern>
@@ -183,5 +188,41 @@
     <servlet-mapping>
         <servlet-name>ManagerPostDetailController</servlet-name>
         <url-pattern>/manager/postDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateCart</servlet-name>
+        <url-pattern>/UpdateCart</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReservationController</servlet-name>
+        <url-pattern>/reservation</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerServiceController</servlet-name>
+        <url-pattern>/manager/listservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>requestPassword</servlet-name>
+        <servlet-class>controller.requestPassword</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>resetPassword</servlet-name>
+        <servlet-class>controller.resetPassword</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>resetService</servlet-name>
+        <servlet-class>controller.resetService</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>requestPassword</servlet-name>
+        <url-pattern>/request</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>resetPassword</servlet-name>
+        <url-pattern>/reset</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>resetService</servlet-name>
+        <url-pattern>/resetService</url-pattern>
     </servlet-mapping>
 </web-app>

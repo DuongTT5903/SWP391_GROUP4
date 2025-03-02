@@ -13,9 +13,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author admin
+ * @author trung
  */
-public class ResetPasswordController extends HttpServlet {
+public class ReservationController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,10 +34,10 @@ public class ResetPasswordController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ForgetPasswordController</title>");
+            out.println("<title>Servlet ReservationController</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ForgetPasswordController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ReservationController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -55,8 +55,7 @@ public class ResetPasswordController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-              request.getRequestDispatcher("views/resetpassword.jsp").forward(request, response);
-
+       request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
     }
 
     /**
@@ -70,7 +69,7 @@ public class ResetPasswordController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
     }
 
     /**

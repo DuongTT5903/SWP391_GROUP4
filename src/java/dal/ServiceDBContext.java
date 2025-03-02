@@ -79,7 +79,7 @@ public class ServiceDBContext {
         ServiceCategory serviceCategory = null;
         try {
             String sql = "SELECT * FROM servicecategories WHERE CategoryID = ?;";
-            stm = connection.prepareStatement(sql);
+            stm = DBContext.getConnection().prepareStatement(sql);
             stm.setInt(1, ID);
             rs = stm.executeQuery();
 
@@ -120,7 +120,7 @@ public class ServiceDBContext {
         try {
             String sql = "select *"
                     + "from services ;";
-            stm = connection.prepareStatement(sql);
+            stm =  DBContext.getConnection().prepareStatement(sql);
             rs = stm.executeQuery();
 
             while (rs.next()) {
@@ -461,6 +461,80 @@ public class ServiceDBContext {
         }
         return services;
     }
+    public boolean updateServiceStatus(int serviceID, boolean newStatus) {
+        PreparedStatement stm = null;
+        Connection conn = null;
+        try {
+            String sql = "UPDATE services SET status = ? WHERE ServiceID = ?";
+            conn = DBContext.getConnection();
+            stm = conn.prepareStatement(sql);
+
+            stm.setBoolean(1, newStatus); // Trực tiếp đặt giá trị boolean (0 hoặc 1)
+            stm.setInt(2, serviceID);
+
+            int rowsUpdated = stm.executeUpdate(); // Thực thi câu lệnh UPDATE
+            return rowsUpdated > 0; // Nếu có ít nhất một dòng bị ảnh hưởng, trả về true
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error updating service status", ex);
+            return false;
+        } finally {
+            try {
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+            }
+        }
+    }
+
+    // Thêm phương thức getListServiceByID từ code của bạn
+    public List<Service> getListServiceByID(int ID) {
+        List<Service> serviceList = new ArrayList<>();
+        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
+                   + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+                   + "JOIN users u ON s.authorID = u.userID "
+                   + "WHERE s.serviceID = ?"; // Chỉnh lại điều kiện chính xác
+
+        try (Connection conn = DBContext.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, ID);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ServiceCategory category = new ServiceCategory(
+                    rs.getInt("categoryID"), 
+                    rs.getString("categoryName"), 
+                    ""
+                );
+
+                User author = new User(
+                    rs.getInt("authorID"), 
+                    rs.getString("authorName"), 
+                    true, "", "", "", "", "", ""
+                );
+
+                Service service = new Service(
+                    rs.getInt("serviceID"),
+                    rs.getString("serviceName"),
+                    rs.getString("serviceDetail"),
+                    category,
+                    rs.getFloat("servicePrice"),
+                    rs.getFloat("salePrice"),
+                    rs.getString("imageURL"),
+                    rs.getBoolean("status"),
+                    author
+                );
+
+                serviceList.add(service);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return serviceList; // Trả về danh sách thay vì chỉ một đối tượng
+    }
+
 
     /**
      *

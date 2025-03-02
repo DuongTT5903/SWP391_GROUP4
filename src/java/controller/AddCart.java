@@ -72,44 +72,66 @@ public class AddCart extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String serviceID = request.getParameter("serviceID");
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    String serviceID = request.getParameter("serviceID");
 
-        // Retrieve current cart data from cookies
-        String cartData = "";
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("cart")) {
-                    cartData = cookie.getValue();
-                    break;
-                }
+    if (serviceID == null || serviceID.trim().isEmpty()) {
+        response.sendRedirect(request.getHeader("Referer"));
+        return;
+    }
+
+    // Get cart data from cookies
+    String cartData = "";
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            if ("cart".equals(cookie.getName())) {
+                cartData = cookie.getValue();
+                break;
             }
         }
-
-        // Add serviceID to the cart data
-        if (!cartData.isEmpty()) {
-            cartData += "-";
-        }
-        cartData += serviceID;
-
-        // Create a new cart cookie
-        Cookie cartCookie = new Cookie("cart", cartData);
-        cartCookie.setMaxAge(60 * 60 * 24); // Cookie lasts 1 day
-        response.addCookie(cartCookie);
-
-        // Redirect back to the page where the form was submitted from
-        String referer = request.getHeader("Referer");
-        if (referer != null) {
-            response.sendRedirect(referer);
-        } else {
-
-            // Chuyển hướng về trang danh sách dịch vụ hoặc hiển thị thông báo thành công
-            response.sendRedirect(request.getContextPath() + "/serviceList");
-
-        }
     }
+
+    // Update quantity if the service is already in the cart
+    String newCartData = new String();
+    boolean found = false;
+    for (String item : cartData.split("-")) {
+        if (item.isEmpty()) continue;
+
+        String[] parts = item.split("/");
+        if (parts.length < 2) continue;
+        String[] info=parts[0].split("~");
+        String existingServiceID = info[1];
+        int quantity = Integer.parseInt(info[2]);
+        int numberOfPeople = Integer.parseInt(parts[1]);
+
+        if (existingServiceID.equals(serviceID)) {
+            quantity += 1; // Increment quantity
+            found = true;
+        }
+        newCartData += "~"+existingServiceID+"~"+quantity +"/"+numberOfPeople+"-";
+    }
+
+    // If service is not in the cart, add it with default values
+    if (!found) {
+        newCartData+="~"+serviceID+"~"+"1/1";
+    }
+
+    // Set new cart cookie
+    Cookie cartCookie = new Cookie("cart", newCartData);
+    cartCookie.setMaxAge(60 * 60 * 24);
+    response.addCookie(cartCookie);
+
+    // Redirect back
+    String referer = request.getHeader("Referer");
+    if (referer != null) {
+        response.sendRedirect(referer);
+    } else {
+        response.sendRedirect(request.getContextPath() + "/serviceList");
+    }
+}
+
 
     /**
      * Returns a short description of the servlet.
