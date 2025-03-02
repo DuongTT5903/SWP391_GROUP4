@@ -96,6 +96,10 @@
         <servlet-name>ReservationController</servlet-name>
         <servlet-class>controller.ReservationController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ManagerServiceController</servlet-name>
+        <servlet-class>controller.ManagerServiceController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -199,5 +203,9 @@
     <servlet-mapping>
         <servlet-name>ReservationController</servlet-name>
         <url-pattern>/reservation</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerServiceController</servlet-name>
+        <url-pattern>/manager/listservice</url-pattern>
     </servlet-mapping>
 </web-app>
