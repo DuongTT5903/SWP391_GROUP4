@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.UserStatus;
 
 /**
  *
@@ -208,11 +209,15 @@ public class UserDBContext {
      */
     public List<User> getUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL "
-                + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID";
+        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL , us.Status "
+                + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID "
+                + "LEFT JOIN UserStatus us ON u.userID = us.userID ";
         try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
+                Boolean userStatus = (rs.getObject("Status") != null) ? rs.getBoolean("Status") : false;
+                UserStatus status = new UserStatus(rs.getInt("userID"), userStatus);
+
                 User user = new User(
                         rs.getInt("userID"),
                         rs.getString("name"),
@@ -222,7 +227,8 @@ public class UserDBContext {
                         null, // Không lưu mật khẩu
                         rs.getString("phone"),
                         rs.getString("roleName"),
-                        rs.getString("imageURL")
+                        rs.getString("imageURL"),
+                        status
                 );
                 users.add(user);
             }
@@ -232,6 +238,36 @@ public class UserDBContext {
         return users;
     }
 
+//    public List<User> getUsers() {
+//        List<User> users = new ArrayList<>();
+//        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL, " // Thêm dấu phẩy
+//                + "COALESCE(us.Status, 0) AS Status " // Thêm khoảng trắng
+//                + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID "
+//                + "LEFT JOIN UserStatus us ON u.userID = us.userID"; // Thêm khoảng trắng
+//
+//        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
+//
+//            while (rs.next()) {
+//                UserStatus status = new UserStatus(rs.getInt("userID"), rs.getBoolean("Status"));
+//                User user = new User(
+//                        rs.getInt("userID"),
+//                        rs.getString("name"),
+//                        rs.getBoolean("gender"),
+//                        rs.getString("email"),
+//                        rs.getString("username"),
+//                        null, // Không lưu mật khẩu
+//                        rs.getString("phone"),
+//                        rs.getString("roleName"),
+//                        rs.getString("imageURL"),
+//                        status // Đối tượng UserStatus
+//                );
+//                users.add(user);
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi lấy danh sách người dùng", ex);
+//        }
+//        return users;
+//    }
     /**
      *
      * @param userID
@@ -338,8 +374,9 @@ public class UserDBContext {
      */
     public List<User> getUsers(int pageIndex, int pageSize) {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL "
+        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL , us.Status "
                 + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID "
+                + "LEFT JOIN UserStatus us ON u.userID = us.userID "
                 + "LIMIT ? OFFSET ?";
         try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
 
@@ -347,6 +384,7 @@ public class UserDBContext {
             stm.setInt(2, (pageIndex - 1) * pageSize);
             try (ResultSet rs = stm.executeQuery()) {
                 while (rs.next()) {
+                    UserStatus status = new UserStatus(rs.getInt("userID"), rs.getBoolean("Status"));
                     User user = new User(
                             rs.getInt("userID"),
                             rs.getString("name"),
@@ -356,7 +394,8 @@ public class UserDBContext {
                             null, // Không lưu mật khẩu
                             rs.getString("phone"),
                             rs.getString("roleName"),
-                            rs.getString("imageURL")
+                            rs.getString("imageURL"),
+                            status
                     );
                     users.add(user);
                 }
@@ -397,7 +436,6 @@ public class UserDBContext {
             stm.setString(5, user.getPassword());
             stm.setString(6, user.getPhone());
             stm.setInt(7, Integer.parseInt(user.getRole())); // Chuyển đổi roleID thành số nguyên
-
             stm.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error adding new user", ex);
@@ -514,20 +552,35 @@ public class UserDBContext {
      * @return
      */
     public boolean isUserExists(String username, String email) {
-    try (Connection conn = DBContext.getConnection()) {
-        String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setString(1, username);
-        stmt.setString(2, email);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại
+        try (Connection conn = DBContext.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return false;
     }
-    return false;
-}
 
+    public void updateUserStatus(int userID, boolean status) {
+        String sql = "INSERT INTO UserStatus (UserID, Status) VALUES (?, ?) "
+                + "ON DUPLICATE KEY UPDATE Status = ?";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
+
+            stm.setInt(1, userID);
+            stm.setBoolean(2, status);
+            stm.setBoolean(3, status); // Cập nhật nếu đã tồn tại
+
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Lỗi cập nhật trạng thái người dùng", ex);
+        }
+    }
 
 }

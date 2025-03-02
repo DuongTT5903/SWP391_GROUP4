@@ -13,7 +13,7 @@
             }
 
             #myInput {
-                
+
                 background-position: 10px 10px;
                 background-repeat: no-repeat;
                 width: 100%;
@@ -67,12 +67,12 @@
 
     <body style="padding: 50px;">
 
-        
-                <div class="d-flex justify-content-between">
-                    <h2>Danh sách người dùng</h2>
-                    <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary" style="margin-bottom:10px">Quay lại</a>
-                        
-                </div>
+
+        <div class="d-flex justify-content-between">
+            <h2>Danh sách người dùng</h2>
+            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary" style="margin-bottom:10px">Quay lại</a>
+
+        </div>
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm kiếm tên người dùng.." title="Nhập tên người dùng">
         <div id="table-container" style="max-height: 500px; overflow-y: auto;">
 
@@ -82,6 +82,7 @@
                     <th style="width:20%;">Email</th>
                     <th style="width:20%;">Số điện thoại</th>
                     <th style="width:20%;">Vai trò</th>
+                    <th style="width:20%;">Trạng thái</th>
                     <th style="width:20%;">Hành động</th>
                 </tr>
                 <c:forEach var="user" items="${users}">
@@ -91,12 +92,35 @@
                         <td>${user.phone}</td>
                         <td>${user.role}</td>
                         <td>
+                            <c:choose>
+                                <c:when test="${user.status.status}">
+                                    <span style="color: green; font-weight: bold;">Hoạt động</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span style="color: red; font-weight: bold;">Bị khóa</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
                             <a href="${pageContext.request.contextPath}/admin/userDetail?id=${user.userID}" class="btn btn-primary">Chi tiết</a>
+                            <form action="userList" method="post" onsubmit="return confirmStatusChange(${user.status.status})">
+                                <input type="hidden" name="action" value="updateStatus">
+                                <input type="hidden" name="userID" value="${user.userID}">
+                                <input type="hidden" name="status" value="${user.status.status ? 0 : 1}">
+                                <button type="submit" class="btn ${user.status.status ? 'btn-danger' : 'btn-success'}">
+                                    ${user.status.status ? 'Khóa' : 'Mở khóa'}
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 </c:forEach>
             </table>
         </div>
+        <script>
+            function confirmStatusChange(isActive) {
+                return confirm(isActive ? 'Bạn có chắc muốn khóa người dùng này?' : 'Bạn có chắc muốn mở khóa người dùng này?');
+            }
+        </script>
         <button class="btn btn-success mt-3" onclick="showAddUserForm()">Thêm người dùng mới</button>
 
         <div id="addUserForm" style="display: none;">

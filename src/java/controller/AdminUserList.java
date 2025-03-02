@@ -11,6 +11,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.List;
 import model.User;
 
@@ -52,9 +54,15 @@ public class AdminUserList extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        UserDBContext db = new UserDBContext();
-        List<User> users = db.getUsers();
-        request.setAttribute("users", users);
+
+        try {
+            UserDBContext db = new UserDBContext();
+            List<User> users = db.getUsers();
+            request.setAttribute("users", users);
+        } catch (Exception e) {
+            
+            request.setAttribute("error", "Could not load user list. Please try again later.");
+        }
         request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
     }
 
@@ -66,49 +74,64 @@ public class AdminUserList extends HttpServlet {
      * @throws IOException
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String roleID = request.getParameter("role");
-        UserDBContext db = new UserDBContext();
+   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    UserDBContext db = new UserDBContext();
+    String action = request.getParameter("action");
 
-        String errorMessage = validateInput(name, email, phone, username, password, db);
-         if (errorMessage != null) {
-        // Lưu lại thông tin nhập vào để giữ nguyên dữ liệu trên form
+    // Handle user status update first
+    if ("updateStatus".equals(action)) {
+        int userID = Integer.parseInt(request.getParameter("userID"));
+        boolean newStatus = request.getParameter("status").equals("1");
+        db.updateUserStatus(userID, newStatus);
+
+        response.sendRedirect(request.getContextPath() + "/admin/userList");
+        return; // Stop further execution
+    }
+
+    // Handle user creation
+    String name = request.getParameter("name");
+    String email = request.getParameter("email");
+    String phone = request.getParameter("phone");
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    String roleID = request.getParameter("role");
+
+    String errorMessage = validateInput(name, email, phone, username, password, db);
+    if (errorMessage != null) {
+        // Preserve form input to show back in case of an error
         request.setAttribute("error", errorMessage);
         request.setAttribute("name", name);
         request.setAttribute("email", email);
         request.setAttribute("phone", phone);
         request.setAttribute("username", username);
         request.setAttribute("role", roleID);
-        
-        // Hiển thị danh sách người dùng lại để tránh lỗi
+
+        // Reload user list for display
         List<User> users = db.getUsers();
         request.setAttribute("users", users);
-        
+
         request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
-        return; // Dừng xử lý khi có lỗi
+        return; // Stop execution when there is an error
     }
 
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setRole(roleID);
+    // Create a new user
+    User user = new User();
+    user.setName(name);
+    user.setEmail(email);
+    user.setPhone(phone);
+    user.setUsername(username);
+    user.setPassword(password);
+    user.setRole(roleID);
 
-        try {
-            db.addUser(user);
-            response.sendRedirect(request.getContextPath() + "/admin/userList");
-        } catch (IOException e) {
-            request.setAttribute("error", "Lỗi trong quá trình thêm người dùng.");
-            request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
-        }
+    try {
+        db.addUser(user);
+        response.sendRedirect(request.getContextPath() + "/admin/userList");
+    } catch (Exception e) {
+        request.setAttribute("error", "Lỗi trong quá trình thêm người dùng.");
+        request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
     }
+}
+
 
     private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty() || password.isEmpty()) {

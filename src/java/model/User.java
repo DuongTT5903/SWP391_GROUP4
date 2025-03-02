@@ -9,6 +9,7 @@ package model;
  * @author admin
  */
 public class User {
+
     private int userID;
     private String name;
     private boolean gender;
@@ -18,9 +19,9 @@ public class User {
     private String phone;
     private String role;
     private String imageURL;
+    private UserStatus status;
 
     // Default constructor
-
     /**
      *
      */
@@ -39,15 +40,27 @@ public class User {
         this.userID = userID;
         this.name = name;
     }
+
     public User(int userID, String name, String role) {
         this.userID = userID;
         this.name = name;
         this.role = role;
     }
 
-    
-    // Parameterized constructor
+    public User(int userID, String name, boolean gender, String email, String username, String password, String phone, String role, String imageURL, UserStatus status) {
+        this.userID = userID;
+        this.name = name;
+        this.gender = gender;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.phone = phone;
+        this.role = role;
+        this.imageURL = imageURL;
+        this.status = status;
+    }
 
+    // Parameterized constructor
     /**
      *
      * @param userID
@@ -72,8 +85,15 @@ public class User {
         this.imageURL = imageURL;
     }
 
-    // Getters and setters
+    public UserStatus getStatus() {
+        return status;
+    }
 
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    // Getters and setters
     /**
      *
      * @return
@@ -219,5 +239,4 @@ public class User {
     }
 
     // Override toString() for debugging or display purposes
-  
 }
