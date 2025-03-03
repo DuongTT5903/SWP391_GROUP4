@@ -7,7 +7,9 @@
 <%@page import="model.Blog"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" language="java"%>
+<%@page import="java.util.List, model.Blog, model.Service, model.Slider"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<jsp:useBean id="sliders" scope="request" type="java.util.List"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -376,7 +378,44 @@
             </div>
 
             <br>
+            <%
+                List<Slider> slider = (List<Slider>) request.getAttribute("sliders");
+            %>
+            <!-- Slider Khuyến mãi -->
+            <h1>Khuyến mãi</h1>
+            <div class="w3-row w3-grayscale">
+                <c:forEach var="slider" items="${sliders}">
+                    <div class="w3-col l3 s6">
+                        <div class="w3-container">
+                            <a href="${pageContext.request.contextPath}/slider?sliderID=${slider.slideID}">
+                                <img src="${slider.img}" style="width:100%">
+                                <p>${slider.title}</p>
+                            </a>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
 
+            <style>
+                .slider-container {
+                    width: 100%;
+                    overflow: hidden;
+                }
+                .slider {
+                    display: flex;
+                    gap: 20px;
+                    overflow-x: auto;
+                }
+                .slide {
+                    min-width: 300px;
+                    border: 1px solid #ddd;
+                    padding: 10px;
+                }
+                .slide img {
+                    width: 100%;
+                    height: auto;
+                }
+            </style>
 
 
 
