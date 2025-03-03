@@ -25,6 +25,8 @@ public class BaseRequiredFilter implements Filter {
             "/serviceList",
             "/shoppingCart",
             "/AddCart",
+            "/UpdateCart",
+            "/reservation",
             "/DeleteCart",
             "/blogDetail",
             "/blogList",

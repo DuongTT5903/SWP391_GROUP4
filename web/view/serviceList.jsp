@@ -97,35 +97,32 @@
                 <div class="container-fluid">
                     <c:choose>
                         <c:when test="${sessionScope.roleID == '4'}">
-                            <!-- Content for customer role -->
                             <h3 class="w3-wide public"> 
-                                <b><a href="/customer" style="text-decoration: none;color: white;">Customer</a></b>
-                            </h3>
+                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
+                            </h3>       
                         </c:when>
                         <c:when test="${sessionScope.roleID == '2'}">
                             <h3 class="w3-wide public"> 
-                                <b><a href="/manager" style="text-decoration: none;color: white;">Manager</a></b>
+                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
                             </h3>
                         </c:when>
-
                         <c:when test="${sessionScope.roleID == '3'}">
-                            <!-- Content for staff role -->
                             <h3 class="w3-wide public"> 
-                                <b><a href="/staff" style="text-decoration: none;color: white;">Staff</a></b>
+                                <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
                             </h3>
                         </c:when>
-
                         <c:when test="${sessionScope.roleID == '1'}">
-                            <!-- Content for admin role -->
                             <h3 class="w3-wide public"> 
-                                <b><a href="/admin" style="text-decoration: none;color: white;">Admin</a></b>
+                                <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                                <br>
                             </h3>
                         </c:when>
-
                         <c:otherwise>
-                            <!-- Default content if userRole is not recognized -->
                             <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;color: white;">LOGIN</a></b>
+                                <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
                             </h3>
                         </c:otherwise>
                     </c:choose>
@@ -150,7 +147,7 @@
                     <option value="2">Y tế tổng quát</option>
                     <option value="3">Tiêm chủng</option>
                 </select>
-                 <select name="sort" class="form-select " style="width: 250px;">
+                <select name="sort" class="form-select " style="width: 250px;">
                     <option value="servicename1">A->Z</option>
                     <option value="servicename2">Z->A</option>
                     <option value="price1">Giá tăng dần</option>

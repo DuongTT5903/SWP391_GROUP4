@@ -238,7 +238,36 @@ public class UserDBContext {
         }
         return users;
     }
+  public List<User> getUsers1() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL , us.Status "
+                + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID "
+                + "LEFT JOIN UserStatus us ON u.userID = us.userID where r.roleID=4  ";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql); ResultSet rs = stm.executeQuery()) {
 
+            while (rs.next()) {
+                Boolean userStatus = (rs.getObject("Status") != null) ? rs.getBoolean("Status") : false;
+                UserStatus status = new UserStatus(rs.getInt("userID"), userStatus);
+
+                User user = new User(
+                        rs.getInt("userID"),
+                        rs.getString("name"),
+                        rs.getBoolean("gender"),
+                        rs.getString("email"),
+                        rs.getString("username"),
+                        null, // Không lưu mật khẩu
+                        rs.getString("phone"),
+                        rs.getString("roleName"),
+                        rs.getString("imageURL"),
+                        status
+                );
+                users.add(user);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching users", ex);
+        }
+        return users;
+    }
 //    public List<User> getUsers() {
 //        List<User> users = new ArrayList<>();
 //        String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL, " // Thêm dấu phẩy
