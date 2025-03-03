@@ -121,6 +121,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     // Set new cart cookie
     Cookie cartCookie = new Cookie("cart", newCartData);
     cartCookie.setMaxAge(60 * 60 * 24);
+    
     response.addCookie(cartCookie);
 
     // Redirect back

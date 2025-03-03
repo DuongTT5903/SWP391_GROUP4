@@ -188,11 +188,19 @@ public class ReservationController extends HttpServlet {
         }
         for (ReservationDetail c : cart) {
             reservationDB.addReservationDetail(reservationDB.ReservationID(), c.getService().getServiceID(), c.getAmount(), c.getNumberOfPerson());
+        }if (cookies != null) {
+        for (Cookie cookie : cookies) {
+            if ("cart".equals(cookie.getName())) {
+                cookie.setMaxAge(0);
+                cookie.setPath("/");              
+                break;
+            }
         }
-        Cookie cartCookie = new Cookie("cart", "");
-        cartCookie.setMaxAge(0); // Hết hạn ngay lập tức
-        cartCookie.setPath("/"); // Đảm bảo xóa trên toàn bộ ứng dụng
+    }
+        Cookie cartCookie = new Cookie("cart", null);
+         // Đảm bảo xóa trên toàn bộ ứng dụng
         response.addCookie(cartCookie);
+        
         request.setAttribute("customer", customer);
         response.setContentType("text/html;charset=UTF-8");
         response.getWriter().println("<script>alert('Thanh toán thành công!'); window.location='" + request.getContextPath() + "/homepage';</script>");
