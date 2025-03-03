@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.ServiceDBContext;
@@ -14,130 +10,138 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import model.Service;
+import model.ServiceCategory;
 
-/**
- *
- * @author LOQ
- */
 public class ManagerServiceController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ManagerServiceController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ManagerServiceController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            out.println("<html><head><title>Servlet ManagerServiceController</title></head>");
+            out.println("<body><h1>Servlet ManagerServiceController at " + request.getContextPath() + "</h1></body></html>");
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServiceDBContext s = new ServiceDBContext();
+        ServiceDBContext db = new ServiceDBContext();
         String service = request.getParameter("service");
 
         if (service == null) {
             service = "listservice";
         }
 
-        // Lấy danh sách dịch vụ
-        if (service.equalsIgnoreCase("listservice")) {
-            List<Service> list = s.getServices();
-            request.setAttribute("list", list);
-            request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
-        }
+        try {
+            switch (service.toLowerCase()) {
+                case "listservice":
+                    List<Service> list = db.getServices();
+                    request.setAttribute("list", list);
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    break;
 
-        // Xử lý cập nhật status
-        if (service.equalsIgnoreCase("editStatus")) {
-            try {
-                // Lấy tham số từ request
-                int serviceID = Integer.parseInt(request.getParameter("serviceID"));
-                boolean newStatus = Boolean.parseBoolean(request.getParameter("editStatus"));
+                case "editstatus":
+                    int serviceIDStatus = Integer.parseInt(request.getParameter("serviceID"));
+                    boolean newStatus = Boolean.parseBoolean(request.getParameter("editStatus"));
+                    db.updateServiceStatus(serviceIDStatus, newStatus);
+                    List<Service> updatedList = db.getServices();
+                    request.setAttribute("list", updatedList);
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    break;
 
-                // Cập nhật trạng thái trong DB
-                boolean success = s.updateServiceStatus(serviceID, newStatus);
+                case "searchbyid":
+                    int searchID = Integer.parseInt(request.getParameter("searchID"));
+                    List<Service> searchResult = db.getListServiceByID(searchID);
+                    request.setAttribute("searchID", searchID);
+                    request.setAttribute("list", searchResult);
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    break;
 
-                List<Service> list = s.getServices();
-                request.setAttribute("list", list);
-                request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
-            } catch (NumberFormatException e) {
-                // Xử lý lỗi nếu tham số không hợp lệ
-                response.getWriter().println("Invalid serviceID or status format!");
+                case "viewdetail":
+                    int viewID = Integer.parseInt(request.getParameter("serviceID"));
+                    Service viewService = db.getServiceByID(viewID);
+                    List<ServiceCategory> categories = db.getServiceCategories();
+                    request.setAttribute("service", viewService);
+                    request.setAttribute("categories", categories);
+                    request.getRequestDispatcher("/manager/view/viewservice.jsp").forward(request, response);
+                    break;
+
+                case "addrequest":
+                    List<ServiceCategory> addCategories = db.getServiceCategories();
+                    request.setAttribute("categories", addCategories);
+                    request.getRequestDispatcher("/manager/view/addservice.jsp").forward(request, response);
+                    break;
+
+                case "adddone":
+                    String serviceNameAdd = request.getParameter("serviceName");
+                    String serviceDetailAdd = request.getParameter("serviceDetail");
+                    int categoryIDAdd = Integer.parseInt(request.getParameter("categoryID"));
+                    float servicePriceAdd = Float.parseFloat(request.getParameter("servicePrice"));
+                    float salePriceAdd = Float.parseFloat(request.getParameter("salePrice"));
+                    String imageURLAdd = request.getParameter("imageURL");
+
+                    ServiceCategory categoryAdd = db.getServiceCategoryByID(categoryIDAdd);
+                    Service newService = new Service(0, serviceNameAdd, serviceDetailAdd, categoryAdd, 
+                                                    servicePriceAdd, salePriceAdd, imageURLAdd, true);
+
+                    db.addService(newService);
+                    List<Service> newList = db.getServices();
+                    request.setAttribute("list", newList);
+                    request.setAttribute("message", "Service added successfully!");
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    break;
+
+                case "savechange":
+                    int serviceID = Integer.parseInt(request.getParameter("serviceID"));
+                    String serviceName = request.getParameter("serviceName");
+                    String serviceDetail = request.getParameter("serviceDetail");
+                    int categoryID = Integer.parseInt(request.getParameter("categoryID"));
+                    float servicePrice = Float.parseFloat(request.getParameter("servicePrice"));
+                    float salePrice = Float.parseFloat(request.getParameter("salePrice"));
+                    String imageURL = request.getParameter("imageURL");
+                    String statusParam = request.getParameter("status");
+                    boolean status = "true".equals(statusParam);
+
+                    Service updatedService = db.getServiceByID(serviceID);
+                    updatedService.setServiceName(serviceName);
+                    updatedService.setServiceDetail(serviceDetail);
+                    updatedService.setCategory(db.getServiceCategoryByID(categoryID));
+                    updatedService.setServicePrice(servicePrice);
+                    updatedService.setSalePrice(salePrice);
+                    updatedService.setImageURL(imageURL);
+                    updatedService.setStatus(status);
+
+                    db.updateService(updatedService.getServiceName(), updatedService.getServiceDetail(), 
+                                    updatedService.getCategory().getCategoryID(), updatedService.getServicePrice(), 
+                                    updatedService.getSalePrice(), updatedService.getImageURL(), updatedService.getServiceID());
+
+                    List<Service> finalList = db.getServices();
+                    request.setAttribute("list", finalList);
+                    request.setAttribute("message", "Service updated successfully!");
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    break;
+
+                default:
+                    response.getWriter().println("Invalid service request!");
+                    break;
             }
+        } catch (NumberFormatException e) {
+            response.getWriter().println("Invalid input format: " + e.getMessage());
+        } catch (Exception e) {
+            response.getWriter().println("An error occurred: " + e.getMessage());
         }
-
-        if (service.equalsIgnoreCase("searchById")) {
-            String id_raw = request.getParameter("searchID");
-            int id = Integer.parseInt(id_raw);
-            List<Service> list = new ArrayList<>();
-            list = s.getListServiceByID(id);
-            request.setAttribute("searchID", id);
-            request.setAttribute("list", list);
-            request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
-        }
-
-        if (service.equalsIgnoreCase("editRequest")) {
-            String id_raw = request.getParameter("serviceID");
-            int id = Integer.parseInt(id_raw);
-            Service serviceObj = s.getServiceByID(id);
-            request.setAttribute("service", serviceObj);
-            request.getRequestDispatcher("/manager/view/editservice.jsp").forward(request, response);
-        }
-        
-         if (service.equalsIgnoreCase("addRequest")) {
-            request.getRequestDispatcher("/manager/view/addservice.jsp").forward(request, response);
-        }
-
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        doGet(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Servlet for managing services in the system";
+    }
 }
