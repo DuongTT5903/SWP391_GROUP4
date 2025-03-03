@@ -120,7 +120,7 @@ public class ManagerServiceController extends HttpServlet {
                     List<Service> finalList = db.getServices();
                     request.setAttribute("list", finalList);
                     request.setAttribute("message", "Service updated successfully!");
-                    request.getRequestDispatcher("/manager/view/manager/listservice.jsp").forward(request, response);
+                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
                     break;
 
                 default:
