@@ -175,8 +175,12 @@ public class UserDBContext {
      */
     public User getUserByUsername(String username, String password) {
         User user = null;
-        String query = "SELECT userID, name, gender, email, username, phone, roleID, imageURL "
-                + "FROM users WHERE BINARY username = ? AND BINARY password = ?";
+        String query = "         SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, u.roleID, u.imageURL, us.userID\n" +
+"FROM users u \n" +
+"INNER JOIN userstatus us ON u.userID = us.userID\n" +
+"WHERE BINARY u.username = ? \n" +
+"AND BINARY u.password = ? \n" +
+"AND us.status = 1;";
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 

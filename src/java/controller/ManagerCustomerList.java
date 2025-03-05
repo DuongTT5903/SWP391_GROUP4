@@ -125,6 +125,14 @@ public class ManagerCustomerList extends HttpServlet {
 
     try {
         db.addUser(user);
+         String subject = "Chào mừng bạn đến với hệ thống!";
+        String content = "<h1>Xin chào " + name + ",</h1>"
+                       + "<p>Bạn đã được thêm vào hệ thống với tài khoản: <strong>" + username + "</strong></p>"
+                       + "<p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật tài khoản.</p>"
+                       + "<p>Cảm ơn bạn đã tham gia!</p>";
+
+        resetService emailService = new resetService();
+       emailService.sendEmail1(email, subject, content);
         response.sendRedirect(request.getContextPath() + "/manager/customerList");
     } catch (Exception e) {
         request.setAttribute("error", "Lỗi trong quá trình thêm người dùng.");

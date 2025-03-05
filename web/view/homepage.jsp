@@ -134,7 +134,7 @@
             <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
                 <a href="${pageContext.request.contextPath}/blogList" class="w3-bar-item w3-button">Blogs</a>
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
-                <a href="#" class="w3-bar-item w3-button">Reservations</a>
+                <a href="${pageContext.request.contextPath}/reservation"  class="w3-bar-item w3-button">Reservations</a>
             </div>
             <a href="#footer" class="w3-bar-item w3-button w3-padding">Contact</a>
             <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display = 'block'">Newsletter</a>
