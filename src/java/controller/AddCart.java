@@ -44,7 +44,7 @@ public class AddCart extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet AddCart at " + request.getContextPath() + "</h1>");
             out.println("</body>");
-            out.println("</html>");
+            out.println("</aaaaaaaa>");
         }
     }
 
