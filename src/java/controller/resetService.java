@@ -68,7 +68,32 @@ public class resetService {  // Tên class nên dùng PascalCase
         boolean sent = sendEmail(to, "Email Verification Code", content);
         return sent ? otp : null;
     }
+  public boolean sendEmail1(String to, String subject, String content) {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
 
+        Session session = Session.getInstance(props, new EmailAuthenticator());
+
+        try {
+            MimeMessage msg = new MimeMessage(session);
+            msg.addHeader("Content-type", "text/html; charset=UTF-8");
+            msg.setFrom(new InternetAddress(FROM_EMAIL));
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+            msg.setSubject(subject, "UTF-8");
+            msg.setContent(content, "text/html; charset=UTF-8");
+
+            Transport.send(msg);
+            System.out.println("Send successfully");
+            return true;
+        } catch (Exception e) {
+            System.out.println("Send error");
+            e.printStackTrace();
+            return false;
+        }
+    }
     /**
      * Tạo mã OTP gồm 6 chữ số.
      */
