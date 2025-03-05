@@ -129,7 +129,7 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\shoppingCart"">Cart</a></li>
+                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\shoppingCart">Cart</a></li>
                             <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
                             <li class="nav-item"><a class="nav-link " href="#">Reservations</a></li>
                         </ul>
@@ -226,7 +226,7 @@
                     <button type="submit">Gửi đánh giá</button>
                 </form>-->
                 <!-- Liên hệ -->
-                <div class="w3-container w3-black w3-padding-32">
+                <div class="w3-container w3-black w3-padding-32" >
                     <h1>Subscribe</h1>
                     <p>To get special offers and VIP treatment:</p>
                     <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>

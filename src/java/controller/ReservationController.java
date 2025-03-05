@@ -15,7 +15,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import model.Customer;
 import model.ReservationDetail;
 import model.Service;
@@ -103,23 +106,6 @@ public class ReservationController extends HttpServlet {
         // Default behavior: Load service list
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        String name = request.getParameter("name");
-        String address = request.getParameter("address");
-        String email = request.getParameter("email");
-        String phone = request.getParameter("phone");
-        String description = request.getParameter("description") != null ? request.getParameter("description") : "";
-        int gender = Integer.parseInt(request.getParameter("gender"));
-        String PTTT1 = request.getParameter("payment");
-        int PTTT = (PTTT1 != null && !PTTT1.isEmpty()) ? Integer.parseInt(PTTT1) : -1;
-        String cardName = request.getParameter("cardName");
-        String cardNumber = request.getParameter("cardNumber");
-        String CVV = request.getParameter("CVV");
-        String expirationDate = request.getParameter("expirationDate");
-        LocalDate date = null;
-        if (expirationDate != null && !expirationDate.isEmpty()) {
-            date = LocalDate.parse(expirationDate);
-        }
-        LocalDate today = LocalDate.now();
         ReservationDBContext reservationDB = new ReservationDBContext();
         Customer customer;
         if (user == null) {
@@ -127,83 +113,80 @@ public class ReservationController extends HttpServlet {
         } else {
             customer = reservationDB.getCustomerByID(user.getUserID());
         }
+        Map<String, String> errors = new HashMap<>();
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String gender = request.getParameter("gender");
+        String note = request.getParameter("note");
+        String payment = request.getParameter("payment");
 
-        String cartData = "";
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("cart".equals(cookie.getName())) {
-                    cartData = cookie.getValue();
-                    break;
-                }
-            }
+        // Kiểm tra lỗi nhập liệu
+        if (name == null || name.length() < 6 || name.length() > 50) {
+            errors.put("name", "Họ và tên phải từ 6 đến 50 ký tự.");
         }
 
-        // If cart is empty, show an empty message
-        if (cartData.isEmpty()) {
-            request.setAttribute("cartItems", new ArrayList<>());
-            request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
+        if (address == null || address.length() < 40 || address.length() > 200) {
+            errors.put("address", "Địa chỉ phải từ 40 đến 200 ký tự.");
+        }
+
+        String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+        if (email == null || !email.matches(emailPattern)) {
+            errors.put("email", "Email không hợp lệ. Vui lòng nhập email đúng định dạng (ví dụ: example@email.com).");
+        }
+
+        if (phone == null || !phone.matches("^0[3789][0-9]{8}$")) {
+            errors.put("phone", "Số điện thoại phải bắt đầu bằng 03, 07, 08 hoặc 09 và có tổng cộng 10 chữ số.");
+        }
+        if (note != null && note.length() > 500) {
+            errors.put("note", "Ghi chú không được vượt quá 500 ký tự.");
+        }
+        if (payment == null) {
+            errors.put("payment", "Vui lòng chọn phương thức thanh toán.");
+        } else if ("0".equals(payment)) { // Nếu chọn thẻ tín dụng
+            String cardName = request.getParameter("cardName");
+            String cardNumber = request.getParameter("cardNumber");
+            String CVV = request.getParameter("CVV");
+            String expirationDate = request.getParameter("expirationDate");
+
+            if (cardName == null || cardName.trim().length() < 6) {
+                errors.put("cardName", "Tên chủ thẻ phải có ít nhất 6 ký tự.");
+            }
+
+            if (cardNumber == null || !cardNumber.matches("\\d{13,19}")) {
+                errors.put("cardNumber", "Số thẻ phải có từ 13 đến 19 chữ số.");
+            }
+
+            if (CVV == null || !CVV.matches("\\d{3,4}")) {
+                errors.put("CVV", "CVV phải có 3-4 chữ số.");
+            }
+
+            if (expirationDate == null || expirationDate.trim().isEmpty()) {
+                errors.put("expirationDate", "Vui lòng nhập ngày hết hạn.");
+            }
+            session.setAttribute("cardName", cardName);
+            session.setAttribute("cardNumber", cardNumber);
+            session.setAttribute("CVV", CVV);
+            request.setAttribute("expirationDate", expirationDate);
+        }
+        if (!errors.isEmpty()) {
+            request.setAttribute("errors", errors);
             request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
             return;
         }
-        List<ReservationDetail> cart = new ArrayList<>();
-        int total = 0;
-        ServiceDBContext serviceDAO = new ServiceDBContext();
-        for (String item : cartData.split("-")) {
-            try {
-                String[] parts = item.split("/");
-                if (parts.length < 2) {
-                    continue;
-                }
-                String[] info = parts[0].split("~");
-                int serviceID = Integer.parseInt(info[1]);
-                int amount = Integer.parseInt(info[2]);
-                int numberOfPeople = Integer.parseInt(parts[1]);
-
-                Service service = serviceDAO.getServiceByID(serviceID);
-                ReservationDetail reservationDetail = new ReservationDetail(0, 0, service, amount, numberOfPeople);
-                if (service != null) {
-                    cart.add(reservationDetail);
-                    total += service.getServicePrice() * (100 - service.getSalePrice()) / 100 * amount * numberOfPeople;
-                }
-            } catch (NumberFormatException e) {
-                System.err.println("Lỗi parse dữ liệu giỏ hàng: " + item);
-            }
+        if (session.getAttribute("startTime") == null) {
+            session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
         }
-
-        int status=0;
-        if (PTTT == 0) {
-            status=0;
-        } else {
-            status=1;
-        }
-        if (user == null) {
-            reservationDB.addReservation(name, email, address, phone, today, 0, PTTT, total, gender, description,status);
-        } else {
-            reservationDB.addReservation(name, email, address, phone, today, user.getUserID(), PTTT, total, gender, description,status);
-        }
-        if (PTTT == 0) {
-
-            reservationDB.addCardInfo(reservationDB.ReservationID(),cardName, cardNumber, CVV, date);
-        }
-        for (ReservationDetail c : cart) {
-            reservationDB.addReservationDetail(reservationDB.ReservationID(), c.getService().getServiceID(), c.getAmount(), c.getNumberOfPerson());
-        }if (cookies != null) {
-        for (Cookie cookie : cookies) {
-            if ("cart".equals(cookie.getName())) {
-                cookie.setMaxAge(0);
-                cookie.setPath("/");              
-                break;
-            }
-        }
-    }
-        Cookie cartCookie = new Cookie("cart", null);
-         // Đảm bảo xóa trên toàn bộ ứng dụng
-        response.addCookie(cartCookie);
-        
         request.setAttribute("customer", customer);
+        session.setAttribute("name", name);
+        session.setAttribute("address", address);
+        session.setAttribute("email", email);
+        session.setAttribute("phone", phone);
+        session.setAttribute("gender", gender);
+        session.setAttribute("note", note);
         response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().println("<script>alert('Thanh toán thành công!'); window.location='" + request.getContextPath() + "/homepage';</script>");
+        response.sendRedirect(request.getContextPath() + "/reservation_complete");
 
     }
 
