@@ -2,6 +2,7 @@ package controller;
 
 import java.time.LocalDateTime;
 import java.util.Properties;
+import java.util.Random;
 import java.util.UUID;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -57,6 +58,24 @@ public class resetService {  // Tên class nên dùng PascalCase
             e.printStackTrace();
             return false;
         }
+    }
+      public String sendVerificationEmail(String to, String name) {
+        String otp = generateOTP(); // Tạo mã OTP
+        String content = "<h1>Xin chào " + name + "</h1>" +
+                "<p>Đây là mã xác thực email của bạn:</p>" +
+                "<h2 style='color:blue;'>" + otp + "</h2>" +
+                "<p>Vui lòng nhập mã này để xác nhận email.</p>";
+        boolean sent = sendEmail(to, "Email Verification Code", content);
+        return sent ? otp : null;
+    }
+
+    /**
+     * Tạo mã OTP gồm 6 chữ số.
+     */
+    private String generateOTP() {
+        Random rand = new Random();
+        int otp = 100000 + rand.nextInt(900000); // Tạo số ngẫu nhiên 6 chữ số
+        return String.valueOf(otp);
     }
 
     // Tạo class riêng cho Authenticator

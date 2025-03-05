@@ -718,6 +718,42 @@ public class UserDBContext {
         }
         return false;  // Return false if there was an error or no rows were updated
     }
+ public boolean activateAccount(String username) {
+    Connection connection = null;
+    PreparedStatement ps = null;
+    try {
+        connection = getConnection();  // Ensure this method returns a valid connection
+        if (connection == null || connection.isClosed()) {
+            throw new SQLException("Connection is not available");
+        }
+
+        String sql = "UPDATE UserStatus " +
+                     "SET Status = 1 " +
+                     "WHERE UserID = (SELECT UserID FROM Users WHERE Username = ?)";
+        ps = connection.prepareStatement(sql);
+        ps.setString(1, username);
+
+        int rowsUpdated = ps.executeUpdate();
+        return rowsUpdated > 0;  // Return true if the status was updated successfully
+    } catch (SQLException e) {
+        LOGGER.log(Level.SEVERE, "Error activating account", e);
+    } finally {
+        // Close resources safely
+        try {
+            if (ps != null) {
+                ps.close();
+            }
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Error closing resources", e);
+        }
+    }
+    return false;  // Return false if there was an error or no rows were updated
+}
+
+
 
     private static class LOGGER {
 

@@ -31,6 +31,7 @@ public class BaseRequiredFilter implements Filter {
             "/blogDetail",
             "/blogList",
             "/reset",
+            "/verify",
             "/request"
     // Trang chủ
     // Trang chủ
