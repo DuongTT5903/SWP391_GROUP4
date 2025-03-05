@@ -7,7 +7,9 @@
 <%@page import="model.Blog"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8" language="java"%>
+<%@page import="java.util.List, model.Blog, model.Service, model.Slider"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<jsp:useBean id="sliders" scope="request" type="java.util.List"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -20,134 +22,171 @@
 
         <title>Home Page</title>
     </head>
-    <body class="w3-content" style="max-width:1200px">
+    <body class="w3-content" style="max-width:max-content ; a {
+              text-decoration: none;
+              color: inherit;
+          }">
         <!-- Check if the userRole is available -->
 
 
 
         !-- Sidebar/menu -->
-        <nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+        <!-- Custom CSS for Sidebar and Header -->
+        <style>
+            /* Sidebar Styles */
+            .custom-sidebar {
+                background-color: #fff;
+                border-right: 1px solid #e0e0e0;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+                width: 250px;
+            }
+            .custom-sidebar .w3-container {
+                padding: 20px;
+            }
+            .custom-sidebar h3 {
+                font-family: 'Montserrat', sans-serif;
+                color: #333;
+                margin-bottom: 10px;
+            }
+            .custom-sidebar a {
+                font-family: 'Roboto', sans-serif;
+                color: #555;
+                padding: 10px 15px;
+                text-decoration: none;
+                display: block;
+                transition: background 0.3s, color 0.3s;
+            }
+            .custom-sidebar a:hover {
+                background-color: #f8f8f8;
+                color: #007bff;
+            }
+
+            /* Links in the extra menu section */
+            .custom-sidebar .w3-bar-item {
+                padding: 12px 15px;
+            }
+
+            /* Top Header for Small Screens */
+            .custom-header {
+                background-color: #343a40;
+                color: #fff;
+                padding: 16px;
+            }
+            .custom-header h3 {
+                font-family: 'Montserrat', sans-serif;
+                margin: 0;
+            }
+            .custom-header a {
+                color: #fff;
+                text-decoration: none;
+            }
+            .custom-header a:hover {
+                color: #d1d1d1;
+            }
+        </style>
+        <nav id="mySidebar" class="w3-sidebar w3-bar-block w3-collapse w3-top custom-sidebar" style="z-index:3;">
             <div class="w3-container w3-display-container w3-padding-16">
                 <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
 
-                <!-- Có thể chèn phần login vào đây -->
+                <!-- Login / User Info Section -->
                 <c:choose>
                     <c:when test="${sessionScope.roleID == '4'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="customerDashboard.jsp">Go to Dashboard</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '2'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
-                        <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to Feedback</a> <br>
-                        <a href="${pageContext.request.contextPath}/manager/postList">Go to Post List</a> 
+                        <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to Feedback</a>
+                        <a href="${pageContext.request.contextPath}/manager/postList">Go to Post List</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '3'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="/staff" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="staffDashboard.jsp">Go to Dashboard</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '1'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="/admin" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="admin/userList">Go to User List</a>
                     </c:when>
                     <c:otherwise>
-                        <h3 class="w3-wide public"> 
-                            <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;">LOGIN</a></b>
                         </h3>
                     </c:otherwise>
                 </c:choose>
                 <br>
-
-
             </div>
             <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
                 <a href="${pageContext.request.contextPath}/blogList" class="w3-bar-item w3-button">Blogs</a>
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
-                <!--
-                <a onclick="myAccFunc()" href="javascript:void(0)" class="w3-button w3-block w3-white w3-left-align" id="myBtn">
-                  Jeans <i class="fa fa-caret-down"></i>
-                </a>
-                <div id="demoAcc" class="w3-bar-block w3-hide w3-padding-large w3-medium">
-                  <a href="#" class="w3-bar-item w3-button w3-light-grey"><i class="fa fa-caret-right w3-margin-right"></i>Skinny</a>
-                  <a href="#" class="w3-bar-item w3-button">Exa1</a>
-                  <a href="#" class="w3-bar-item w3-button">Bootcut</a>
-                  <a href="#" class="w3-bar-item w3-button">Straight</a>
-                </div>
-                -->
                 <a href="#" class="w3-bar-item w3-button">Reservations</a>
             </div>
-            <a href="#footer" class="w3-bar-item w3-button w3-padding">Contact</a> 
-            <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display = 'block'">Newsletter</a> 
+            <a href="#footer" class="w3-bar-item w3-button w3-padding">Contact</a>
+            <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display = 'block'">Newsletter</a>
             <a href="#footer"  class="w3-bar-item w3-button w3-padding">Subscribe</a>
         </nav>
-        <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
-        <!-- Top menu on small screens -->
-        <header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+
+        <!-- Top Menu on Small Screens -->
+        <header class="w3-bar w3-top w3-hide-large custom-header w3-xlarge">
             <div class="w3-bar-item w3-padding-24 w3-wide">
-
-
                 <c:choose>
                     <c:when test="${sessionScope.roleID == '4'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="customerDashboard.jsp">Go to Dashboard</a>
-
                     </c:when>
                     <c:when test="${sessionScope.roleID == '2'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="/manager" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="/manager" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
-
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
-                        <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to feedback</a> 
+                        <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to Feedback</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '3'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="/staff" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
-
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="staffDashboard.jsp">Go to Dashboard</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '1'}">
-                        <h3 class="w3-wide public"> 
-                            <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="/admin" style="text-decoration: none;">${sessionScope.user.username}</a></b>
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="admin/userList">Go to User List</a>
                     </c:when>
                     <c:otherwise>
-                        <h3 class="w3-wide public"> 
-                            <br>
-
-                            <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
+                        <h3 class="w3-wide">
+                            <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;">LOGIN</a></b>
                         </h3>
                     </c:otherwise>
                 </c:choose>
                 <br>
-
             </div>
-            <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+            <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()">
+                <i class="fa fa-bars"></i>
+            </a>
         </header>
         <!-- ------------------------------------------------------------------------------------------------------------------------------------------------------------ -->
 
@@ -166,7 +205,25 @@
                 <p class="w3-right">
 
 
-                    <i class="tamthoi" ><a href="${pageContext.request.contextPath}/shoppingCart">Your Cart</a></i>
+                <style>
+                    .tamthoi a {
+                        display: inline-block;
+                        background-color: #007bff;  /* Màu xanh dương */
+                        color: #fff;               /* Màu chữ trắng */
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        transition: background-color 0.3s ease;
+                    }
+                    .tamthoi a:hover {
+                        background-color: #0056b3;
+                    }
+                </style>
+
+                <i class="tamthoi">
+                    <a href="${pageContext.request.contextPath}/shoppingCart">Your Cart</a>
+                </i>
 
 
 
@@ -352,32 +409,181 @@
                     dots[slideIndex - 1].className += " active";
                 }
             </script>
+            <!-- Custom Styles for Service Grid -->
+            <style>
+                .service-container {
+                    margin-bottom: 20px;
+                }
+                .service-card {
+                    background: #fff;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 5px;
+                    overflow: hidden;
+                    transition: transform 0.3s, box-shadow 0.3s;
+                    padding: 10px;
+                }
+                .service-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                .service-image {
+                    width: 100%;
+                    height: 200px; /* Ensures all images have equal height */
+                    object-fit: cover;
+                    display: block;
+                }
+                .service-info {
+                    padding: 10px 0;
+                }
+                .service-title {
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #333;
+                    margin: 0;
+                }
+                .service-price {
+                    font-size: 14px;
+                    color: #e91e63;
+                    margin: 5px 0 0;
+                }
+                .add-to-cart {
+                    background-color: #000;
+                    color: #fff;
+                    border: none;
+                    padding: 8px 16px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                    width: 100%;
+                }
+                .add-to-cart:hover {
+                    background-color: #333;
+                }
+                .service-info {
+                    padding: 10px 0;
+                }
+                .service-info p {
+                    margin: 0;
+                    text-decoration: none; /* Remove any underline */
+                }
+                .service-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                }
+                .service-price {
+                    font-size: 16px;
+                    color: #e91e63;
+                    margin-top: 5px;
+                }
+            </style>
+
             <div class="w3-container w3-text-grey" id="services">
                 <p>${services.size()} items</p>
             </div>
 
-            <!-- Product grid -->
+            <!-- Product Grid -->
             <div class="w3-row w3-grayscale">
                 <c:forEach var="service" items="${services}">
-                    <div class="w3-col l3 s6">
-                        <div class="w3-container">
+                    <div class="w3-col l3 s6 service-container">
+                        <div class="service-card" style="a {
+    text-decoration: none;
+    color: inherit;
+}">
                             <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}">
-                                <img src="${service.imageURL}" style="width:100%">
-                                <p>${service.serviceName}<br><b>${service.servicePrice}00 VND</b></p>
+                                <img src="${service.imageURL}" alt="${service.serviceName}" class="service-image">
+                                <style>
+                                    .service-info {
+                                        padding: 10px 0;
+                                    }
+                                    .service-info p {
+                                        margin: 0;
+                                        text-decoration: none; /* Remove any underline */
+                                    }
+                                    .service-title {
+                                        font-size: 18px;
+                                        font-weight: 600;
+                                        color: #333;
+                                    }
+                                    .service-price {
+                                        font-size: 16px;
+                                        color: #e91e63;
+                                        margin-top: 5px;
+                                    }
+                                    a {
+                                        text-decoration: none;
+                                        color: inherit;
+                                    }
+                                </style>
+                                <div class="service-info">
+                                    <p class="service-title" style="text-decoration: none;">${service.serviceName}</p>
+                                    <p class="service-price" style="text-decoration: none;"><b>${service.servicePrice}00 VND</b></p>
+                                    <p class="service-title" style="text-decoration: none;">${service.serviceDetail}</p>
+                                </div>
                             </a>
-
                             <form action="AddCart" method="post">
                                 <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                <button type="submit" class="w3-button w3-black">Add to Cart</button>
+                                <button type="submit" class="add-to-cart">Add to Cart</button>
                             </form>
                         </div>
                     </div>
                 </c:forEach>
             </div>
-
             <br>
 
+            <%
+                List<Slider> slider = (List<Slider>) request.getAttribute("sliders");
+            %>
+            <!-- Slider Khuyến mãi -->
+            <h1>Khuyến mãi</h1>
+            <div class="w3-row w3-grayscale">
+                <c:forEach var="slider" items="${sliders}">
+                    <div class="w3-col l3 s6 service-container">
+                        <div class="service-card">
+                            <a href="${pageContext.request.contextPath}/slider?sliderID=${slider.slideID}">
+                                <img src="${slider.img}" alt="${slider.title}" class="service-image">
+                                <div class="service-info">
+                                    <p class="service-title">${slider.title}</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </c:forEach>
+            </div>
 
+            <style>
+                .service-container {
+                    margin-bottom: 20px;
+                }
+                .service-card {
+                    background: #fff;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 5px;
+                    overflow: hidden;
+                    transition: transform 0.3s, box-shadow 0.3s;
+                    padding: 10px;
+                }
+                .service-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                .service-image {
+                    width: 100%;
+                    height: 200px; /* Kích thước cố định cho ảnh */
+                    object-fit: cover;
+                    display: block;
+                }
+                .service-info {
+                    padding: 10px 0;
+                    text-align: center;
+                }
+                .service-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                    margin: 0;
+                }
+            </style>
 
 
             <!--               
