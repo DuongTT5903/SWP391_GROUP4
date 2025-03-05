@@ -138,6 +138,26 @@
                 </table>
             </c:if>
             <p>Tổng Thanh Toán: ${total} VNĐ</p>
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Nút Trang Trước -->
+                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage - 1}&search=${param.search}&category=${param.category}">« Trang trước</a>
+                    </li>
+
+                    <!-- Hiển thị các số trang -->
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
+                        </li>
+                    </c:forEach>
+
+                    <!-- Nút Trang Sau -->
+                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage + 1}&search=${param.search}&category=${param.category}">Trang sau »</a>
+                    </li>
+                </ul>
+            </nav>
             <c:if test="${not empty cartItems}">
                 <a href="${pageContext.request.contextPath}/reservation" class="btn btn-primary" style="margin-bottom: 5px">Thanh toán</a>
             </c:if>

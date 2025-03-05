@@ -2,6 +2,28 @@
 <%@ page import="java.util.List" %>
 <%@ page import="model.Service" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    // Lấy thời gian bắt đầu từ session
+    Long startTime = (Long) session.getAttribute("startTime");
+
+    if (startTime != null) {
+        long currentTime = System.currentTimeMillis() / 1000; // Lấy thời gian hiện tại (seconds)
+        long elapsedTime = currentTime - startTime; // Tính thời gian đã trôi qua
+
+        // Nếu vượt quá 15 phút (900 giây), hiển thị thông báo và chuyển hướng về trang chủ
+        if (elapsedTime > 900) { 
+%>
+            <script>
+                alert("Phiên làm việc của bạn đã hết hạn. Bạn sẽ được chuyển về trang chủ.");
+                window.location.href = "<%= request.getContextPath() %>/homepage"; // Đổi đường dẫn trang chủ nếu cần
+            </script>
+<%
+            return; // Dừng xử lý tiếp theo
+        }
+    }
+%>
+
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -132,14 +154,25 @@
 
                 <nav class="mt-4">
                     <ul class="pagination justify-content-center">
+                        <!-- Nút Trang Trước -->
                         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/reservation?page=1&search=&category=0">« Trang trước</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/reservation?page=${currentPage - 1}&search=${param.search}&category=${param.category}">« Trang trước</a>
                         </li>
-                        <li class="page-item">
-                            <a class="page-link" href="${pageContext.request.contextPath}/reservation?page=2&search=&category=0">Trang sau »</a>
+
+                        <!-- Hiển thị các số trang -->
+                        <c:forEach var="i" begin="1" end="${totalPages}">
+                            <li class="page-item ${i == currentPage ? 'active' : ''}">
+                                <a class="page-link" href="${pageContext.request.contextPath}/reservation?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
+                            </li>
+                        </c:forEach>
+
+                        <!-- Nút Trang Sau -->
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="${pageContext.request.contextPath}/reservation?page=${currentPage + 1}&search=${param.search}&category=${param.category}">Trang sau »</a>
                         </li>
                     </ul>
                 </nav>
+
 
                 <form action="reservation" method="POST" class="mt-4">
                     <div class="row g-3">

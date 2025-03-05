@@ -14,9 +14,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.jsp.PageContext;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.List;
 import model.Service;
 import model.Slider;
@@ -113,7 +115,11 @@ public class HomepageController extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching sliders.");
         }
-
+        HttpSession session = request.getSession();
+        // Nếu chưa có thời gian truy cập, lưu thời gian bắt đầu
+        if (session.getAttribute("startTime") == null) {
+            session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
+        }
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 
