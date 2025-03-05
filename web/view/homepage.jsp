@@ -518,6 +518,7 @@
                                 <div class="service-info">
                                     <p class="service-title" style="text-decoration: none;">${service.serviceName}</p>
                                     <p class="service-price" style="text-decoration: none;"><b>${service.servicePrice}00 VND</b></p>
+                                    <p class="service-title" style="text-decoration: none;">${service.serviceDetail}</p>
                                 </div>
                             </a>
                             <form action="AddCart" method="post">
