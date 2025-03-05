@@ -137,7 +137,7 @@
                     </tbody>
                 </table>
             </c:if>
-            <p>Tổng Thanh Toán: ${total}VNĐ</p>
+            <p>Tổng Thanh Toán: ${total} VNĐ</p>
             <c:if test="${not empty cartItems}">
                 <a href="${pageContext.request.contextPath}/reservation" class="btn btn-primary" style="margin-bottom: 5px">Thanh toán</a>
             </c:if>

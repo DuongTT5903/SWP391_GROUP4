@@ -46,6 +46,16 @@ public class Service {
         this.status = status;
         this.author = author;
     }
+    public Service(int serviceID, String serviceName, String serviceDetail, ServiceCategory category, float servicePrice, float salePrice, String imageURL, boolean status) {
+        this.serviceID = serviceID;
+        this.serviceName = serviceName;
+        this.serviceDetail = serviceDetail;
+        this.category = category;
+        this.servicePrice = servicePrice;
+        this.salePrice = salePrice;
+        this.imageURL = imageURL;
+        this.status = status;
+    }
 
     /**
      *

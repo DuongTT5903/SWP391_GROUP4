@@ -44,7 +44,7 @@ public class AddCart extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet AddCart at " + request.getContextPath() + "</h1>");
             out.println("</body>");
-            out.println("</html>");
+            out.println("</aaaaaaaa>");
         }
     }
 
@@ -121,6 +121,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     // Set new cart cookie
     Cookie cartCookie = new Cookie("cart", newCartData);
     cartCookie.setMaxAge(60 * 60 * 24);
+    
     response.addCookie(cartCookie);
 
     // Redirect back

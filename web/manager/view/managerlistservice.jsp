@@ -51,10 +51,15 @@
         </style>
     </head>
     <body>
+        <c:if test="${not empty message}">
+            <div style="color: green; text-align: center; margin-bottom: 15px;">
+                ${message}
+            </div>
+        </c:if>
+
         <h1>Manager List Service</h1>
 
-        <!-- Search Form -->
-        <form action="managerlistservice" method="get" onsubmit="return validateSearch()">
+        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" onsubmit="return validateSearch()">
             <input type="hidden" name="service" value="searchById">
             <label for="searchID">Search by ID:</label>
             <input type="text" id="searchID" name="searchID" placeholder="Enter Service ID" value="${searchID}">
@@ -63,7 +68,6 @@
 
         <br>
 
-        <!-- Filter by Status -->
         <div class="filter-container">
             <label for="statusFilter">Filter by Status:</label>
             <select id="statusFilter" onchange="filterStatus()">
@@ -73,7 +77,6 @@
             </select>
         </div>
 
-        <!-- Service List Table -->
         <table id="serviceTable">
             <tr>
                 <th>ID</th>
@@ -84,7 +87,6 @@
                 <th>Sale Price</th>
                 <th>Image</th>
                 <th>Status</th>
-                <th>Author</th>
                 <th>Actions</th>
             </tr>
             <c:forEach var="service" items="${list}">
@@ -99,7 +101,7 @@
                         <img src="${service.imageURL}" alt="Service Image" width="50" height="50">
                     </td>
                     <td>
-                        <form action="managerlistservice" method="get">
+                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get">
                             <input type="hidden" name="service" value="editStatus">
                             <input type="hidden" name="serviceID" value="${service.serviceID}">
                             <select name="editStatus" onchange="this.form.submit()">
@@ -108,28 +110,23 @@
                             </select>
                         </form>
                     </td>
-                    <td>${service.author.username}</td>
                     <td>
-                        <form action="managerlistservice" method="get" style="display:inline;">
+                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" style="display:inline;">
                             <input type="hidden" name="serviceID" value="${service.serviceID}">
-                            <input type="hidden" name="service" value="editRequest">
-                            <button type="submit">Edit</button>
+                            <input type="hidden" name="service" value="viewDetail">
+                            <button type="submit">View</button>
                         </form>
                     </td>
                 </tr>
             </c:forEach>
         </table>
 
-        <!-- Buttons -->
         <div class="button-container">
-            <form action="managerlistservice" method="get" style="display:inline;">
+            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" style="display:inline;">
                 <input type="hidden" name="service" value="addRequest">
                 <button type="submit">Add New Service</button>
             </form>
-
-            <a href="homepage">
-                <button>Back to Home</button>
-            </a>
+            <a href="homepage"><button>Back to Home</button></a>
         </div>
 
         <script>
@@ -137,7 +134,7 @@
                 let searchInput = document.getElementById("searchID").value.trim();
                 if (searchInput === "") {
                     alert("Please enter a Service ID to search!");
-                    return false; // Ngăn chặn việc gửi form
+                    return false;
                 }
                 return true;
             }
@@ -145,7 +142,6 @@
             function filterStatus() {
                 let filter = document.getElementById("statusFilter").value;
                 let rows = document.querySelectorAll(".service-row");
-
                 rows.forEach(row => {
                     let status = row.getAttribute("data-status");
                     if (filter === "all" || status === filter) {
@@ -156,28 +152,20 @@
                 });
             }
 
-            let ascending = true; // Trạng thái sắp xếp
-
+            let ascending = true;
             function sortTable() {
                 let table = document.getElementById("serviceTable");
                 let rows = Array.from(table.getElementsByClassName("service-row"));
-                let icon = table.rows[0].cells[4]; // Cột "Service Price"
-
+                let icon = table.rows[0].cells[4];
                 rows.sort((a, b) => {
                     let priceA = parseFloat(a.cells[4].innerText);
                     let priceB = parseFloat(b.cells[4].innerText);
                     return ascending ? priceA - priceB : priceB - priceA;
                 });
-
-                ascending = !ascending; // Đảo trạng thái sắp xếp
-
-                // Cập nhật icon
+                ascending = !ascending;
                 icon.innerHTML = `Service Price ${ascending ? '🔽' : '🔼'}`;
-
-                // Cập nhật lại bảng
                 rows.forEach(row => table.appendChild(row));
             }
         </script>
-
     </body>
 </html>

@@ -39,8 +39,8 @@ public class ReservationDBContext {
 
     public void addReservation(String customerName, String email, String address, String phone, LocalDate creationDate, int userID, int paymentMethod, float totalPrice, int gender, String Description,int status) {
 
-        String sql = "INSERT INTO reservations ( CustomerName,Email,Address,Phone ,CreationDate,UserID ,Status  ,PaymentMethod ,TotalPrice, Gender,Description ,Status)"
-                + " VALUES (?, ?, ?, ?, ?,?, 1, ?, ?,?,?,?);";
+        String sql = "INSERT INTO reservations ( CustomerName,Email,Address,Phone ,CreationDate,UserID   ,PaymentMethod ,TotalPrice, Gender,Description ,Status)"
+                + " VALUES (?, ?, ?, ?, ?,?, ?, ?,?,?,?);";
 
         // ✅ Use executeUpdate() instead
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {

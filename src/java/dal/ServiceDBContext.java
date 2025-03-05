@@ -37,9 +37,8 @@ public class ServiceDBContext {
         List<ServiceCategory> serviceCategories = new ArrayList<>();
 
         try {
-            String sql = "select *"
-                    + "from servicesCategories ;";
-            stm = connection.prepareStatement(sql);
+            String sql = "SELECT * FROM servicecategories;";
+            stm = DBContext.getConnection().prepareStatement(sql);
             rs = stm.executeQuery();
 
             while (rs.next()) {
@@ -51,7 +50,7 @@ public class ServiceDBContext {
                 serviceCategories.add(serviceCategory);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error fetching users", ex);
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi lấy danh mục dịch vụ", ex);
         } finally {
             try {
                 if (rs != null) {
@@ -61,7 +60,7 @@ public class ServiceDBContext {
                     stm.close();
                 }
             } catch (SQLException ex) {
-                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
             }
         }
 
@@ -120,7 +119,7 @@ public class ServiceDBContext {
         try {
             String sql = "select *"
                     + "from services ;";
-            stm =  DBContext.getConnection().prepareStatement(sql);
+            stm = DBContext.getConnection().prepareStatement(sql);
             rs = stm.executeQuery();
 
             while (rs.next()) {
@@ -213,7 +212,7 @@ public class ServiceDBContext {
             String sql = "UPDATE services"
                     + "SET ServiceName = ?, ServiceDetail=? ,CategoryID=?, ServicePrice=?,SalePrice=?,imageURL=?"
                     + "WHERE ServiceID=?;  ";
-            stm = connection.prepareStatement(sql);
+            stm = DBContext.getConnection().prepareStatement(sql);
             stm.setString(1, serviceName);
             stm.setString(2, serviceDetail);
             stm.setInt(3, categoryID);
@@ -279,17 +278,15 @@ public class ServiceDBContext {
      * @param pageSize
      * @return
      */
-
     public List<Service> getServices(String search, int categoryID, int page, int pageSize) {
         List<Service> services = new ArrayList<>();
-        
+
         String sql = """
              SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, sc.CategoryID, sc.CategoryName, sc.CategoryDetail, 
              s.ServicePrice, s.ImageURL, s.status, s.SalePrice, s.authorID 
              FROM services s 
              INNER JOIN servicecategories sc ON s.CategoryID = sc.CategoryID
              WHERE s.status = 1""";
-
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -323,59 +320,60 @@ public class ServiceDBContext {
         }
         return services;
     }
-   public List<Service> getServices(String search, int categoryID, int page, int pageSize, String type, String sort) {
-    List<Service> services = new ArrayList<>();
-    
-    // Validate sorting input
-    List<String> validSortColumns = Arrays.asList("serviceName", "servicePrice", "salePrice", "serviceid"); // Allowed columns
-    List<String> validSortOrders = Arrays.asList("ASC", "DESC"); // Allowed sorting orders
-    
-   
-    if (!validSortOrders.contains(sort)) {
-        sort = "DESC"; // Default sorting order
 
-    }
+    public List<Service> getServices(String search, int categoryID, int page, int pageSize, String type, String sort) {
+        List<Service> services = new ArrayList<>();
 
-    // Dynamic SQL (Avoiding ORDER BY placeholder issue)
-    String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
-            + "JOIN servicecategories c ON s.categoryID = c.categoryID "
-            + "JOIN users u ON s.authorID = u.userID "
-            + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
-            + "AND (? = 0 OR s.categoryID = ?) "
-            + "ORDER BY " + type + " " + sort + " " // Safe dynamic ORDER BY
-            + "LIMIT ?, ?";
+        // Validate sorting input
+        List<String> validSortColumns = Arrays.asList("serviceName", "servicePrice", "salePrice", "serviceid"); // Allowed columns
+        List<String> validSortOrders = Arrays.asList("ASC", "DESC"); // Allowed sorting orders
 
-    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-        stmt.setString(1, search.isEmpty() ? null : "%" + search + "%");
-        stmt.setString(2, search.isEmpty() ? null : "%" + search + "%");
-        stmt.setInt(3, categoryID);
-        stmt.setInt(4, categoryID);
-        stmt.setInt(5, (page - 1) * pageSize);
-        stmt.setInt(6, pageSize);
-        
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
-            User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+        if (!validSortOrders.contains(sort)) {
+            sort = "DESC"; // Default sorting order
 
-            Service service = new Service(
-                    rs.getInt("serviceID"),
-                    rs.getString("serviceName"),
-                    rs.getString("serviceDetail"),
-                    category,
-                    rs.getFloat("servicePrice"),
-                    rs.getFloat("salePrice"),
-                    rs.getString("imageURL"),
-                    rs.getBoolean("status"),
-                    author
-            );
-            services.add(service);
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+
+        // Dynamic SQL (Avoiding ORDER BY placeholder issue)
+        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
+                + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+                + "JOIN users u ON s.authorID = u.userID "
+                + "WHERE (? IS NULL OR s.serviceName LIKE ?) "
+                + "AND (? = 0 OR s.categoryID = ?) "
+                + "ORDER BY " + type + " " + sort + " " // Safe dynamic ORDER BY
+                + "LIMIT ?, ?";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, search.isEmpty() ? null : "%" + search + "%");
+            stmt.setString(2, search.isEmpty() ? null : "%" + search + "%");
+            stmt.setInt(3, categoryID);
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, (page - 1) * pageSize);
+            stmt.setInt(6, pageSize);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ServiceCategory category = new ServiceCategory(rs.getInt("categoryID"), rs.getString("categoryName"), "");
+                User author = new User(rs.getInt("authorID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+
+                Service service = new Service(
+                        rs.getInt("serviceID"),
+                        rs.getString("serviceName"),
+                        rs.getString("serviceDetail"),
+                        category,
+                        rs.getFloat("servicePrice"),
+                        rs.getFloat("salePrice"),
+                        rs.getString("imageURL"),
+                        rs.getBoolean("status"),
+                        author
+                );
+                services.add(service);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return services;
     }
-    return services;
-}
+
     /**
      *
      * @param ID
@@ -415,10 +413,8 @@ public class ServiceDBContext {
         }
         return service;
     }
-    
 
     // Lấy tất cả dịch vụ để hiển thị trên trang homepage
-
     /**
      *
      * @return
@@ -429,30 +425,28 @@ public class ServiceDBContext {
                      SELECT s.ServiceID, s.ServiceName, s.ServiceDetail,sc.CategoryID, sc.CategoryName, sc.CategoryDetail, s.ServicePrice,s.ImageURL, 
                      s.status, s.SalePrice, s.authorID FROM services s Inner join servicecategories sc on s.CategoryID = sc.CategoryID""";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 ServiceCategory category = new ServiceCategory(
-                rs.getInt("CategoryID"),
-                rs.getString("CategoryDetail"),
-                rs.getString("CategoryName")
+                        rs.getInt("CategoryID"),
+                        rs.getString("CategoryDetail"),
+                        rs.getString("CategoryName")
                 );
-                
+
                 User author = new User();
-                author.setUserID(rs.getInt("authorID")); 
-                
+                author.setUserID(rs.getInt("authorID"));
+
                 Service service = new Service(
-                rs.getInt("ServiceID"),
-                rs.getString("ServiceName"),
-                rs.getString("ServiceDetail"),
-                category,
-                rs.getFloat("ServicePrice"),
-                rs.getFloat("SalePrice"),
-                rs.getString("ImageURL"),
-                rs.getBoolean("status"),
-                author
+                        rs.getInt("ServiceID"),
+                        rs.getString("ServiceName"),
+                        rs.getString("ServiceDetail"),
+                        category,
+                        rs.getFloat("ServicePrice"),
+                        rs.getFloat("SalePrice"),
+                        rs.getString("ImageURL"),
+                        rs.getBoolean("status"),
+                        author
                 );
                 services.add(service);
             }
@@ -461,6 +455,7 @@ public class ServiceDBContext {
         }
         return services;
     }
+
     public boolean updateServiceStatus(int serviceID, boolean newStatus) {
         PreparedStatement stm = null;
         Connection conn = null;
@@ -479,69 +474,111 @@ public class ServiceDBContext {
             return false;
         } finally {
             try {
-                if (stm != null) stm.close();
-                if (conn != null) conn.close();
+                if (stm != null) {
+                    stm.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
             }
         }
     }
 
-    // Thêm phương thức getListServiceByID từ code của bạn
     public List<Service> getListServiceByID(int ID) {
+        PreparedStatement stm = null;
+        ResultSet rs = null;
         List<Service> serviceList = new ArrayList<>();
-        String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
-                   + "JOIN servicecategories c ON s.categoryID = c.categoryID "
-                   + "JOIN users u ON s.authorID = u.userID "
-                   + "WHERE s.serviceID = ?"; // Chỉnh lại điều kiện chính xác
+        UserDBContext u = new UserDBContext();
 
-        try (Connection conn = DBContext.getConnection(); 
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, ID);
-            ResultSet rs = stmt.executeQuery();
+        try {
+            String sql = "SELECT s.*, c.categoryName, u.name AS authorName FROM services s "
+                    + "JOIN servicecategories c ON s.categoryID = c.categoryID "
+                    + "JOIN users u ON s.authorID = u.userID "
+                    + "WHERE s.serviceID = ?";
+            stm = DBContext.getConnection().prepareStatement(sql);
+            stm.setInt(1, ID);
+            rs = stm.executeQuery();
 
             while (rs.next()) {
-                ServiceCategory category = new ServiceCategory(
-                    rs.getInt("categoryID"), 
-                    rs.getString("categoryName"), 
-                    ""
-                );
-
-                User author = new User(
-                    rs.getInt("authorID"), 
-                    rs.getString("authorName"), 
-                    true, "", "", "", "", "", ""
-                );
+                int serviceID = rs.getInt("serviceID");
+                String serviceName = rs.getString("serviceName");
+                String serviceDetail = rs.getString("serviceDetail");
+                int categoryID = rs.getInt("categoryID");
+                float servicePrice = rs.getFloat("servicePrice");
+                float salePrice = rs.getFloat("salePrice");
+                String imageURL = rs.getString("imageURL");
+                boolean status = rs.getBoolean("status");
+                int authorID = rs.getInt("authorID");
 
                 Service service = new Service(
-                    rs.getInt("serviceID"),
-                    rs.getString("serviceName"),
-                    rs.getString("serviceDetail"),
-                    category,
-                    rs.getFloat("servicePrice"),
-                    rs.getFloat("salePrice"),
-                    rs.getString("imageURL"),
-                    rs.getBoolean("status"),
-                    author
+                        serviceID, serviceName, serviceDetail,
+                        getServiceCategoryByID(categoryID), // Dùng phương thức này để đồng bộ
+                        servicePrice, salePrice, imageURL, status,
+                        u.getUserByID(authorID)
                 );
-
                 serviceList.add(service);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi lấy danh sách dịch vụ", ex);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stm != null) {
+                    stm.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
+            }
         }
-
-        return serviceList; // Trả về danh sách thay vì chỉ một đối tượng
+        return serviceList;
     }
 
+    public void addService(Service service) {
+        PreparedStatement stm = null;
+
+        try {
+            String sql = "INSERT INTO services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, ImageURL, status, authorID) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+            stm = DBContext.getConnection().prepareStatement(sql);
+
+            stm.setString(1, service.getServiceName());
+            stm.setString(2, service.getServiceDetail());
+            stm.setInt(3, service.getCategory().getCategoryID()); // Lấy ID từ đối tượng category
+            stm.setFloat(4, service.getServicePrice());
+            stm.setFloat(5, service.getSalePrice());
+            stm.setString(6, service.getImageURL());
+            stm.setBoolean(7, service.isStatus());
+            stm.setInt(8, 2); // Lấy ID từ đối tượng author
+
+            stm.executeUpdate();
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Dịch vụ đã được thêm thành công: {0}", service.getServiceName());
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi thêm dịch vụ", ex);
+        } finally {
+            try {
+                if (stm != null) {
+                    stm.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
+            }
+        }
+    }
 
     /**
      *
      * @param args
      */
     public static void main(String[] args) {
-        ServiceDBContext s = new ServiceDBContext();
-        System.out.println(s.getServiceByID(1).getAuthor().getName());
+        ServiceDBContext serviceDB = new ServiceDBContext();
+
+        // Gọi hàm lấy danh mục dịch vụ
+        System.out.println(serviceDB.getServiceByID(1));
     }
+
 }
