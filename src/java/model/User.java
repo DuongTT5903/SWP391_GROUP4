@@ -59,7 +59,27 @@ public class User {
         this.imageURL = imageURL;
         this.status = status;
     }
+public User(String name, boolean gender, String email, String username, String password, String phone, String role, String imageURL) {
+    this.name = name;
+    this.gender = gender;
+    this.email = email;
+    this.username = username;
+    this.password = password;
+    this.phone = phone;
+    this.role = role;
+    this.imageURL = imageURL;
+ 
+}
+public User(String name, boolean gender, String email, String username, String password, String phone) {
+    this.name = name;
+    this.gender = gender;
+    this.email = email;
+    this.username = username;
+    this.password = password;
+    this.phone = phone;
 
+ 
+}
     // Parameterized constructor
     /**
      *
@@ -84,6 +104,8 @@ public class User {
         this.role = role;
         this.imageURL = imageURL;
     }
+
+
 
     public UserStatus getStatus() {
         return status;

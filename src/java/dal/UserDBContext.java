@@ -143,27 +143,24 @@ public class UserDBContext {
      * @param pass
      * @param phone
      */
-    public void signup(String name, String gender, String email, String user, String pass, String phone) {
-        try {
-            // Connect to MySQL database
-            Connection conn = new DBContext().getConnection();
-            String sql = "INSERT INTO Users\n"
-                    + "           (Name, Gender, Email, Username, Password, Phone, RoleID)\n"
-                    + "     VALUES\n"
-                    + "           (?, ?, ?, ?, ?, ?, 4)";
+ public void signup(String name, boolean gender, String email, String user, String pass, String phone) {
+    try {
+        Connection conn = new DBContext().getConnection();
+        String sql = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID) VALUES (?, ?, ?, ?, ?, ?, 4)";
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, gender);
-            ps.setString(3, email);
-            ps.setString(4, user);
-            ps.setString(5, pass);
-            ps.setString(6, phone);
-            ps.executeUpdate();
-        } catch (Exception ex) {
-            ex.printStackTrace(System.out);
-        }
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, name);
+        ps.setBoolean(2, gender); // Chuyển đổi trực tiếp sang boolean
+        ps.setString(3, email);
+        ps.setString(4, user);
+        ps.setString(5, pass);
+        ps.setString(6, phone);
+        ps.executeUpdate();
+    } catch (Exception ex) {
+        ex.printStackTrace(System.out);
     }
+}
+
 
     private static Connection connection = DBContext.getConnection();
 

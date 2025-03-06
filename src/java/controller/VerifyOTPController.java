@@ -1,12 +1,14 @@
 package controller;
 
+import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
 import dal.UserDBContext;
+import model.User;
+import model.UserStatus; // Đảm bảo bạn có enum UserStatus
 
 public class VerifyOTPController extends HttpServlet {
 @Override
@@ -18,24 +20,42 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         String enteredOTP = request.getParameter("otp");
-        String sessionOTP = (String) session.getAttribute("otp");
-        String user = (String) session.getAttribute("registeredUser");
+        HttpSession session = request.getSession();
+        String generatedOTP = (String) session.getAttribute("otp");
+        User registeredUser = (User) session.getAttribute("registeredUser");
 
-        if (enteredOTP != null && enteredOTP.equals(sessionOTP)) {
-            // Kích hoạt tài khoản trong database
-            UserDBContext db = new UserDBContext();
-            db.activateAccount(user);
+        if (enteredOTP != null && generatedOTP != null && enteredOTP.equals(generatedOTP)) {
+            // Kiểm tra xem registeredUser có null không để tránh lỗi NullPointerException
+            if (registeredUser != null) {
+                UserDBContext account = new UserDBContext();
+                
+                // Đăng ký tài khoản với trạng thái ACTIVE (mặc định là 1)
+                account.signup(
+                    registeredUser.getName(),
+                    registeredUser.isGender(),
+                    registeredUser.getEmail(),
+                    registeredUser.getUsername(),
+                    registeredUser.getPassword(),
+                    registeredUser.getPhone()   
+                );
 
-            // Xóa session OTP sau khi xác thực thành công
-            session.removeAttribute("otp");
-            session.removeAttribute("registeredUser");
+                // Xóa thông tin session sau khi đăng ký thành công
+                session.removeAttribute("otp");
+                session.removeAttribute("registeredUser");
 
-            request.setAttribute("message", "Xác thực thành công! Vui lòng đăng nhập.");
-            request.getRequestDispatcher("views/login.jsp").forward(request, response);
+                // Chuyển hướng đến trang login với thông báo thành công
+                request.setAttribute("success", "Xác thực thành công! Tài khoản của bạn đã được đăng ký.");
+                request.getRequestDispatcher("views/login.jsp").forward(request, response);
+            } else {
+                request.setAttribute("error", "Lỗi hệ thống: Không tìm thấy thông tin người dùng.");
+                request.getRequestDispatcher("view/register.jsp").forward(request, response);
+            }
         } else {
-            request.setAttribute("e", "Mã OTP không đúng! Vui lòng thử lại.");
+            request.setAttribute("error", "Mã OTP không chính xác, vui lòng thử lại.");
             request.getRequestDispatcher("view/verify.jsp").forward(request, response);
         }
     }
