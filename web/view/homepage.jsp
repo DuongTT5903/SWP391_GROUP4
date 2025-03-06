@@ -135,7 +135,12 @@
                 <a href="${pageContext.request.contextPath}/blogList" class="w3-bar-item w3-button">Blogs</a>
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
                 <a href="${pageContext.request.contextPath}/reservation"  class="w3-bar-item w3-button">Reservations</a>
+                <c:if test="${sessionScope.roleID == '2'}">
+                    <a href="${pageContext.request.contextPath}/manager/listservice" class="w3-bar-item w3-button">Service Manager</a>
+                </c:if>
             </div>
+            <!-- Nút điều hướng tới ManagerServiceController cho Manager -->
+
             <a href="#footer" class="w3-bar-item w3-button w3-padding">Contact</a>
             <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display = 'block'">Newsletter</a>
             <a href="#footer"  class="w3-bar-item w3-button w3-padding">Subscribe</a>
@@ -487,9 +492,9 @@
                 <c:forEach var="service" items="${services}">
                     <div class="w3-col l3 s6 service-container">
                         <div class="service-card" style="a {
-    text-decoration: none;
-    color: inherit;
-}">
+                                 text-decoration: none;
+                                 color: inherit;
+                             }">
                             <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}">
                                 <img src="${service.imageURL}" alt="${service.serviceName}" class="service-image">
                                 <style>
