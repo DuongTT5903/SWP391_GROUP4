@@ -51,21 +51,39 @@
                     Add New Post
                 </div>
                 <div class="card-body">
-                    <form action="AddPost" method="post" enctype="multipart/form-data">
+                    <form action="<%= request.getContextPath() %>/manager/addPost" method="post" class="needs-validation" novalidate>
                         <div class="mb-3">
-                            <label for="postTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="postTitle" name="title" placeholder="Enter title" required>
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" id="title" name="title" class="form-control" placeholder="Enter post title" required>
+                            <div class="invalid-feedback">
+                                Please provide a title.
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="postContent" class="form-label">Content</label>
-                            <textarea class="form-control" id="postContent" name="content" rows="8" placeholder="Write your content here..." required></textarea>
+                            <label for="detail" class="form-label">Detail</label>
+                            <textarea id="detail" name="detail" class="form-control" rows="5" placeholder="Enter post details" required></textarea>
+                            <div class="invalid-feedback">
+                                Please provide the post details.
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="postImage" class="form-label">Image Link</label>
+                            <label for="category" class="form-label">Category</label>
+                            <input type="text" id="category" name="category" class="form-control" placeholder="Enter category" required>
+                            <div class="invalid-feedback">
+                                Please provide a category.
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageLink" class="form-label">Image Link</label>
                             <input type="text" id="imageLink" name="imageLink" class="form-control" placeholder="Enter image URL">
-<!--                            <input class="form-control" type="file" id="postImage" name="image">-->
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit Post</button>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" id="status" name="status" class="form-check-input" checked>
+                            <label for="status" class="form-check-label">Active</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Post</button>
+                        <a href="<%= request.getContextPath()%>/manager/postList" class="btn btn-secondary">Cancel</a><p>   </p>
+                        <a href="${pageContext.request.contextPath}/homepage" class="btn btn-primary" style="margin-bottom:10px">Quay lại</a>
                     </form>
                 </div>
             </div>
@@ -89,10 +107,10 @@
                         })
             })()
         </script>
-<!--        <div class="mb-3">
-            <label for="imageLink" class="form-label">Image Link</label>
-            <input type="text" id="imageLink" name="imageLink" class="form-control" placeholder="Enter image URL">
-        </div>-->
+        <!--        <div class="mb-3">
+                    <label for="imageLink" class="form-label">Image Link</label>
+                    <input type="text" id="imageLink" name="imageLink" class="form-control" placeholder="Enter image URL">
+                </div>-->
     </body>
 </html>
 
