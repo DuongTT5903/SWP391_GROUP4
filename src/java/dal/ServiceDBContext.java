@@ -206,36 +206,36 @@ public class ServiceDBContext {
      * @param serviceID
      */
     public void updateService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int serviceID) {
-        PreparedStatement stm = null;
-        ResultSet rs = null;
+    PreparedStatement stm = null;
+    try {
+        String sql = "UPDATE services SET ServiceName = ?, ServiceDetail = ?, CategoryID = ?, ServicePrice = ?, SalePrice = ?, ImageURL = ? WHERE ServiceID = ?";
+        stm = DBContext.getConnection().prepareStatement(sql);
+        stm.setString(1, serviceName);
+        stm.setString(2, serviceDetail);
+        stm.setInt(3, categoryID);
+        stm.setFloat(4, servicePrice);
+        stm.setFloat(5, salePrice);
+        stm.setString(6, imageURL);
+        stm.setInt(7, serviceID);
+
+        int rowsUpdated = stm.executeUpdate();
+        if (rowsUpdated > 0) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Service ID {0} updated successfully.", serviceID);
+        } else {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.WARNING, "No rows updated for Service ID {0}.", serviceID);
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error updating service", ex);
+    } finally {
         try {
-            String sql = "UPDATE services"
-                    + "SET ServiceName = ?, ServiceDetail=? ,CategoryID=?, ServicePrice=?,SalePrice=?,imageURL=?"
-                    + "WHERE ServiceID=?;  ";
-            stm = DBContext.getConnection().prepareStatement(sql);
-            stm.setString(1, serviceName);
-            stm.setString(2, serviceDetail);
-            stm.setInt(3, categoryID);
-            stm.setFloat(4, servicePrice);
-            stm.setFloat(5, salePrice);
-            stm.setString(6, imageURL);
-            stm.setInt(7, serviceID);
-            rs = stm.executeQuery();
-        } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error fetching users", ex);
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stm != null) {
-                    stm.close();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+            if (stm != null) {
+                stm.close();
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
         }
     }
+}
 
     /**
      *
