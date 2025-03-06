@@ -495,7 +495,7 @@
                                  text-decoration: none;
                                  color: inherit;
                              }">
-                            <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}">
+                            <a href="${pageContext.request.contextPath}/manager/service?serviceID=${service.serviceID}">
                                 <img src="${service.imageURL}" alt="${service.serviceName}" class="service-image">
                                 <style>
                                     .service-info {
