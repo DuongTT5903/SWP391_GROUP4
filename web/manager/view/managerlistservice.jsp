@@ -7,128 +7,134 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Manager List Service</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-            }
-            table, th, td {
-                border: 1px solid black;
-            }
-            th, td {
-                padding: 10px;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-                cursor: pointer;
-            }
-            th:hover {
-                background-color: #ddd;
-            }
-            img {
-                border-radius: 5px;
-            }
-            .button-container {
-                margin-top: 15px;
-            }
-            .button-container button {
-                padding: 8px 15px;
-                margin-right: 5px;
-                cursor: pointer;
-            }
-            .filter-container {
-                margin-bottom: 15px;
-            }
-            select {
-                padding: 5px;
-            }
-        </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
-    <body>
-        <c:if test="${not empty message}">
-            <div style="color: green; text-align: center; margin-bottom: 15px;">
-                ${message}
+    <body class="bg-light">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="mb-0">Manager List Service</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Thông báo -->
+                            <c:if test="${not empty message}">
+                                <div class="alert alert-success text-center" role="alert">
+                                    ${message}
+                                </div>
+                            </c:if>
+
+                            <!-- Form tìm kiếm -->
+                            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-3" onsubmit="return validateSearch()">
+                                <input type="hidden" name="service" value="searchById">
+                                <div class="input-group">
+                                    <span class="input-group-text">Search by ID</span>
+                                    <input type="text" class="form-control" id="searchID" name="searchID" 
+                                           placeholder="Enter Service ID" value="${searchID}">
+                                    <button type="submit" class="btn btn-primary">Search</button>
+                                </div>
+                            </form>
+
+                            <!-- Bộ lọc trạng thái -->
+                            <div class="mb-3">
+                                <label for="statusFilter" class="form-label">Filter by Status:</label>
+                                <select class="form-select w-auto d-inline-block" id="statusFilter" onchange="filterStatus()">
+                                    <option value="all">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+
+                            <!-- Bảng danh sách dịch vụ -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="serviceTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Title</th>
+                                            <th>Detail</th>
+                                            <th>Category</th>
+                                            <th onclick="sortTable()" style="cursor: pointer;">Service Price <span id="sortIcon">🔽</span></th>
+                                            <th>Sale Price</th>
+                                            <th>Image</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="service" items="${list}">
+                                            <tr class="service-row" data-status="${service.status ? 'active' : 'inactive'}">
+                                                <td>${service.serviceID}</td>
+                                                <td>${service.serviceName}</td>
+                                                <td>${service.serviceDetail}</td>
+                                                <td>${service.category.categoryName}</td>
+                                                <td class="service-price">${service.servicePrice}</td>
+                                                <td>${service.salePrice}</td>
+                                                <td>
+                                                    <img src="${service.imageURL}" alt="Service Image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
+                                                </td>
+                                                <td>
+                                                    <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
+                                                        <input type="hidden" name="service" value="editStatus">
+                                                        <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                                        <select name="editStatus" class="form-select" onchange="this.form.submit()">
+                                                            <option value="true" ${service.status ? "selected" : ""}>Active</option>
+                                                            <option value="false" ${!service.status ? "selected" : ""}>Inactive</option>
+                                                        </select>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
+                                                        <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                                        <input type="hidden" name="service" value="viewDetail">
+                                                        <button type="submit" class="btn btn-sm btn-info">View</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Phân trang -->
+                            <nav aria-label="Page navigation" class="mt-3">
+                                <ul class="pagination justify-content-center">
+                                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage - 1}" 
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">&laquo; Previous</span>
+                                        </a>
+                                    </li>
+                                    <c:forEach begin="1" end="${totalPages}" var="i">
+                                        <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                            <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${i}">${i}</a>
+                                        </li>
+                                    </c:forEach>
+                                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage + 1}" 
+                                           aria-label="Next">
+                                            <span aria-hidden="true">Next &raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                            <!-- Nút điều hướng -->
+                            <div class="d-flex justify-content-between mt-3">
+                                <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
+                                    <input type="hidden" name="service" value="addRequest">
+                                    <button type="submit" class="btn btn-success">Add New Service</button>
+                                </form>
+                                <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary">Back to Home</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </c:if>
-
-        <h1>Manager List Service</h1>
-
-        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" onsubmit="return validateSearch()">
-            <input type="hidden" name="service" value="searchById">
-            <label for="searchID">Search by ID:</label>
-            <input type="text" id="searchID" name="searchID" placeholder="Enter Service ID" value="${searchID}">
-            <button type="submit">Search</button>
-        </form>
-
-        <br>
-
-        <div class="filter-container">
-            <label for="statusFilter">Filter by Status:</label>
-            <select id="statusFilter" onchange="filterStatus()">
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
         </div>
 
-        <table id="serviceTable">
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Detail</th>
-                <th>Category</th>
-                <th onclick="sortTable()">Service Price 🔽</th>
-                <th>Sale Price</th>
-                <th>Image</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            <c:forEach var="service" items="${list}">
-                <tr class="service-row" data-status="${service.status ? 'active' : 'inactive'}">
-                    <td>${service.serviceID}</td>
-                    <td>${service.serviceName}</td>
-                    <td>${service.serviceDetail}</td>
-                    <td>${service.category.categoryName}</td>
-                    <td class="service-price">${service.servicePrice}</td>
-                    <td>${service.salePrice}</td>
-                    <td>
-                        <img src="${service.imageURL}" alt="Service Image" width="50" height="50">
-                    </td>
-                    <td>
-                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get">
-                            <input type="hidden" name="service" value="editStatus">
-                            <input type="hidden" name="serviceID" value="${service.serviceID}">
-                            <select name="editStatus" onchange="this.form.submit()">
-                                <option value="true" ${service.status ? "selected" : ""}>Active</option>
-                                <option value="false" ${!service.status ? "selected" : ""}>Inactive</option>
-                            </select>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" style="display:inline;">
-                            <input type="hidden" name="serviceID" value="${service.serviceID}">
-                            <input type="hidden" name="service" value="viewDetail">
-                            <button type="submit">View</button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-        </table>
-
-        <div class="button-container">
-            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" style="display:inline;">
-                <input type="hidden" name="service" value="addRequest">
-                <button type="submit">Add New Service</button>
-            </form>
-            <a href="homepage"><button>Back to Home</button></a>
-        </div>
-
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             function validateSearch() {
                 let searchInput = document.getElementById("searchID").value.trim();
@@ -156,15 +162,18 @@
             function sortTable() {
                 let table = document.getElementById("serviceTable");
                 let rows = Array.from(table.getElementsByClassName("service-row"));
-                let icon = table.rows[0].cells[4];
+                let icon = document.getElementById("sortIcon");
+
                 rows.sort((a, b) => {
-                    let priceA = parseFloat(a.cells[4].innerText);
-                    let priceB = parseFloat(b.cells[4].innerText);
+                    let priceA = parseFloat(a.querySelector(".service-price").innerText);
+                    let priceB = parseFloat(b.querySelector(".service-price").innerText);
                     return ascending ? priceA - priceB : priceB - priceA;
                 });
+
                 ascending = !ascending;
-                icon.innerHTML = `Service Price ${ascending ? '🔽' : '🔼'}`;
-                rows.forEach(row => table.appendChild(row));
+                icon.textContent = ascending ? "🔽" : "🔼";
+
+                rows.forEach(row => table.querySelector("tbody").appendChild(row));
             }
         </script>
     </body>
