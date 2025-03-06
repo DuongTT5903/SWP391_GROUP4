@@ -1,165 +1,134 @@
-/*
-     * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-     * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.UserDBContext;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.List;
 import model.User;
 
-/**
- *
- * @author admin
- */
 public class ManagerCustomerList extends HttpServlet {
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminUserList</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminUserList at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    private static final Logger LOGGER = Logger.getLogger(ManagerCustomerList.class.getName());
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         try {
             UserDBContext db = new UserDBContext();
             List<User> users = db.getUsers1();
             request.setAttribute("users", users);
+            request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
         } catch (Exception e) {
-            
-            request.setAttribute("error", "Could not load user list. Please try again later.");
+            LOGGER.log(Level.SEVERE, "Lỗi khi lấy danh sách người dùng", e);
+            request.setAttribute("error", "Không thể tải danh sách người dùng.");
+            request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
         }
-        request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
     }
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
-   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    UserDBContext db = new UserDBContext();
-    String action = request.getParameter("action");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        UserDBContext db = new UserDBContext();
+        String action = request.getParameter("action");
 
-    // Handle user status update first
-    if ("updateStatus".equals(action)) {
-        int userID = Integer.parseInt(request.getParameter("userID"));
-        boolean newStatus = request.getParameter("status").equals("1");
-        db.updateUserStatus(userID, newStatus);
+        try {
+            if ("updateStatus".equals(action)) {
+                String userIDParam = request.getParameter("userID");
+                String statusParam = request.getParameter("status");
 
-        response.sendRedirect(request.getContextPath() + "/manager/customerList");
-        return; // Stop further execution
+                if (userIDParam == null || statusParam == null) {
+                    LOGGER.warning("Thiếu thông tin userID hoặc status khi cập nhật trạng thái.");
+                    throw new IllegalArgumentException("Thiếu thông tin cần thiết!");
+                }
+
+                int userID = Integer.parseInt(userIDParam);
+                boolean newStatus = "1".equals(statusParam);
+
+                db.updateUserStatus(userID, newStatus);
+                response.sendRedirect(request.getContextPath() + "/manager/customerList");
+                return;
+            }
+
+            // Xử lý thêm user mới
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String roleID = request.getParameter("role");
+
+            String errorMessage = validateInput(name, email, phone, username, password, db);
+            if (errorMessage != null) {
+                LOGGER.warning("Lỗi xác thực dữ liệu: " + errorMessage);
+                request.setAttribute("error", errorMessage);
+                request.setAttribute("name", name);
+                request.setAttribute("email", email);
+                request.setAttribute("phone", phone);
+                request.setAttribute("username", username);
+                request.setAttribute("role", roleID);
+
+                List<User> users = db.getUsers1();
+                request.setAttribute("users", users);
+                request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
+                return;
+            }
+
+            // Tạo user mới
+            User user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setUsername(username);
+            user.setPassword(password);
+            user.setRole(roleID);
+
+            db.addUser(user);
+            LOGGER.info("Thêm user thành công: " + username);
+
+            response.sendRedirect(request.getContextPath() + "/manager/customerList");
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Lỗi chuyển đổi số (userID không hợp lệ): ", e);
+            request.setAttribute("error", "ID người dùng không hợp lệ.");
+            request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
+        } catch (IllegalArgumentException e) {
+            LOGGER.log(Level.WARNING, "Lỗi đầu vào: {0}", e.getMessage());
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi hệ thống khi xử lý POST", e);
+            request.setAttribute("error", "Lỗi trong quá trình xử lý.");
+            request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
+        }
     }
-
-    // Handle user creation
-    String name = request.getParameter("name");
-    String email = request.getParameter("email");
-    String phone = request.getParameter("phone");
-    String username = request.getParameter("username");
-    String password = request.getParameter("password");
-    String roleID = request.getParameter("role");
-
-    String errorMessage = validateInput(name, email, phone, username, password, db);
-    if (errorMessage != null) {
-        // Preserve form input to show back in case of an error
-        request.setAttribute("error", errorMessage);
-        request.setAttribute("name", name);
-        request.setAttribute("email", email);
-        request.setAttribute("phone", phone);
-        request.setAttribute("username", username);
-        request.setAttribute("role", roleID);
-
-        // Reload user list for display
-        List<User> users = db.getUsers1();
-        request.setAttribute("users", users);
-
-        request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
-        return; // Stop execution when there is an error
-    }
-
-    // Create a new user
-    User user = new User();
-    user.setName(name);
-    user.setEmail(email);
-    user.setPhone(phone);
-    user.setUsername(username);
-    user.setPassword(password);
-    user.setRole(roleID);
-
-    try {
-        db.addUser(user);
-         String subject = "Chào mừng bạn đến với hệ thống!";
-        String content = "<h1>Xin chào " + name + ",</h1>"
-                       + "<p>Bạn đã được thêm vào hệ thống với tài khoản: <strong>" + username + "</strong></p>"
-                       + "<p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật tài khoản.</p>"
-                       + "<p>Cảm ơn bạn đã tham gia!</p>";
-
-        resetService emailService = new resetService();
-       emailService.sendEmail1(email, subject, content);
-        response.sendRedirect(request.getContextPath() + "/manager/customerList");
-    } catch (Exception e) {
-        request.setAttribute("error", "Lỗi trong quá trình thêm người dùng.");
-        request.getRequestDispatcher("/manager/view/customerList.jsp").forward(request, response);
-    }
-}
-
 
     private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        if (name == null || name.trim().isEmpty() ||
+            email == null || email.trim().isEmpty() ||
+            phone == null || phone.trim().isEmpty() ||
+            username == null || username.trim().isEmpty() ||
+            password == null || password.trim().isEmpty()) {
+            LOGGER.warning("Xác thực thất bại: Thiếu thông tin bắt buộc.");
             return "Vui lòng điền đầy đủ thông tin.";
         }
+
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            LOGGER.warning("Xác thực thất bại: Email không hợp lệ - " + email);
             return "Email không hợp lệ.";
         }
+
+        if (!phone.matches("^\\d{10,11}$")) {
+            LOGGER.warning("Xác thực thất bại: Số điện thoại không hợp lệ - " + phone);
+            return "Số điện thoại không hợp lệ (phải có 10-11 chữ số).";
+        }
+
         if (db.isUserExists(username, email)) {
+            LOGGER.warning("Xác thực thất bại: Tài khoản hoặc email đã tồn tại - " + username);
             return "Tài khoản hoặc email đã tồn tại!";
         }
-        return null;
-    }
 
-    /**
-     *
-     * @return
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
+        return null;
     }
 }

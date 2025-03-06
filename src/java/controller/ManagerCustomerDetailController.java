@@ -72,68 +72,124 @@ public class ManagerCustomerDetailController extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    int userID = Integer.parseInt(request.getParameter("userID"));
-    String name = request.getParameter("name");
-    boolean gender = Boolean.parseBoolean(request.getParameter("gender"));
-    String email = request.getParameter("email");
-    String username = request.getParameter("username");
-    String password = request.getParameter("password");
-    String phone = request.getParameter("phone");
-    String role = request.getParameter("role");
+  @Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    try {
+        int userID = Integer.parseInt(request.getParameter("userID"));
+        String name = request.getParameter("name");
+        boolean gender = Boolean.parseBoolean(request.getParameter("gender"));
+        String email = request.getParameter("email");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String phone = request.getParameter("phone");
+        String role = request.getParameter("role");
 
-    UserDBContext db = new UserDBContext();
-    
-    // Lấy thông tin user cũ
-    User oldUser = db.getUserByIDUserDetail(userID);
+        UserDBContext db = new UserDBContext();
+        User oldUser = db.getUserByIDUserDetail(userID);
 
-    // Cập nhật thông tin mới
-    User user = new User(userID, name, gender, email, username, password, phone, role, null);
-    db.updateUserDetail(user);
+        if (oldUser == null) {
+            request.setAttribute("error", "Người dùng không tồn tại.");
+            request.getRequestDispatcher("/manager/view/customerDetail.jsp").forward(request, response);
+            return;
+        }
 
-    // Xây dựng nội dung email thông báo thay đổi
-    String subject = "Thông báo cập nhật thông tin tài khoản";
-    StringBuilder content = new StringBuilder("<h1>Xin chào " + name + ",</h1>");
-    content.append("<p>Thông tin tài khoản của bạn đã được cập nhật:</p>");
-    content.append("<ul>");
+        // Kiểm tra dữ liệu nhập vào
+        String error = validateInput(name, email, phone, username, password, db);
+        if (error != null) {
+            request.setAttribute("error", error);
+            request.setAttribute("user", oldUser); // Giữ dữ liệu cũ để hiển thị lại
+            request.getRequestDispatcher("/manager/view/customerDetail.jsp").forward(request, response);
+            return;
+        }
 
-    if (!oldUser.getName().equals(name)) {
-        content.append("<li><strong>Họ tên:</strong> ").append(oldUser.getName()).append(" → ").append(name).append("</li>");
+        // Nếu mật khẩu rỗng, giữ nguyên mật khẩu cũ
+        if (password == null || password.trim().isEmpty()) {
+            password = oldUser.getPassword();
+        }
+
+        User user = new User(userID, name, gender, email, username, password, phone, role, null);
+        db.updateUserDetail(user);
+
+        // Gửi email thông báo cập nhật (không hiển thị mật khẩu)
+        String subject = "Thông báo cập nhật thông tin tài khoản";
+        StringBuilder content = new StringBuilder("<h1>Xin chào " + name + ",</h1>");
+        content.append("<p>Thông tin tài khoản của bạn đã được cập nhật:</p>");
+        content.append("<ul>");
+
+        if (!oldUser.getName().equals(name)) {
+            content.append("<li><strong>Họ tên:</strong> ").append(oldUser.getName()).append(" → ").append(name).append("</li>");
+        }
+        if (!oldUser.getEmail().equals(email)) {
+            content.append("<li><strong>Email:</strong> ").append(oldUser.getEmail()).append(" → ").append(email).append("</li>");
+        }
+        if (!oldUser.getUsername().equals(username)) {
+            content.append("<li><strong>Tên đăng nhập:</strong> ").append(oldUser.getUsername()).append(" → ").append(username).append("</li>");
+        }
+        if (!oldUser.getPhone().equals(phone)) {
+            content.append("<li><strong>Số điện thoại:</strong> ").append(oldUser.getPhone()).append(" → ").append(phone).append("</li>");
+        }
+        if (!oldUser.getRole().equals(role)) {
+            content.append("<li><strong>Quyền hạn:</strong> ").append(oldUser.getRole()).append(" → ").append(role).append("</li>");
+        }
+
+        content.append("</ul>");
+        content.append("<p>Nếu bạn không thực hiện thay đổi này, vui lòng liên hệ với quản trị viên.</p>");
+        content.append("<p>Cảm ơn bạn!</p>");
+
+        resetService emailService = new resetService();
+        emailService.sendEmail1(email, subject, content.toString());
+
+        response.sendRedirect(request.getContextPath() + "/manager/customerList");
+
+    } catch (NumberFormatException e) {
+        request.setAttribute("error", "ID người dùng không hợp lệ.");
+        request.getRequestDispatcher("/manager/view/customerDetail.jsp").forward(request, response);
+    } catch (Exception e) {
+        request.setAttribute("error", "Có lỗi xảy ra khi cập nhật thông tin.");
+        request.getRequestDispatcher("/manager/view/customerDetail.jsp").forward(request, response);
     }
-    if (!oldUser.getEmail().equals(email)) {
-        content.append("<li><strong>Email:</strong> ").append(oldUser.getEmail()).append(" → ").append(email).append("</li>");
-    }
-    if (!oldUser.getUsername().equals(username)) {
-        content.append("<li><strong>Tên đăng nhập:</strong> ").append(oldUser.getUsername()).append(" → ").append(username).append("</li>");
-    }
-        if (!oldUser.getPassword().equals(password)) {
-        content.append("<li><strong>pass:</strong> ").append(oldUser.getPassword()).append(" → ").append(password).append("</li>");
-    }
-    if (!oldUser.getPhone().equals(phone)) {
-        content.append("<li><strong>Số điện thoại:</strong> ").append(oldUser.getPhone()).append(" → ").append(phone).append("</li>");
-    }
-    if (!oldUser.getRole().equals(role)) {
-        content.append("<li><strong>Quyền hạn:</strong> ").append(oldUser.getRole()).append(" → ").append(role).append("</li>");
-    }
-
-    content.append("</ul>");
-    content.append("<p>Nếu bạn không thực hiện thay đổi này, vui lòng liên hệ với quản trị viên.</p>");
-    content.append("<p>Cảm ơn bạn!</p>");
-
-    // Gửi email thông báo cập nhật
-    resetService emailService = new resetService();
-    emailService.sendEmail1(email, subject, content.toString());
-
-    // Chuyển hướng về danh sách user
-    response.sendRedirect(request.getContextPath() + "/manager/customerList");
 }
+
 
     /**
      * Returns a short description of the servlet.
      *
      * @return a String containing servlet description
      */
+    private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
+    if (name == null || name.trim().isEmpty()) {
+        return "Tên không được để trống.";
+    }
+
+    if (email == null || email.trim().isEmpty()) {
+        return "Email không được để trống.";
+    } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        return "Email không hợp lệ.";
+    }
+
+    if (phone == null || phone.trim().isEmpty()) {
+        return "Số điện thoại không được để trống.";
+    } else if (!phone.matches("^\\d{10,11}$")) {
+        return "Số điện thoại không hợp lệ (phải có 10-11 chữ số).";
+    }
+
+    if (username == null || username.trim().isEmpty()) {
+        return "Tên đăng nhập không được để trống.";
+    } else if (!username.matches("^[A-Za-z0-9_]+$")) {
+        return "Tên đăng nhập chỉ được chứa chữ, số và dấu gạch dưới.";
+    }
+
+    if (password != null && !password.isEmpty() && password.length() < 1) {
+        return "Mật khẩu phải có ít nhất 6 ký tự.";
+    }
+
+    if (db.isUserExists(username, email)) {
+        return "Tài khoản hoặc email đã tồn tại!";
+    }
+
+    return null;
+}
+
     @Override
     public String getServletInfo() {
         return "Short description";

@@ -1,10 +1,3 @@
-<%-- 
-    Document   : userDetail
-    Created on : Jan 23, 2025, 9:30:14 AM
-    Author     : yugio
---%>
-
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -37,6 +30,14 @@
 
         <div class="container">
             <h2>Chi tiết người dùng</h2>
+
+            <!-- Hiển thị lỗi nếu có -->
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger" role="alert">
+                    ${error}
+                </div>
+            </c:if>
+
             <form action="${pageContext.request.contextPath}/manager/customerDetail" method="POST">
                 <input type="hidden" name="userID" value="${user.userID}">
                 <div class="mb-3">
@@ -69,7 +70,6 @@
                 <div class="mb-3">
                     <label for="role" class="form-label">Vai trò</label>
                     <select class="form-control" id="role" name="role">
-                   
                         <option value="Customer" ${user.role == 'Customer' ? 'selected' : ''}>Customer</option>
                     </select>
                 </div>

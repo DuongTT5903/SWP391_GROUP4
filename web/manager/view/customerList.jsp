@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -31,7 +31,13 @@
     </style>
 </head>
 <body>
+
     <div class="container">
+        <!-- Hiển thị lỗi nếu có -->
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger">${error}</div>
+        </c:if>
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-primary">Danh sách người dùng</h2>
             <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary">Quay lại</a>
@@ -93,19 +99,19 @@
                 <form action="${pageContext.request.contextPath}/manager/customerList" method="POST">
                     <div class="mb-3">
                         <label for="name" class="form-label">Tên</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <input type="text" class="form-control" id="name" name="name" value="${param.name}" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" value="${param.email}" required>
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Số điện thoại</label>
-                        <input type="text" class="form-control" id="phone" name="phone" required>
+                        <input type="text" class="form-control" id="phone" name="phone" value="${param.phone}" required>
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">Tên tài khoản</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" value="${param.username}" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
@@ -154,5 +160,6 @@
             form.style.display = form.style.display === "none" ? "block" : "none";
         }
     </script>
+
 </body>
 </html>
