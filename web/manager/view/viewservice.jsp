@@ -78,18 +78,6 @@
                                      style="max-height: 200px;">
                             </div>
 
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="status" name="status" 
-                                       value="true" ${service.status ? "checked" : ""}>
-                                <label class="form-check-label" for="status">Active</label>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="author" class="form-label">Author</label>
-                                <input type="text" class="form-control" id="author" 
-                                       value="${service.author.name}" disabled>
-                            </div>
-
                             <div class="d-flex justify-content-between">
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                                 <a href="${pageContext.request.contextPath}/manager/listservice?service=listservice" 
