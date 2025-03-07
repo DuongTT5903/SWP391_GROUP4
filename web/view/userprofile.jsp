@@ -49,7 +49,9 @@
             background-color: #f4f4f4;
         }
         .form-container .button-container {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Khoảng cách giữa các nút */
             margin-top: 20px;
         }
         .form-container button {
@@ -64,20 +66,18 @@
         .form-container button.edit {
             background-color: #ff9800;
         }
-        .form-container .change-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-left: 10px;
-}
-.form-container .change-link:hover {
-    background-color: #0056b3;
-}
-
+        .form-container .change-link, .form-container .home-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-container .change-link:hover, .form-container .home-link:hover {
+            background-color: #0056b3;
+        }
     </style>
     <script>
         function toggleEdit() {
@@ -109,17 +109,17 @@
             <input type="text" name="phone" value="<%= user != null ? user.getPhone() : "" %>" required readonly class="readonly-field"><br>
             
             <label>Giới tính:</label>
-            <select name="gender" >
+            <select name="gender">
                 <option value="true" <%= user != null && user.isGender() ? "selected" : "" %>>Nam</option>
                 <option value="false" <%= user != null && !user.isGender() ? "selected" : "" %>>Nữ</option>
             </select><br>
 
-
             <div class="button-container">
-    <button type="button" onclick="toggleEdit()" class="edit">Chỉnh sửa</button>
-    <button type="submit">Lưu thay đổi</button>
-    <a href="<%= request.getContextPath() %>/change" class="change-link">Đổi mật khẩu</a>
-</div>
+                <button type="button" onclick="toggleEdit()" class="edit">Chỉnh sửa</button>
+                <button type="submit">Lưu thay đổi</button>
+                <a href="<%= request.getContextPath() %>/change" class="change-link">Đổi mật khẩu</a>
+                <a href="<%= request.getContextPath() %>/homepage" class="home-link">Homepage</a>
+            </div>
         </form>
     </div>
 </body>

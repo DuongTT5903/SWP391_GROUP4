@@ -246,7 +246,7 @@ public class ServiceDBContext {
 
         try {
             String sql = "DELETE FROM services WHERE ServiceID = ?;";
-            stm = connection.prepareStatement(sql);
+            stm = DBContext.getConnection().prepareStatement(sql);
             stm.setInt(1, ID);
 
             int rowsAffected = stm.executeUpdate();

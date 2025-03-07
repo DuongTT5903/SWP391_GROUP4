@@ -37,8 +37,23 @@ public class ManagerServiceController extends HttpServlet {
         try {
             switch (service.toLowerCase()) {
                 case "listservice":
-                    List<Service> list = db.getServices();
+                    int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+                    int pageSize = 5; // Số dịch vụ mỗi trang
+                    List<Service> allServices = db.getServices();
+                    int totalServices = allServices.size();
+                    int totalPages = (int) Math.ceil((double) totalServices / pageSize);
+
+                    if (page < 1) page = 1;
+                    if (page > totalPages) page = totalPages;
+
+                    int start = (page - 1) * pageSize;
+                    int end = Math.min(start + pageSize, totalServices);
+
+                    List<Service> list = allServices.subList(start, end);
+
                     request.setAttribute("list", list);
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPages);
                     request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
                     break;
 
@@ -46,9 +61,7 @@ public class ManagerServiceController extends HttpServlet {
                     int serviceIDStatus = Integer.parseInt(request.getParameter("serviceID"));
                     boolean newStatus = Boolean.parseBoolean(request.getParameter("editStatus"));
                     db.updateServiceStatus(serviceIDStatus, newStatus);
-                    List<Service> updatedList = db.getServices();
-                    request.setAttribute("list", updatedList);
-                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    response.sendRedirect(request.getContextPath() + "/manager/listservice");
                     break;
 
                 case "searchbyid":
@@ -56,6 +69,8 @@ public class ManagerServiceController extends HttpServlet {
                     List<Service> searchResult = db.getListServiceByID(searchID);
                     request.setAttribute("searchID", searchID);
                     request.setAttribute("list", searchResult);
+                    request.setAttribute("currentPage", 1);
+                    request.setAttribute("totalPages", 1);
                     request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
                     break;
 
@@ -87,10 +102,7 @@ public class ManagerServiceController extends HttpServlet {
                                                     servicePriceAdd, salePriceAdd, imageURLAdd, true);
 
                     db.addService(newService);
-                    List<Service> newList = db.getServices();
-                    request.setAttribute("list", newList);
-                    request.setAttribute("message", "Service added successfully!");
-                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    response.sendRedirect(request.getContextPath() + "/manager/listservice?message=Service added successfully!");
                     break;
 
                 case "savechange":
@@ -117,10 +129,13 @@ public class ManagerServiceController extends HttpServlet {
                                     updatedService.getCategory().getCategoryID(), updatedService.getServicePrice(), 
                                     updatedService.getSalePrice(), updatedService.getImageURL(), updatedService.getServiceID());
 
-                    List<Service> finalList = db.getServices();
-                    request.setAttribute("list", finalList);
-                    request.setAttribute("message", "Service updated successfully!");
-                    request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
+                    response.sendRedirect(request.getContextPath() + "/manager/listservice?message=Service updated successfully!");
+                    break;
+
+                case "delete":
+                    int deleteServiceID = Integer.parseInt(request.getParameter("serviceID"));
+                    db.deleteService(deleteServiceID); // Giả định có hàm deleteService trong ServiceDBContext
+                    response.sendRedirect(request.getContextPath() + "/manager/listservice?message=Service deleted successfully!");
                     break;
 
                 default:

@@ -60,6 +60,7 @@
                                             <th>Image</th>
                                             <th>Status</th>
                                             <th>Actions</th>
+                                            <th>Delete</th> <!-- Thêm cột Delete -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -91,6 +92,13 @@
                                                         <button type="submit" class="btn btn-sm btn-info">View</button>
                                                     </form>
                                                 </td>
+                                                <td>
+                                                    <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0" onsubmit="return confirmDelete()">
+                                                        <input type="hidden" name="service" value="delete">
+                                                        <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                                    </form>
+                                                </td>
                                             </tr>
                                         </c:forEach>
                                     </tbody>
@@ -103,7 +111,7 @@
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                                         <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage - 1}" 
                                            aria-label="Previous">
-                                            <span aria-hidden="true">&laquo; Previous</span>
+                                            <span aria-hidden="true">« Previous</span>
                                         </a>
                                     </li>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
@@ -114,7 +122,7 @@
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
                                         <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage + 1}" 
                                            aria-label="Next">
-                                            <span aria-hidden="true">Next &raquo;</span>
+                                            <span aria-hidden="true">Next »</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -174,6 +182,10 @@
                 icon.textContent = ascending ? "🔽" : "🔼";
 
                 rows.forEach(row => table.querySelector("tbody").appendChild(row));
+            }
+
+            function confirmDelete() {
+                return confirm("Are you sure you want to delete this service?");
             }
         </script>
     </body>
