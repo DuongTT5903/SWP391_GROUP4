@@ -97,7 +97,14 @@
                 color: #d1d1d1;
             }
         </style>
-    </head>
+
+    </head>  
+    <script>
+        function showNotification() {
+            alert("Dịch vụ đã được thêm vào giỏ hàng!");
+            return true; // Cho phép form tiếp tục submit
+        }
+    </script>
     <body>
         <div class="container">
             <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
@@ -188,7 +195,7 @@
                                 <span class="sale-price">${service.servicePrice*(100-service.salePrice)/100}00VNĐ</span></p>
                             <div class="buttons">
                                 <!-- Add to Cart Form -->                            
-                                <form action="AddCart" method="POST">
+                                <form action="AddCart" method="POST" onsubmit="return showNotification();">
                                     <input type="hidden" name="serviceID" value="${service.serviceID}">
                                     <button class="btn btn-success" type="submit">Thêm vào giỏ hàng</button>
                                 </form>
@@ -203,90 +210,97 @@
             <!-- Phân trang -->
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
+                    <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link"
-                           href="${pageContext.request.contextPath}\serviceList?page=1&search=&category=0">« Trang
-                            trước</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage - 1}&search=${param.search}&category=${param.category}">« Trang trước</a>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link"
-                           href="${pageContext.request.contextPath}\serviceList?page=2&search=&category=0">Trang sau
-                            »</a>
+
+                    <!-- Hiển thị các số trang -->
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li class="page-item ${i == currentPage ? 'active' : ''}">
+                            <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
+                        </li>
+                    </c:forEach>
+
+                    <!-- Nút Trang Sau -->
+                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage + 1}&search=${param.search}&category=${param.category}">Trang sau »</a>
                     </li>
                 </ul>
-                <!--            </nav>
-                                            modal
-                <form action="SubmitFeedbackController" method="post">
-                    <input type="hidden" name="serviceID" value="${service.serviceID}">
-                    <label>Chọn số sao:</label>
-                    <select name="rating">
-                        <option value="1">⭐</option>
-                        <option value="2">⭐⭐</option>
-                        <option value="3">⭐⭐⭐</option>
-                        <option value="4">⭐⭐⭐⭐</option>
-                        <option value="5">⭐⭐⭐⭐⭐</option>
-                    </select>
-                    <br>
-                    <label>Nhận xét:</label>
-                    <textarea name="comment" required></textarea>
-                    <br>
-                    <button type="submit">Gửi đánh giá</button>
-                </form>-->
-                <!-- Liên hệ -->
-                <div class="w3-container w3-black w3-padding-32" >
-                    <h1>Subscribe</h1>
-                    <p>To get special offers and VIP treatment:</p>
-                    <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>
-                    <button type="button" class="w3-button w3-red w3-margin-bottom">Subscribe</button>
-                </div>
-                <footer class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">
-                    <div class="w3-row-padding">
-                        <div class="w3-col s4">
-                            <h4>Contact</h4>
-                            <p>Questions? Go ahead.</p>
-                            <form action="/action_page.php" target="_blank">
-                                <p><input class="w3-input w3-border" type="text" placeholder="Name" name="Name" required></p>
-                                <p><input class="w3-input w3-border" type="text" placeholder="Email" name="Email" required></p>
-                                <p><input class="w3-input w3-border" type="text" placeholder="Subject" name="Subject" required></p>
-                                <p><input class="w3-input w3-border" type="text" placeholder="Message" name="Message" required></p>
-                                <button type="submit" class="w3-button w3-block w3-black">Send</button>
-                            </form>
-                        </div>
+            </nav>
 
-                        <div class="w3-col s4">
-                            <h4>About</h4>
-                            <p><a href="#">About us</a></p>
-                            <p><a href="#">We're hiring</a></p>
-                            <p><a href="#">Support</a></p>
-                            <p><a href="#">Find store</a></p>
-                            <p><a href="#">Shipment</a></p>
-                            <p><a href="#">Payment</a></p>
-                            <p><a href="#">Gift card</a></p>
-                            <p><a href="#">Return</a></p>
-                            <p><a href="#">Help</a></p>
-                        </div>
-
-                        <div class="w3-col s4 w3-justify">
-                            <h4>Store</h4>
-                            <p><i class="fa fa-fw fa-map-marker"></i> Company Name</p>
-                            <p><i class="fa fa-fw fa-phone"></i> 0044123123</p>
-                            <p><i class="fa fa-fw fa-envelope"></i> ex@mail.com</p>
-                            <h4>We accept</h4>
-                            <p><i class="fa fa-fw fa-cc-amex"></i> Amex</p>
-                            <p><i class="fa fa-fw fa-credit-card"></i> Credit Card</p>
-                            <br>
-                            <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
-                            <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
-                            <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
-                            <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
-                            <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
-                            <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
-                        </div>
+            <!--                <form action="SubmitFeedbackController" method="post">
+                                <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                <label>Chọn số sao:</label>
+                                <select name="rating">
+                                    <option value="1">⭐</option>
+                                    <option value="2">⭐⭐</option>
+                                    <option value="3">⭐⭐⭐</option>
+                                    <option value="4">⭐⭐⭐⭐</option>
+                                    <option value="5">⭐⭐⭐⭐⭐</option>
+                                </select>
+                                <br>
+                                <label>Nhận xét:</label>
+                                <textarea name="comment" required></textarea>
+                                <br>
+                                <button type="submit">Gửi đánh giá</button>
+                            </form>-->
+            <!-- Liên hệ -->
+            <div class="w3-container w3-black w3-padding-32" >
+                <h1>Subscribe</h1>
+                <p>To get special offers and VIP treatment:</p>
+                <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>
+                <button type="button" class="w3-button w3-red w3-margin-bottom">Subscribe</button>
+            </div>
+            <footer class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">
+                <div class="w3-row-padding">
+                    <div class="w3-col s4">
+                        <h4>Contact</h4>
+                        <p>Questions? Go ahead.</p>
+                        <form action="/action_page.php" target="_blank">
+                            <p><input class="w3-input w3-border" type="text" placeholder="Name" name="Name" required></p>
+                            <p><input class="w3-input w3-border" type="text" placeholder="Email" name="Email" required></p>
+                            <p><input class="w3-input w3-border" type="text" placeholder="Subject" name="Subject" required></p>
+                            <p><input class="w3-input w3-border" type="text" placeholder="Message" name="Message" required></p>
+                            <button type="submit" class="w3-button w3-block w3-black">Send</button>
+                        </form>
                     </div>
-                </footer>
 
-                <div class="w3-black w3-center w3-padding-24">Footer Contents Add later <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">CSS on W3</a></div>
+                    <div class="w3-col s4">
+                        <h4>About</h4>
+                        <p><a href="#">About us</a></p>
+                        <p><a href="#">We're hiring</a></p>
+                        <p><a href="#">Support</a></p>
+                        <p><a href="#">Find store</a></p>
+                        <p><a href="#">Shipment</a></p>
+                        <p><a href="#">Payment</a></p>
+                        <p><a href="#">Gift card</a></p>
+                        <p><a href="#">Return</a></p>
+                        <p><a href="#">Help</a></p>
+                    </div>
+
+                    <div class="w3-col s4 w3-justify">
+                        <h4>Store</h4>
+                        <p><i class="fa fa-fw fa-map-marker"></i> Company Name</p>
+                        <p><i class="fa fa-fw fa-phone"></i> 0044123123</p>
+                        <p><i class="fa fa-fw fa-envelope"></i> ex@mail.com</p>
+                        <h4>We accept</h4>
+                        <p><i class="fa fa-fw fa-cc-amex"></i> Amex</p>
+                        <p><i class="fa fa-fw fa-credit-card"></i> Credit Card</p>
+                        <br>
+                        <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
+                        <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
+                        <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
+                        <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
+                        <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
+                        <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
+                    </div>
+                </div>
+            </footer>
+
+            <div class="w3-black w3-center w3-padding-24">Footer Contents Add later <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">CSS on W3</a></div>
         </div>
+
     </body>
 
 </html>

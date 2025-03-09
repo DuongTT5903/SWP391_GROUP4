@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.time.Instant;
 import java.util.List;
 import model.Service;
 
@@ -23,7 +24,6 @@ import model.Service;
  */
 public class ServiceListController extends HttpServlet {
 
-    private static final int PAGE_SIZE = 6;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -63,53 +63,69 @@ public class ServiceListController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        int currentPage = 1;
+        int recordsPerPage = 6; // Số bản ghi trên mỗi trang
+
+        // Lấy số trang từ request (nếu có)
+        if (request.getParameter("page") != null) {
+            currentPage = Integer.parseInt(request.getParameter("page"));
+        }
+
         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         int categoryID = request.getParameter("category") != null ? Integer.parseInt(request.getParameter("category")) : 0;
-        int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-        String t=request.getParameter("sort");
+        String t = request.getParameter("sort");
         String sort;
         String type;
-        if(t==null){
-            sort="ASC";
-            type="serviceid";
-        }else{
-         switch (t) {
-            case "servicename1" -> {
-                sort="ASC";
-                type="servicename";
+        if (t == null) {
+            sort = "ASC";
+            type = "serviceid";
+        } else {
+            switch (t) {
+                case "servicename1" -> {
+                    sort = "ASC";
+                    type = "servicename";
+                }
+                case "servicename2" -> {
+                    sort = "DESC";
+                    type = "servicename";
+                }
+                case "price1" -> {
+                    sort = "ASC";
+                    type = "serviceprice";
+                }
+                case "price2" -> {
+                    sort = "DESC";
+                    type = "serviceprice";
+                }
+                case "saleprice1" -> {
+                    sort = "ASC";
+                    type = "saleprice";
+                }
+                case "saleprice2" -> {
+                    sort = "DESC";
+                    type = "saleprice";
+                }
+                default -> {
+                    sort = "ASC";
+                    type = "serviceid";
+                }
             }
-            case "servicename2" -> {
-                sort="DESC";
-                type="servicename";
-            }
-            case "price1" -> {
-                sort="ASC";
-                type="serviceprice";
-            }
-            case "price2" -> {
-                sort="DESC";
-                type="serviceprice";
-            }
-            case "saleprice1" -> {
-                sort="ASC";
-                type="saleprice";
-            }
-            case "saleprice2" -> {
-                sort="DESC";
-                type="saleprice";
-            }
-            default -> {
-                sort="ASC";
-                type="serviceid";
-            }
-        }
         }
         ServiceDBContext serviceDAO = new ServiceDBContext();
-        
-        List<Service> services = serviceDAO.getServices(search, categoryID, page, PAGE_SIZE,type,sort);
 
+        List<Service> services = serviceDAO.getServices(search, categoryID, currentPage, recordsPerPage, type, sort);
+        int totalRecords = services.size(); // Hàm lấy tổng số bản ghi từ DB
+        int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
+        
+         HttpSession session = request.getSession();
+        // Nếu chưa có thời gian truy cập, lưu thời gian bắt đầu
+        if (session.getAttribute("startTime") == null) {
+              session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
+        }
+        // Gửi dữ liệu qua JSP
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("services", services);
-        request.setAttribute("currentPage", page);
         request.setAttribute("search", search);
         request.setAttribute("categoryID", categoryID);
 
