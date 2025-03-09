@@ -105,7 +105,7 @@
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="${pageContext.request.contextPath}/manager/customerList">Go to Customer List</a>
-                        <a href="${pageContext.request.contextPath}/manager/feedbackList">Go to Feedback</a>
+                        <a href="${pageContext.request.contextPath}/manager/feedbackdetail">Go to Feedback</a>
                         <a href="${pageContext.request.contextPath}/manager/postList">Go to Post List</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '3'}">
