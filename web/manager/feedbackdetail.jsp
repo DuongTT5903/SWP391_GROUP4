@@ -54,7 +54,6 @@
                         <tr style="cursor: pointer; font-size: 15px; border-bottom: 1px solid #ccc; text-align: center;">
                             <th>ID<i class="fa fa-caret-down" aria-hidden="true"></i></th>
                             <th>Full Name</th>
-
                             <th>Service Name</th>
                             <th>Rated Star<i class="fa fa-caret-down" aria-hidden="true"></i></th>
                             <th>Feedback</th>
@@ -70,7 +69,6 @@
                             <tr>
                                 <td>${f.id}</td>
                                 <td>${f.user.name}</td>
-
                                 <td>${f.services.serviceName}</td>
                                 <td>${f.rated}<i class="fa fa-star" style="color: red;" aria-hidden="true"></i></td>
                                 <td>${f.feedbackDetail}</td>
@@ -91,66 +89,66 @@
                                 </c:if>
                             </tr>
 
-                        <div class="modal fade" id="Show${f.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Detail</h5>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="row">
-                                            <div class="form-group col-md-6">
-                                                <h4>ID : ${f.id} </h4>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <h4>UserName : ${f.user.name} </h4>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Service Name:</label>
-                                                <p>${f.services.serviceName}</p>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Creation date:</label>
-                                                <p>${f.creationDate}</p>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Rated:</label>
-                                                <p>${f.rated}</p>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Email:</label>
-                                                <p>${f.user.email}</p>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Phone:</label>
-                                                <p>${f.user.phone}</p>
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label class="control-label">Status: </label>
-                                                <c:if test="${f.status}">
-                                                    <span class="label label-success" style="font-size: 15px;">Active</span>
-                                                </c:if>
-                                                <c:if test="${!f.status}">
-                                                    <span class="label label-danger" style="font-size: 15px;">Inactive</span>
-                                                </c:if>
-                                            </div>
-                                            <div class="form-group col-md-12">
-                                                <label class="control-label">Content: </label>
-                                                <p>${f.feedbackDetail}</p>
-                                            </div>
-                                            <div class="form-group col-md-12">
-                                                <label class="control-label">Image:</label><br>
-                                                <img src="${f.imgLink}" width="50%">
+                            <div class="modal fade" id="Show${f.id}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Detail</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="form-group col-md-6">
+                                                    <h4>ID : ${f.id} </h4>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <h4>UserName : ${f.user.name} </h4>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Service Name:</label>
+                                                    <p>${f.services.serviceName}</p>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Creation date:</label>
+                                                    <p>${f.creationDate}</p>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Rated:</label>
+                                                    <p>${f.rated}</p>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Email:</label>
+                                                    <p>${f.user.email}</p>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Phone:</label>
+                                                    <p>${f.user.phone}</p>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="control-label">Status: </label>
+                                                    <c:if test="${f.status}">
+                                                        <span class="label label-success" style="font-size: 15px;">Active</span>
+                                                    </c:if>
+                                                    <c:if test="${!f.status}">
+                                                        <span class="label label-danger" style="font-size: 15px;">Inactive</span>
+                                                    </c:if>
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label class="control-label">Content: </label>
+                                                    <p>${f.feedbackDetail}</p>
+                                                </div>
+                                                <div class="form-group col-md-12">
+                                                    <label class="control-label">Image:</label><br>
+                                                    <img src="${f.imgLink}" width="50%">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </c:forEach>
+                        </c:forEach>
                     </tbody>
                 </table>
 
@@ -162,25 +160,29 @@
                                     <h5 class="modal-title" id="editModalLabel">Edit Feedback</h5>
                                 </div>
                                 <div class="modal-body">
-                                    <form action="feedbackdetail" method="post">
+                                    <form action="feedbackdetail" method="post" onsubmit="return validateForm(this)">
                                         <input type="hidden" name="action" value="edit">
                                         <input type="hidden" name="fid" value="${f.id}">
                                         <div class="form-group">
                                             <label for="content">Content</label>
-                                            <textarea class="form-control" id="content" name="content" rows="3">${f.feedbackDetail}</textarea>
+                                            <textarea class="form-control" id="content" name="content" rows="3" required>${f.feedbackDetail}</textarea>
+                                            <small class="text-danger" id="contentError" style="display:none;">Content cannot be empty</small>
                                         </div>
                                         <div class="form-group">
                                             <label for="frate">Rated</label>
-                                            <input type="number" class="form-control" id="frate" name="frate" value="${f.rated}" max="5">
+                                            <input type="number" class="form-control" id="frate" name="frate" value="${f.rated}" min="1" max="5" required>
+                                            <small class="text-danger" id="frateError" style="display:none;">Rated must be between 1 and 5</small>
                                         </div>
                                         <div class="form-group">
                                             <label for="fcreate">Creation Date</label>
-                                            <input type="date" class="form-control" id="fcreate" name="fcreate" value="${f.creationDate}">
+                                            <input type="date" class="form-control" id="fcreate" name="fcreate" value="${f.creationDate}" required>
+                                            <small class="text-danger" id="fcreateError" style="display:none;">Creation date cannot be empty</small>
                                         </div>
                                         <div class="form-group">
                                             <label for="fstatus">Status</label><br>
-                                            <input type="radio" name="fstatus" value="1" ${f.status ? 'checked' : ''}> Active
+                                            <input type="radio" name="fstatus" value="1" ${f.status ? 'checked' : ''} required> Active
                                             <input type="radio" name="fstatus" value="0" ${!f.status ? 'checked' : ''}> Inactive
+                                            <small class="text-danger" id="fstatusError" style="display:none;">Please select a status</small>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Save</button>
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -209,5 +211,47 @@
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4xF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+        <script>
+            function validateForm(form) {
+                let isValid = true;
+
+                // Reset error messages
+                document.getElementById('contentError').style.display = 'none';
+                document.getElementById('frateError').style.display = 'none';
+                document.getElementById('fcreateError').style.display = 'none';
+                document.getElementById('fstatusError').style.display = 'none';
+
+                // Check content
+                const content = form.querySelector('#content').value.trim();
+                if (!content) {
+                    document.getElementById('contentError').style.display = 'block';
+                    isValid = false;
+                }
+
+                // Check rated
+                const frate = form.querySelector('#frate').value;
+                if (!frate || frate < 1 || frate > 5) {
+                    document.getElementById('frateError').style.display = 'block';
+                    isValid = false;
+                }
+
+                // Check creation date
+                const fcreate = form.querySelector('#fcreate').value;
+                if (!fcreate) {
+                    document.getElementById('fcreateError').style.display = 'block';
+                    isValid = false;
+                }
+
+                // Check status
+                const fstatus = form.querySelector('input[name="fstatus"]:checked');
+                if (!fstatus) {
+                    document.getElementById('fstatusError').style.display = 'block';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+        </script>
     </body>
 </html>
