@@ -24,7 +24,6 @@ import model.Service;
  */
 public class ServiceListController extends HttpServlet {
 
-
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -72,7 +71,18 @@ public class ServiceListController extends HttpServlet {
         }
 
         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
-        int categoryID = request.getParameter("category") != null ? Integer.parseInt(request.getParameter("category")) : 0;
+        String categoryStr = request.getParameter("category");
+
+        int categoryID = 0; // Giá trị mặc định
+
+        if (categoryStr != null && !categoryStr.trim().isEmpty()) {
+            try {
+                categoryID = Integer.parseInt(categoryStr);
+            } catch (NumberFormatException e) {
+                System.err.println("Lỗi: category không hợp lệ - " + categoryStr);
+            }
+        }
+
         String t = request.getParameter("sort");
         String sort;
         String type;
@@ -116,11 +126,11 @@ public class ServiceListController extends HttpServlet {
         List<Service> services = serviceDAO.getServices(search, categoryID, currentPage, recordsPerPage, type, sort);
         int totalRecords = services.size(); // Hàm lấy tổng số bản ghi từ DB
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-        
-         HttpSession session = request.getSession();
+
+        HttpSession session = request.getSession();
         // Nếu chưa có thời gian truy cập, lưu thời gian bắt đầu
         if (session.getAttribute("startTime") == null) {
-              session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
+            session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
         }
         // Gửi dữ liệu qua JSP
         request.setAttribute("currentPage", currentPage);
