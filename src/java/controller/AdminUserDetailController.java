@@ -87,7 +87,7 @@ public class AdminUserDetailController extends HttpServlet {
 
         // Lấy thông tin user cũ
         User oldUser = db.getUserByIDUserDetail(userID);
-        String errorMessage = validateInput(name, email, phone, username, password, db);
+        String errorMessage = validateInput(userID, name, email, phone, username, password, db);
         if (errorMessage != null) {
             // Preserve form input to show back in case of an error
             request.setAttribute("error", errorMessage);
@@ -139,14 +139,28 @@ public class AdminUserDetailController extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/userList");
     }
 
-    private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
+    private String validateInput(int userID, String name, String email, String phone, String username, String password, UserDBContext db) {
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty() || password.isEmpty()) {
             return "Vui lòng điền đầy đủ thông tin.";
         }
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (email == null || email.trim().isEmpty()) {
+            return "Email không được để trống.";
+        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             return "Email không hợp lệ.";
         }
 
+        if (phone == null || phone.trim().isEmpty()) {
+            return "Số điện thoại không được để trống.";
+        } else if (!phone.matches("^\\d{10,11}$")) {
+            return "Số điện thoại không hợp lệ (phải có 10-11 chữ số).";
+        }
+        if (password != null && !password.isEmpty() && password.length() < 1) {
+            return "Mật khẩu phải có ít nhất 6 ký tự.";
+        }
+        String userIDst = Integer.toString(userID);
+        if (db.isUserExists(userIDst ,username, email)) {
+        return "Tài khoản hoặc email đã tồn tại!";
+    }
         return null;
     }
 

@@ -582,12 +582,29 @@ public class UserDBContext {
      * @param email
      * @return
      */
-    public boolean isUserExists(String username, String email) {
+    public boolean isUserExists(String userID, String username, String email) {
+        try (Connection conn = DBContext.getConnection()) {
+            String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ? AND userID! = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            stmt.setString(3, userID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean isUserExistsUE(String username, String email) {
         try (Connection conn = DBContext.getConnection()) {
             String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, email);
+            
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại

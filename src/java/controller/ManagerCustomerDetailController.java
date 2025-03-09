@@ -94,7 +94,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
         }
 
         // Kiểm tra dữ liệu nhập vào
-        String error = validateInput(name, email, phone, username, password, db);
+        String error = validateInput(userID, name, email, phone, username, password, db);
         if (error != null) {
             request.setAttribute("error", error);
             request.setAttribute("user", oldUser); // Giữ dữ liệu cũ để hiển thị lại
@@ -156,7 +156,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
      *
      * @return a String containing servlet description
      */
-    private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
+    private String validateInput(int userID,String name, String email, String phone, String username, String password, UserDBContext db) {
     if (name == null || name.trim().isEmpty()) {
         return "Tên không được để trống.";
     }
@@ -183,7 +183,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
         return "Mật khẩu phải có ít nhất 6 ký tự.";
     }
 
-    if (db.isUserExists(username, email)) {
+    if (db.isUserExists(userID, username, email)) {
         return "Tài khoản hoặc email đã tồn tại!";
     }
 

@@ -53,6 +53,7 @@ public class ManagerCustomerList extends HttpServlet {
             }
 
             // Xử lý thêm user mới
+            String userID = request.getParameter("userID");
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String phone = request.getParameter("phone");
@@ -60,7 +61,7 @@ public class ManagerCustomerList extends HttpServlet {
             String password = request.getParameter("password");
             String roleID = request.getParameter("role");
 
-            String errorMessage = validateInput(name, email, phone, username, password, db);
+            String errorMessage = validateInput(userID, name, email, phone, username, password, db);
             if (errorMessage != null) {
                 LOGGER.warning("Lỗi xác thực dữ liệu: " + errorMessage);
                 request.setAttribute("error", errorMessage);
@@ -104,7 +105,7 @@ public class ManagerCustomerList extends HttpServlet {
         }
     }
 
-    private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
+    private String validateInput(String userID,  String name, String email, String phone, String username, String password, UserDBContext db) {
         if (name == null || name.trim().isEmpty() ||
             email == null || email.trim().isEmpty() ||
             phone == null || phone.trim().isEmpty() ||
@@ -124,7 +125,7 @@ public class ManagerCustomerList extends HttpServlet {
             return "Số điện thoại không hợp lệ (phải có 10-11 chữ số).";
         }
 
-        if (db.isUserExists(username, email)) {
+        if (db.isUserExists(userID, username, email)) {
             LOGGER.warning("Xác thực thất bại: Tài khoản hoặc email đã tồn tại - " + username);
             return "Tài khoản hoặc email đã tồn tại!";
         }
