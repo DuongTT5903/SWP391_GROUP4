@@ -11,12 +11,12 @@
         long elapsedTime = currentTime - startTime; // Tính thời gian đã trôi qua
 
         // Nếu vượt quá 15 phút (900 giây), hiển thị thông báo và chuyển hướng về trang chủ
-        if (elapsedTime > 900) { 
+        if (elapsedTime > 900) {
 %>
-            <script>
-                alert("Phiên làm việc của bạn đã hết hạn. Bạn sẽ được chuyển về trang chủ.");
-                window.location.href = "<%= request.getContextPath() %>/homepage"; // Đổi đường dẫn trang chủ nếu cần
-            </script>
+<script>
+    alert("Phiên làm việc của bạn đã hết hạn. Bạn sẽ được chuyển về trang chủ.");
+    window.location.href = "<%= request.getContextPath()%>/homepage"; // Đổi đường dẫn trang chủ nếu cần
+</script>
 <%
             return; // Dừng xử lý tiếp theo
         }
@@ -31,6 +31,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Reservation</title>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
         <script src="https://kit.fontawesome.com/bf043842f3.js" crossorigin="anonymous"></script>
     </head>
@@ -51,6 +53,17 @@
             padding: 15px;
             display: block;
             text-align: center;
+        }
+        .navbar h3 {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            color: #d1d1d1;
         }
     </style>
     <body >
@@ -134,7 +147,7 @@
                                 <th>Tên dịch vụ</th>
                                 <th>Giá</th>
                                 <th>Số lượng</th>
-                                <th>Số người</th>
+                                <!--                                <th>Số người</th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -144,7 +157,7 @@
                                     <td>${s.service.serviceName}</td>
                                     <td>${(s.service.servicePrice * (100 - s.service.salePrice))/100}00VNĐ</td>
                                     <td>${s.amount}</td>
-                                    <td>${s.numberOfPerson}</td>
+<!--                                    <td>${s.numberOfPerson}</td>-->
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -184,7 +197,7 @@
 
                             <div class="col-md-6">
                                 <label for="address" class="form-label">Địa chỉ:</label>
-                                <input type="text"  name="address" class="form-control" value="${customer.adress}" style="background-color: gray" readonly>
+                                <input type="text"  name="address" class="form-control" value="${customer.address}" style="background-color: gray" readonly>
                             </div>
 
                             <div class="col-md-6">

@@ -106,30 +106,40 @@ public class ReservationDBContext {
     }
 
     public Customer getCustomerByID(int ID) {
-        Customer customer = new Customer();
-        String sql = "SELECT u.*,s.Address"
-                + "JOIN users u ON s.userID = u.userID "
-                + "WHERE (s.userID LIKE ?) ";
+    Customer customer = null;  // Use null to handle cases where no customer is found
+    String sql = "SELECT u.*, c.CustomerID, c.Address "
+               + "FROM customer c JOIN users u ON c.userID = u.userID "
+               + "WHERE c.userID = ?";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, ID);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                User author = new User(rs.getInt("UserID"), rs.getString("Name"), rs.getBoolean("Gender"), rs.getString("Email"), rs.getString("Username"), rs.getString("Password"), rs.getString("Phone"), "", "");
+        stmt.setInt(1, ID);
+        ResultSet rs = stmt.executeQuery();
 
-                customer = new Customer(
-                        rs.getInt("CustomerID"),
-                        author,
-                        rs.getString("Adress")
-                );
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (rs.next()) {  // Use if instead of while since userID should be unique
+            User author = new User(
+                rs.getInt("UserID"),
+                rs.getString("Name"),
+                rs.getBoolean("Gender"),
+                rs.getString("Email"),
+                rs.getString("Username"),
+                rs.getString("Password"),
+                rs.getString("Phone"),
+                "", ""
+            );
+            customer = new Customer(
+                rs.getInt("CustomerID"),
+                author,
+                rs.getString("Address")  // Corrected field name
+            );
         }
-        return customer;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return customer;
+}
+
 
     public List<ReservationDetail> searchService(List<ReservationDetail> reservationDetail, String search, int categoryID, int page, int pageSize) {
         int min = pageSize * (page - 1);
@@ -159,8 +169,7 @@ public class ReservationDBContext {
     public static void main(String[] args) {
         ReservationDBContext r = new ReservationDBContext();
         LocalDate today = LocalDate.now();
-        r.addReservation("Phạm Hải","lien3@gmail.com", "Thành Phố Hải Dương,Xã Hải Hà,số nhà 172", "0123456123", today, 0, 0, 450, 1, "",1);
-       r.addReservationDetail(r.ReservationID(), 1, 1, 1);
+        System.out.println(""+r.getCustomerByID(5).getAddress());
        
     }
 }

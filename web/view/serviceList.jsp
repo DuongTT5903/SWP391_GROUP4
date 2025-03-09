@@ -85,13 +85,20 @@
                 display: block;
                 text-align: center;
             }
+            .navbar h3 {
+                font-family: 'Montserrat', sans-serif;
+                margin: 0;
+            }
+            .navbar a {
+                color: #fff;
+                text-decoration: none;
+            }
+            .navbar a:hover {
+                color: #d1d1d1;
+            }
         </style>
     </head>
-    <script>
-
-    </script>
     <body>
-
         <div class="container">
             <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
                 <div class="container-fluid">

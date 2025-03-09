@@ -37,109 +37,9 @@ public class ReservationController extends HttpServlet {
      * @throws IOException
      */
     @Override
-   protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    String search = request.getParameter("search") != null ? request.getParameter("search") : "";
-
-    // Kiểm tra categoryID, tránh lỗi khi parse số
-    int categoryID = 0;
-    String categoryParam = request.getParameter("category");
-    if (categoryParam != null && !categoryParam.trim().isEmpty()) {
-        try {
-            categoryID = Integer.parseInt(categoryParam);
-        } catch (NumberFormatException e) {
-            categoryID = 0; // Nếu lỗi, đặt mặc định là 0
-        }
-    }
-
-    // Kiểm tra số trang, tránh lỗi khi parse số
-    int currentPage = 1;
-    int recordsPerPage = 6;
-    String pageParam = request.getParameter("page");
-    if (pageParam != null && !pageParam.trim().isEmpty()) {
-        try {
-            currentPage = Integer.parseInt(pageParam);
-        } catch (NumberFormatException e) {
-            currentPage = 1; // Nếu lỗi, đặt mặc định là trang 1
-        }
-    }
-
-    // Lấy dữ liệu từ cookie giỏ hàng
-    String cartData = "";
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-        for (Cookie cookie : cookies) {
-            if ("cart".equals(cookie.getName())) {
-                cartData = cookie.getValue();
-                break;
-            }
-        }
-    }
-
-    // Nếu giỏ hàng trống, hiển thị thông báo
-    if (cartData.isEmpty()) {
-        request.setAttribute("cartItems", new ArrayList<>());
-        request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
-        request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
-        return;
-    }
-
-    List<ReservationDetail> cartItems ;
-    List<ReservationDetail> cart = new ArrayList<>();
-    ReservationDBContext reservationDB = new ReservationDBContext();
-    ServiceDBContext serviceDAO = new ServiceDBContext();
-    int total = 0;
-
-    for (String item : cartData.split("-")) {
-        try {
-            String[] parts = item.split("/");
-            if (parts.length < 2) {
-                continue;
-            }
-
-            String[] info = parts[0].split("~");
-            if (info.length < 3) {
-                continue;
-            }
-
-            // Kiểm tra và parse serviceID, amount, numberOfPeople
-            int serviceID = Integer.parseInt(info[1]);
-            int amount = Integer.parseInt(info[2]);
-            int numberOfPeople = Integer.parseInt(parts[1]);
-
-            Service service = serviceDAO.getServiceByID(serviceID);
-            if (service != null) {
-                ReservationDetail reservationDetail = new ReservationDetail(0, 0, service, amount, numberOfPeople);
-                cart.add(reservationDetail);
-                total += service.getServicePrice() * (100 - service.getSalePrice()) * 10 * amount * numberOfPeople;
-            }
-        } catch (NumberFormatException e) {
-            System.err.println("Lỗi parse dữ liệu giỏ hàng: " + item);
-        }
-    }
-
-    // Lọc dịch vụ dựa trên tìm kiếm
-    cartItems = reservationDB.searchService(cart, search, categoryID, currentPage, recordsPerPage);
-    if (cartItems.isEmpty()) {
-        request.setAttribute("cartMessage", "Không tìm thấy kết quả.");
-    }
-
-    int totalRecords = cart.size();
-    int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-
-    // Gửi dữ liệu qua JSP
-    request.setAttribute("currentPage", currentPage);
-    request.setAttribute("totalPages", totalPages);
-    request.setAttribute("total", total);
-    request.setAttribute("cartItems", cartItems);
-
-    request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
-}
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Default behavior: Load service list
+        String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         ReservationDBContext reservationDB = new ReservationDBContext();
@@ -149,6 +49,110 @@ public class ReservationController extends HttpServlet {
         } else {
             customer = reservationDB.getCustomerByID(user.getUserID());
         }
+        // Kiểm tra categoryID, tránh lỗi khi parse số
+        int categoryID = 0;
+        String categoryParam = request.getParameter("category");
+        if (categoryParam != null && !categoryParam.trim().isEmpty()) {
+            try {
+                categoryID = Integer.parseInt(categoryParam);
+            } catch (NumberFormatException e) {
+                categoryID = 0; // Nếu lỗi, đặt mặc định là 0
+            }
+        }
+
+        // Kiểm tra số trang, tránh lỗi khi parse số
+        int currentPage = 1;
+        int recordsPerPage = 6;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.trim().isEmpty()) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+            } catch (NumberFormatException e) {
+                currentPage = 1; // Nếu lỗi, đặt mặc định là trang 1
+            }
+        }
+
+        // Lấy dữ liệu từ cookie giỏ hàng
+        String cartData = "";
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("cart".equals(cookie.getName())) {
+                    cartData = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // Nếu giỏ hàng trống, hiển thị thông báo
+        if (cartData.isEmpty()) {
+            request.setAttribute("cartItems", new ArrayList<>());
+            request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
+            request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
+            return;
+        }
+
+        List<ReservationDetail> cartItems;
+        List<ReservationDetail> cart = new ArrayList<>();
+        ServiceDBContext serviceDAO = new ServiceDBContext();
+        int total = 0;
+
+        for (String item : cartData.split("-")) {
+            try {
+                String[] parts = item.split("/");
+                if (parts.length < 2) {
+                    continue;
+                }
+
+                String[] info = parts[0].split("~");
+                if (info.length < 3) {
+                    continue;
+                }
+
+                // Kiểm tra và parse serviceID, amount, numberOfPeople
+                int serviceID = Integer.parseInt(info[1]);
+                int amount = Integer.parseInt(info[2]);
+                int numberOfPeople = Integer.parseInt(parts[1]);
+
+                Service service = serviceDAO.getServiceByID(serviceID);
+                if (service != null) {
+                    ReservationDetail reservationDetail = new ReservationDetail(0, 0, service, amount, numberOfPeople);
+                    cart.add(reservationDetail);
+                    total += service.getServicePrice() * (100 - service.getSalePrice()) * 10 * amount * numberOfPeople;
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Lỗi parse dữ liệu giỏ hàng: " + item);
+            }
+        }
+
+        // Lọc dịch vụ dựa trên tìm kiếm
+        cartItems = reservationDB.searchService(cart, search, categoryID, currentPage, recordsPerPage);
+        if (cartItems.isEmpty()) {
+            request.setAttribute("cartMessage", "Không tìm thấy kết quả.");
+        }
+
+        int totalRecords = cart.size();
+        int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
+
+        // Gửi dữ liệu qua JSP
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("total", total);
+        request.setAttribute("cartItems", cartItems);
+        request.setAttribute("customer", customer);
+        session.setAttribute("currentPage", currentPage);
+        session.setAttribute("totalPages", totalPages);
+        session.setAttribute("total", total);
+        session.setAttribute("cartItems", cartItems);
+        session.setAttribute("customer", customer);
+        request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Default behavior: Load service list
+        HttpSession session = request.getSession();
         Map<String, String> errors = new HashMap<>();
         String name = request.getParameter("name");
         String address = request.getParameter("address");
@@ -157,7 +161,11 @@ public class ReservationController extends HttpServlet {
         String gender = request.getParameter("gender");
         String note = request.getParameter("note");
         String payment = request.getParameter("payment");
-
+        Customer customer = (Customer) session.getAttribute("customer");
+        List<ReservationDetail> cartItems = (List<ReservationDetail>) session.getAttribute("cartItems");
+        int total=(int)session.getAttribute("total");
+        int currentPage=(int)session.getAttribute("currentPage");
+        int totalPages=(int)session.getAttribute("totalPages");
         // Kiểm tra lỗi nhập liệu
         if (name == null || name.length() < 6 || name.length() > 50) {
             errors.put("name", "Họ và tên phải từ 6 đến 50 ký tự.");
@@ -207,14 +215,24 @@ public class ReservationController extends HttpServlet {
             request.setAttribute("expirationDate", expirationDate);
         }
         if (!errors.isEmpty()) {
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("total", total);
+            request.setAttribute("cartItems", cartItems);
+            request.setAttribute("customer", customer);
             request.setAttribute("errors", errors);
             request.getRequestDispatcher("view/reservation.jsp").forward(request, response);
             return;
         }
+
         if (session.getAttribute("startTime") == null) {
             session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
         }
-        request.setAttribute("customer", customer);
+        session.removeAttribute("currentPage");
+        session.removeAttribute("totalPages");
+        session.removeAttribute("total");
+        session.removeAttribute("cartItems");
+        session.removeAttribute("customer");
         session.setAttribute("name", name);
         session.setAttribute("address", address);
         session.setAttribute("email", email);

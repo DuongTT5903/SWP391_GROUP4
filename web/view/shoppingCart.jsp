@@ -10,6 +10,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Service Cart</title>
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
         <script src="https://kit.fontawesome.com/bf043842f3.js" crossorigin="anonymous"></script>
     </head>
@@ -30,6 +32,17 @@
             padding: 15px;
             display: block;
             text-align: center;
+        }
+        .navbar h3 {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            color: #d1d1d1;
         }
     </style>
     <body>
@@ -93,7 +106,7 @@
                             <th>Tên dịch vụ</th>
                             <th>Giá</th>
                             <th>Số lượng</th>
-                            <th>Số người</th>
+                            <!--                            <th>Số người</th>-->
                             <th>Chức năng</th>
                         </tr>
                     </thead>
@@ -113,16 +126,16 @@
                                     </form>
                                 </td>
 
-                                <td>
-                                    <form action="UpdateCart" method="POST">
-                                        <input type="hidden" name="UpdateID" value="${s.service.serviceID}">
-                                        <div class="input-group d-flex align-items-center">
-                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="increasePersons">+</button>
-                                            <span class="mx-3 text-center" style="min-width: 20px;">${s.numberOfPerson}</span>
-                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="decreasePersons">-</button>
-                                        </div>
-                                    </form>
-                                </td>
+                                <!--                                <td>
+                                                                    <form action="UpdateCart" method="POST">
+                                                                        <input type="hidden" name="UpdateID" value="${s.service.serviceID}">
+                                                                        <div class="input-group d-flex align-items-center">
+                                                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="increasePersons">+</button>
+                                                                            <span class="mx-3 text-center" style="min-width: 20px;">${s.numberOfPerson}</span>
+                                                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="decreasePersons">-</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </td>-->
 
 
 
