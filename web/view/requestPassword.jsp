@@ -1,55 +1,45 @@
-<%-- 
-    Document   : login.jsp
-    Created on : 4 Jun, 2024, 4:48:55 AM
-    Author     : HP
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Login page</title>
-        <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-6/assets/css/login-6.css">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Reset Password</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css">
     </head>
-    <body class="bg-primary">
-        <section class="p-3 p-md-4 p-xl-5">
+    <body>
+        <section class="h-100 d-flex align-items-center justify-content-center">
             <div class="container">
                 <div class="row justify-content-center">
-                    <div class="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
-                        <div class="card border-0 shadow-sm rounded-4" style="margin-top: 250px;">
-                            <div class="card-body p-3 p-md-4 p-xl-5">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="mb-5">
-                                            <h3>Send to email</h3>
-                                        </div>
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="card shadow-lg">
+                            <div class="card-body p-5">
+                                <h3 class="fw-bold mb-4 text-center">Send to Email</h3>
+                                <form action="request" method="POST" class="needs-validation" novalidate>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" required>
+                                        <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
                                     </div>
-                                </div>
-                                <form action="request" method="POST">
-                                    <div class="row gy-3 overflow-hidden">
-                                        <div class="col-12">
-                                            <div class="form-floating mb-3">
-                                                <input type="email" class="form-control"
-                                                       name="email" 
-                                                       id="email" placeholder="name@example.com" required>
-                                                <label for="email" class="form-label">Email</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="d-grid">
-                                                <button class="btn bsb-btn-2xl btn-primary" type="submit">Reset password</button>
-                                            </div>
-                                        </div>
+                                    <div class="d-grid">
+                                        <button class="btn btn-primary" type="submit">Reset Password</button>
                                     </div>
                                 </form>
-                                <p class="text-danger">${mess}</p>
+                                <p class="text-danger text-center mt-3">${mess}</p>
                             </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-outline-primary px-4 py-2 fw-bold rounded-pill">
+                                ⬅ Back to Home
+                            </a>
+                        </div>
+                        <div class="text-center mt-5 text-muted">
+                            ChildrenCare &copy; VÌ SỨC KHỎE
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

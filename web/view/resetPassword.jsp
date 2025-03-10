@@ -1,65 +1,50 @@
-<%-- 
-    Document   : login.jsp
-    Created on : 4 Jun, 2024, 4:48:55 AM
-    Author     : HP
---%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Login page</title>
-        <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-         <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-6/assets/css/login-6.css">
+        <title>Reset Password</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
     </head>
     <body class="bg-primary">
- <section class="p-3 p-md-4 p-xl-5">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
-          <div class="card border-0 shadow-sm rounded-4" style="margin-top: 170px">
-          <div class="card-body p-3 p-md-4 p-xl-5">
-            <div class="row">
-              <div class="col-12">
-                <div class="mb-5">
-                  <h3>Reset password</h3>
+        <section class="h-100">
+            <div class="container h-100">
+                <div class="row justify-content-sm-center h-100">
+                    <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                        <div class="card shadow-lg" style="margin-top: 170px">
+                            <div class="card-body p-5">
+                                <h3 class="fs-4 card-title fw-bold mb-4">Reset Password</h3>
+                                <form action="reset" method="POST" class="needs-validation" autocomplete="off">
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="email">Email</label>
+                                        <input type="email" class="form-control" name="email" id="email" value="${email}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="password">Password</label>
+                                        <input type="password" class="form-control" name="password" id="password" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="confirm_password">Confirm Password</label>
+                                        <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">Reset Password</button>
+                                    </div>
+                                    <p class="text-danger mt-3">${mess}</p>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-outline-light px-4 py-2 fw-bold rounded-pill">
+                                ⬅ Back to Home
+                            </a>
+                        </div>
+                        <div class="text-center mt-5 text-muted">
+                            ChildrenCare &copy; VÌ SỨC KHỎE
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-            <form action="reset" method="POST">
-              <div class="row gy-3 overflow-hidden">
-                <div class="col-12">
-                  <div class="form-floating mb-3">
-                    <input type="email" class="form-control" value="${email}" name="email" id="email" placeholder="name@example.com" required>
-                    <label for="email" class="form-label">Email</label>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="form-floating mb-3">
-                    <input type="password" class="form-control" name="password" id="password" value="" placeholder="Password" required>
-                    <label for="password" class="form-label">Password</label>
-                  </div>
-                </div>
-                   <div class="col-12">
-                  <div class="form-floating mb-3">
-                    <input type="password" class="form-control" name="confirm_password" id="confirm_password" value="" placeholder="Password" required>
-                    <label for="confirm_password" class="form-label">Confirm Password</label>
-                  </div>
-                </div>
-                <div class="col-12">
-                  <div class="d-grid">
-                    <button class="btn bsb-btn-2xl btn-primary" type="submit">Reset password</button>
-                  </div>
-                </div>
-              </div>
-               <p class="text-danger">${mess}</p>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+        </section>
     </body>
 </html>
-
