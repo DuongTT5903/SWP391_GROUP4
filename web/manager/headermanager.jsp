@@ -7,16 +7,17 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
         <ul class="navbar-nav mr-auto">
-            <c:if test="${sessionScope.account.role.roleID == 1 || sessionScope.account.role.roleID == 2}">
+            <c:if test="${sessionScope.roleID == '1' || sessionScope.roleID == '2'}">
                 <li class="nav-item">
-                    <a class="nav-link" href="FeedbackList">Feedbacklist</a>
+                    <a class="nav-link" href="feedbackdetail">Feedbacklist</a>
                 </li>
+                
                 <li class="nav-item">
-                    <a class="nav-link" href="PostList">PostList</a>
+                    <a class="nav-link" href="postList">PostList</a>
                 </li>
             </c:if>
             <li class="nav-item">
-                <a class="nav-link" href="servicesmanager">ServicesList</a>
+                <a class="nav-link" href="listservice">ServicesList</a>
             </li>
             <c:if test="${sessionScope.account.role.roleID == 1}">
                 <li class="nav-item">
