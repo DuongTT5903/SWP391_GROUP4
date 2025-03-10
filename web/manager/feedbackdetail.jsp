@@ -21,32 +21,9 @@
     <body>
         <jsp:include page="./headermanager.jsp" />
         <div class="container">
-            <h1 style="text-align: center; background-color: lightgray; width: 100%; position: relative;">Feedback Detail</h1>
+            <h1 style="text-align: center; background-color: lightgray; width: 100%; position: relative;">Feedback List</h1>
             <div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Status
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="feedbackdetail?filters=&filterr=${param['filterr']}">All</a>
-                        <a class="dropdown-item" href="feedbackdetail?filters=1&filterr=${param['filterr']}">Active</a>
-                        <a class="dropdown-item" href="feedbackdetail?filters=0&filterr=${param['filterr']}">Inactive</a>
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Rated Star
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" href="feedbackdetail?filterr=&filters=${param['filters']}">All</a>
-                        <a class="dropdown-item" href="feedbackdetail?filterr=1&filters=${param['filters']}">1</a>
-                        <a class="dropdown-item" href="feedbackdetail?filterr=2&filters=${param['filters']}">2</a>
-                        <a class="dropdown-item" href="feedbackdetail?filterr=3&filters=${param['filters']}">3</a>
-                        <a class="dropdown-item" href="feedbackdetail?filterr=4&filters=${param['filters']}">4</a>
-                        <a class="dropdown-item" href="feedbackdetail?filterr=5&filters=${param['filters']}">5</a>
-                    </div>
-                </div>
-            </div>
+              
 
             <div style="width: 100%;">
                 <table class="table-striped table-hover" cellspacing="0" style="width: 100%;font-size: 18px; padding: 5px;" id="tablesample">

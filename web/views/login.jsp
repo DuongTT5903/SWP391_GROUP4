@@ -1,6 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -17,51 +16,33 @@
             <div class="container h-100">
                 <div class="row justify-content-sm-center h-100">
                     <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-                        
                         <div class="card shadow-lg">
                             <div class="card-body p-5">
-
                                 <h1 class="fs-4 card-title fw-bold mb-4">Đăng nhập</h1>
-                                <form action="login" method="POST" class="needs-validation"  autocomplete="off">
+                                <form action="login" method="POST" class="needs-validation" autocomplete="off">
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="username">Tên tài khoản</label>
                                         <input id="username" type="text" class="form-control" name="username" value="${cookie.user.value}" required>
-                                        <div class="invalid-feedback">
-                                            Tên tài khoản không hợp lệ
-                                        </div>
+                                        <div class="invalid-feedback">Tên tài khoản không hợp lệ</div>
                                     </div>
-
                                     <div class="mb-3">
                                         <div class="mb-2 w-100">
                                             <label class="text-muted" for="password">Mật khẩu</label>
-                                            <!--										<a href="forgot.html" class="float-end" >
-                                                                                                                                    Quên mật khẩu?
-                                                                                                                            </a>-->
                                         </div>
                                         <input id="password" type="password" class="form-control" name="password" value="${cookie.pass.value}" required>
-                                        <div class="invalid-feedback">
-                                            Vui lòng nhập mật khẩu
-                                        </div>
+                                        <div class="invalid-feedback">Vui lòng nhập mật khẩu</div>
                                     </div>
-
                                     <div class="d-flex align-items-center">
                                         <div class="form-check">
-                                            <input type="checkbox" name="remember" id="remember" class="form-check-input" ${(cookie.rem.value eq 'on')?"checked":""}value="on">
+                                            <input type="checkbox" name="remember" id="remember" class="form-check-input" ${(cookie.rem.value eq 'on')?"checked":""} value="on">
                                             <label for="remember" class="form-check-label">Duy trì đăng nhập</label>
                                         </div>
-                                        <button type="submit" class="btn btn-primary ms-auto" style="background-color: #00c4cc; border-color: #00c4cc" >
-                                            Đăng nhập
-                                        </button>
-
+                                        <button type="submit" class="btn btn-primary ms-auto" style="background-color: #00c4cc; border-color: #00c4cc">Đăng nhập</button>
                                     </div>
-
                                 </form>
-
                             </div>
-
                             <div class="card-footer py-3 border-0">
                                 <div class="text-center" style="color: red">${requestScope.e} ${requestScope.success} ${requestScope.successchange}</div>
-
                                 <div class="text-center">
                                     Bạn không có tài khoản? <a href="register" class="text-dark">Đăng ký</a>
                                 </div>
@@ -70,6 +51,11 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="d-flex justify-content-center mt-3">
+                            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-outline-primary px-4 py-2 fw-bold rounded-pill">
+                                ⬅ Quay lại Trang chủ
+                            </a>
+                        </div>
                         <div class="text-center mt-5 text-muted">
                             ChildrenCare &copy; VÌ SỨC KHỎE
                         </div>
@@ -77,8 +63,6 @@
                 </div>
             </div>
         </section>
-
         <script src="js/login.js"></script>
     </body>
-</html>
 </html>
