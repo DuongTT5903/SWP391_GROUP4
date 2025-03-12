@@ -584,7 +584,7 @@ public class UserDBContext {
      */
     public boolean isUserExists(String userID, String username, String email) {
         try (Connection conn = DBContext.getConnection()) {
-            String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ? AND userID! = ?";
+            String sql = "SELECT COUNT(*) FROM Users WHERE (username = ? OR email = ?) AND userID! = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, email);
