@@ -1,95 +1,45 @@
-/*
-     * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-     * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
 import dal.UserDBContext;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.List;
 import model.User;
 
-/**
- *
- * @author admin
- */
 public class AdminUserList extends HttpServlet {
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AdminUserList</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AdminUserList at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         try {
             UserDBContext db = new UserDBContext();
             List<User> users = db.getUsers();
             request.setAttribute("users", users);
         } catch (Exception e) {
-
-            request.setAttribute("error", "Could not load user list. Please try again later.");
+            request.setAttribute("error", "Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
         }
         request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
     }
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         UserDBContext db = new UserDBContext();
         String action = request.getParameter("action");
 
-        // Handle user status update first
         if ("updateStatus".equals(action)) {
             int userID = Integer.parseInt(request.getParameter("userID"));
             boolean newStatus = request.getParameter("status").equals("1");
             db.updateUserStatus(userID, newStatus);
-
             response.sendRedirect(request.getContextPath() + "/admin/userList");
-            return; // Stop further execution
+            return;
         }
 
-        // Handle user creation
-        
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
@@ -97,10 +47,8 @@ public class AdminUserList extends HttpServlet {
         String password = request.getParameter("password");
         String roleID = request.getParameter("role");
 
-        String errorMessage;
-        errorMessage = validateInput( name, email, phone, username, password, db);
+        String errorMessage = validateInput(name, email, phone, username, password, db);
         if (errorMessage != null) {
-            // Preserve form input to show back in case of an error
             request.setAttribute("error", errorMessage);
             request.setAttribute("name", name);
             request.setAttribute("email", email);
@@ -108,34 +56,24 @@ public class AdminUserList extends HttpServlet {
             request.setAttribute("username", username);
             request.setAttribute("role", roleID);
 
-            // Reload user list for display
             List<User> users = db.getUsers();
             request.setAttribute("users", users);
-
             request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
-            return; // Stop execution when there is an error
+            return;
         }
 
-        // Create a new user
+        String hashedPassword = hashPassword(password);
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPhone(phone);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(hashedPassword);
         user.setRole(roleID);
 
         try {
             db.addUser(user);
-            String subject = "Chào mừng bạn đến với hệ thống!";
-            String content = "<h1>Xin chào " + name + ",</h1>"
-                    + "<p>Bạn đã được thêm vào hệ thống với tài khoản: <strong>" + username + "</strong></p>"
-                    + "<p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật tài khoản.</p>"
-                    + "<p>Cảm ơn bạn đã tham gia!</p>";
-
-            resetService emailService = new resetService();
-            emailService.sendEmail1(email, subject, content);
-
             response.sendRedirect(request.getContextPath() + "/admin/userList");
         } catch (Exception e) {
             request.setAttribute("error", "Lỗi trong quá trình thêm người dùng.");
@@ -143,37 +81,44 @@ public class AdminUserList extends HttpServlet {
         }
     }
 
-    private String validateInput( String name, String email, String phone, String username, String password, UserDBContext db) {
+private String hashPassword(String password) {
+    String salt = "RANDOM_SALT"; // Nên lưu salt riêng cho từng user
+    try {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hashedBytes = md.digest((salt + password).getBytes(StandardCharsets.UTF_8));
+        BigInteger number = new BigInteger(1, hashedBytes);
+        StringBuilder hexString = new StringBuilder(number.toString(16));
+
+        while (hexString.length() < 64) {
+            hexString.insert(0, '0');
+        }
+        return hexString.toString();
+    } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
+    }
+}
+
+    private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty() || password.isEmpty()) {
             return "Vui lòng điền đầy đủ thông tin.";
         }
-        if (email == null || email.trim().isEmpty()) {
-            return "Email không được để trống.";
-        } else if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             return "Email không hợp lệ.";
         }
-
-        if (phone == null || phone.trim().isEmpty()) {
-            return "Số điện thoại không được để trống.";
-        } else if (!phone.matches("^\\d{10,11}$")) {
+        if (!phone.matches("^\\d{10,11}$")) {
             return "Số điện thoại không hợp lệ (phải có 10-11 chữ số).";
         }
-        if (password != null && !password.isEmpty() && password.length() < 1) {
+        if (password.length() < 6) {
             return "Mật khẩu phải có ít nhất 6 ký tự.";
         }
-        
-        if (db.isUserExistsUE( username, email)) {
+        if (db.isUserExistsUE(username, email)) {
             return "Tài khoản hoặc email đã tồn tại!";
         }
         return null;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Servlet quản lý danh sách người dùng của admin";
     }
 }

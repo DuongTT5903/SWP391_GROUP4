@@ -61,8 +61,10 @@
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Mật khẩu</label>
-                    <input type="password" class="form-control" id="password" name="password" value="${user.password}" required>
+                    <input type="password" class="form-control" id="password" name="password">
+                    <small class="text-muted">Để trống nếu không muốn đổi mật khẩu.</small>
                 </div>
+
                 <div class="mb-3">
                     <label for="phone" class="form-label">Số điện thoại</label>
                     <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" required>
