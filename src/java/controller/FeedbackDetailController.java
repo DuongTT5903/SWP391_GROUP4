@@ -21,8 +21,40 @@ public class FeedbackDetailController extends HttpServlet {
         FeedbackDBContext fdao = new FeedbackDBContext();
 
         if (action == null) {
-            List<Feedback> flist = fdao.getAllFeedbacks();
+            // --- Bắt đầu phân trang ---
+            int page = 1;  // Mặc định trang đầu tiên
+            int pageSize = 5; // Số feedback mỗi trang
+
+            // Lấy số trang từ request (nếu có)
+            if (request.getParameter("page") != null) {
+                try {
+                    page = Integer.parseInt(request.getParameter("page"));
+                } catch (NumberFormatException e) {
+                    page = 1; // Nếu lỗi, quay về trang đầu
+                }
+            }
+
+            // Lấy danh sách feedback từ DB
+            List<Feedback> allFeedbacks = fdao.getAllFeedbacks();
+            int totalFeedbacks = allFeedbacks.size();
+            int totalPages = (int) Math.ceil((double) totalFeedbacks / pageSize);
+
+            // Đảm bảo `page` hợp lệ
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            // Xác định vị trí bắt đầu và kết thúc trong danh sách
+            int start = (page - 1) * pageSize;
+            int end = Math.min(start + pageSize, totalFeedbacks);
+
+            // Lấy danh sách feedback theo trang
+            List<Feedback> flist = allFeedbacks.subList(start, end);
+
+            // Đưa dữ liệu vào request để hiển thị trong JSP
             request.setAttribute("flist", flist);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            
             request.getRequestDispatcher("/manager/feedbackdetail.jsp").forward(request, response);
         } else if ("edit".equals(action)) {
             String fid = request.getParameter("fid");
@@ -58,6 +90,6 @@ public class FeedbackDetailController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Feedback Detail Controller";
+        return "Feedback Detail Controller with Pagination";
     }
 }
