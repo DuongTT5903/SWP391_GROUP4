@@ -12,6 +12,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Servlet for handling password reset requests
@@ -107,7 +111,9 @@ request.getRequestDispatcher("view/resetPassword.jsp").forward(request, response
         }
 
         // Cập nhật mật khẩu người dùng
-        DAOUser.updatePassword1(email, password);
+       String hashedPassword = hashPassword(password);
+DAOUser.updatePassword1(email, hashedPassword);
+
 
         // Đánh dấu token đã sử dụng
         tokenForgetPassword.setIsUsed(true);
@@ -118,7 +124,21 @@ request.getRequestDispatcher("view/resetPassword.jsp").forward(request, response
         request.setAttribute("mess", "reset password done");
         request.getRequestDispatcher("view/requestPassword.jsp").forward(request, response);
     }
-
+private String hashPassword(String password) {
+        String salt = "RANDOM_SALT";
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest((salt + password).getBytes(StandardCharsets.UTF_8));
+            BigInteger number = new BigInteger(1, hashedBytes);
+            StringBuilder hexString = new StringBuilder(number.toString(16));
+            while (hexString.length() < 64) {
+                hexString.insert(0, '0');
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
+        }
+    }
     @Override
     public String getServletInfo() {
         return "Servlet for handling password reset requests";

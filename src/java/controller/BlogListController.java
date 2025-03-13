@@ -45,7 +45,7 @@ public class BlogListController extends HttpServlet {
 
         // Xử lý phân trang an toàn
         int page = 1;
-        int pageSize = 5;
+        int pageSize = 4;
         try {
             if (request.getParameter("page") != null) {
                 page = Integer.parseInt(request.getParameter("page"));
