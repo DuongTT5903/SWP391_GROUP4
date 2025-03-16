@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package controller;
 
 import dal.PostDBContext;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import model.Post;
 import model.User;
+
 /**
  *
  * @author yugio
@@ -23,14 +23,16 @@ import model.User;
 public class ManagerAddPost extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
@@ -40,7 +42,7 @@ public class ManagerAddPost extends HttpServlet {
             out.println("<title>Servlet ManagerAddPost</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ManagerAddPost at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ManagerAddPost at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -49,13 +51,13 @@ public class ManagerAddPost extends HttpServlet {
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     @Override
-    
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -68,7 +70,13 @@ public class ManagerAddPost extends HttpServlet {
         String category = request.getParameter("category");
         String imageLink = request.getParameter("imageLink");
         // Nếu checkbox "status" được chọn thì có giá trị, nếu không thì null
-        boolean status = (request.getParameter("status") != null);
+        String statusget = request.getParameter("status");
+        boolean status = true;
+        if(statusget == "hide"){
+            status = false;
+        }else{
+            status = true;
+        }
 
         // Lấy thông tin user từ session để làm tác giả
         HttpSession session = request.getSession(false);
@@ -80,20 +88,20 @@ public class ManagerAddPost extends HttpServlet {
         User author = (User) session.getAttribute("user");
 
         // Tạo đối tượng Post mới và set các trường
-        Post post = new Post();
-        post.setTitle(title);
-        post.setDetail(detail);
-        post.setCategory(category);
-        post.setStatus(status);
-        post.setImageLink(imageLink);
-        post.setAuthor(author);
+        Post post = new Post(title, detail, category, imageLink, status, author);
 
         // Gọi DBContext để thêm bài viết mới vào bảng blogs
         PostDBContext postDB = new PostDBContext();
         postDB.addPost(post);
+        boolean success = postDB.addPost(post);
 
         // Sau khi thêm thành công, chuyển hướng về trang danh sách bài viết
-        response.sendRedirect(request.getContextPath() + "/manager/postList");
+        if (success) {
+            response.sendRedirect(request.getContextPath() + "/manager/postList");
+        } else {
+            request.setAttribute("error", "Failed to add post. Please try again.");
+            request.getRequestDispatcher("addPost.jsp").forward(request, response);
+        }
     }
 
     @Override
@@ -102,6 +110,7 @@ public class ManagerAddPost extends HttpServlet {
         // Nếu yêu cầu GET, chuyển tiếp đến trang addPost.jsp để hiển thị form
         request.getRequestDispatcher("addPost.jsp").forward(request, response);
     }
+
     @Override
     public String getServletInfo() {
         return "Short description";

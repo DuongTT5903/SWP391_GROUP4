@@ -21,6 +21,10 @@ public class ManagerPostListController extends HttpServlet {
 //        String idParam = request.getParameter("id");
 //        Integer postId = (idParam != null && !idParam.isEmpty()) ? Integer.parseInt(idParam) : null;
         String action = request.getParameter("action");
+        String searchQuery = request.getParameter("search");
+
+        
+        
         String idParam = request.getParameter("id");
         String currentPage = request.getParameter("page");
         if (action != null && idParam != null && !idParam.isEmpty()) {
@@ -59,7 +63,8 @@ public class ManagerPostListController extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
 
         // Gọi DAO để lấy danh sách bài viết
-        List<Post> posts = postDAO.getPosts(filterCategory, filterAuthor, filterStatus, searchTitle, sortBy, page, pageSize);
+        List<Post> posts = postDAO.getPosts(filterCategory, filterAuthor, filterStatus, searchQuery, sortBy, page, pageSize);
+
 
         // Đưa dữ liệu lên JSP
         request.setAttribute("categories", categories);

@@ -31,6 +31,15 @@ public class Post {
         this.status = status;
         this.imageLink = imageLink;
     }
+
+    public Post(String title, String detail, String category, String imageLink, boolean status, User author) {
+        this.title = title;
+        this.detail = detail;
+        this.category = category;
+        this.status = status;
+        this.imageLink = imageLink;
+        this.author = author;
+    }
     
 
     // Getters and Setters

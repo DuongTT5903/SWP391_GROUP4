@@ -32,7 +32,8 @@ public class PostDBContext extends DBContext {
             params.add(Boolean.parseBoolean(filterStatus));
         }
         if (searchTitle != null && !searchTitle.isEmpty()) {
-            sql += " AND p.BlogTitle LIKE ?";
+            sql += " AND (p.BlogTitle LIKE ? OR p.BlogDetail LIKE ?)";
+            params.add("%" + searchTitle + "%");
             params.add("%" + searchTitle + "%");
         }
 
@@ -117,7 +118,7 @@ public class PostDBContext extends DBContext {
         }
     }
 
-    public void addPost(Post post) {
+    public boolean addPost(Post post) {
         String sql = "INSERT INTO blogs (BlogTitle, BlogDetail, Category, status, imglink, AuthorID) "
                 + "VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -127,13 +128,13 @@ public class PostDBContext extends DBContext {
             stmt.setString(3, post.getCategory());
             stmt.setBoolean(4, post.isStatus());
             stmt.setString(5, post.getImageLink());
-            // Giả sử đối tượng User có phương thức getId() trả về ID của tác giả
             stmt.setInt(6, post.getAuthor().getUserID());
 
-            stmt.executeUpdate();
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Trả về true nếu chèn thành công
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error adding post to blogs", e);
+            System.err.println("Lỗi khi thêm bài viết: " + e.getMessage());
+            return false; // Trả về false nếu có lỗi
         }
     }
 
