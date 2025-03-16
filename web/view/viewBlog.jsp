@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <title>Chi Tiết Blog</title>
     <style>
-        /* Font chữ dễ đọc */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
         body {
@@ -62,6 +61,26 @@
             color: #555;
         }
 
+        .back-btn {
+            display: block;
+            width: 150px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+
         hr {
             border: 0;
             height: 1px;
@@ -69,12 +88,13 @@
             margin: 20px 0;
         }
     </style>
+    <jsp:include page="/view/head.jsp" />
 </head>
 <body>
     <div class="container">
         <% for (Blog blog : (List<Blog>) request.getAttribute("blogs")) { %>
             <h2><%= blog.getBlogTitle() %></h2>
-            
+
             <% if (blog.getImageLink() != null && !blog.getImageLink().isEmpty()) { %>
                 <img class="blog-image" src="<%= blog.getImageLink() %>" width="300"/>
             <% } else { %>
@@ -82,17 +102,29 @@
             <% } %>
 
             <p class="category">Thể loại: <%= blog.getCategory() %></p>
-            
-<% if (blog.getAuthor() != null) { %>
-    <p class="author">Tác giả: <%= blog.getAuthor() != null ? blog.getAuthor().getName() : "Không xác định" %></p>
-<% } else { %>
-    <p class="author">Tác giả: Không xác định</p>
-<% } %>
 
+            <% if (blog.getAuthor() != null) { %>
+                <p class="author">Tác giả: <%= blog.getAuthor().getName() %></p>
+            <% } else { %>
+                <p class="author">Tác giả: Không xác định</p>
+            <% } %>
 
             <p><%= blog.getBlogDetail() %></p>
             <hr>
         <% } %>
+
+        <!-- Nút "Quay lại" -->
+        <button class="back-btn" onclick="goBack()">⬅ Quay lại</button>
     </div>
+
+    <script>
+        function goBack() {
+            if (document.referrer.includes("blogList")) {
+                window.history.back();
+            } else {
+                window.location.href = "blogList";
+            }
+        }
+    </script>
 </body>
 </html>

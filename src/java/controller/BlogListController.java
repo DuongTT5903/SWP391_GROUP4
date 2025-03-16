@@ -21,6 +21,10 @@ public class BlogListController extends HttpServlet {
 //        String idParam = request.getParameter("id");
 //        Integer postId = (idParam != null && !idParam.isEmpty()) ? Integer.parseInt(idParam) : null;
         String action = request.getParameter("action");
+        String searchQuery = request.getParameter("search");
+
+        
+        
         String idParam = request.getParameter("id");
         String currentPage = request.getParameter("page");
         if (action != null && idParam != null && !idParam.isEmpty()) {
@@ -45,7 +49,7 @@ public class BlogListController extends HttpServlet {
 
         // Xử lý phân trang an toàn
         int page = 1;
-        int pageSize = 4;
+        int pageSize = 5;
         try {
             if (request.getParameter("page") != null) {
                 page = Integer.parseInt(request.getParameter("page"));
@@ -59,7 +63,8 @@ public class BlogListController extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
 
         // Gọi DAO để lấy danh sách bài viết
-        List<Post> posts = postDAO.getPosts1(filterCategory, filterAuthor, filterStatus, searchTitle, sortBy, page, pageSize);
+        List<Post> posts = postDAO.getPosts(filterCategory, filterAuthor, filterStatus, searchQuery, sortBy, page, pageSize);
+
 
         // Đưa dữ liệu lên JSP
         request.setAttribute("categories", categories);
@@ -68,13 +73,13 @@ public class BlogListController extends HttpServlet {
         request.setAttribute("currentPage", page);
         request.setAttribute("pageSize", pageSize);
 
-        request.getRequestDispatcher("view/blogList.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/blogList.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Hiện tại chưa có logic xử lý POST, có thể thêm chức năng thêm bài viết sau này
-        response.sendRedirect("view/blogList.jsp");
+        response.sendRedirect("/view/blogList.jsp");
     }
 
     @Override
