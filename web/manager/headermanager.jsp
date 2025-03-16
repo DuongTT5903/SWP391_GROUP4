@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <a class="navbar-brand" href="dashboard">Dashboard</a>
+    <a class="navbar-brand" href="<%= request.getContextPath() %>/homepage">Homepage</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
             aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -28,7 +28,7 @@
                 <a class="nav-link" href="reservationList">ReservationList</a>
             </li>
         </ul>
-        <div class="dropdown">
+<!--        <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle" type="button" id="account" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 ${sessionScope.account.name}
             </button>
@@ -36,7 +36,7 @@
                 <a class="dropdown-item" href="userDetail?UserID=${sessionScope.account.userID}">Edit account info</a>
                 <a class="dropdown-item" href="changepass">Change Password</a>
                 <a class="dropdown-item" href="logout">Log out</a>
-            </div>
+            </div>-->
         </div>
     </div>
 </nav>
