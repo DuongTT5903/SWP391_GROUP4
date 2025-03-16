@@ -92,7 +92,7 @@ public class ManagerAddPost extends HttpServlet {
 
         // Gọi DBContext để thêm bài viết mới vào bảng blogs
         PostDBContext postDB = new PostDBContext();
-        postDB.addPost(post);
+       
         boolean success = postDB.addPost(post);
 
         // Sau khi thêm thành công, chuyển hướng về trang danh sách bài viết
