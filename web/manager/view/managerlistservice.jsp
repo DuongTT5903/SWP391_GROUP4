@@ -9,6 +9,25 @@
         <title>Manager List Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
+    <script>
+        function searchServices() {
+            let searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
+            let rows = document.querySelectorAll(".service-row");
+
+            rows.forEach(row => {
+                let title = row.querySelector("td:nth-child(2)").innerText.toLowerCase(); // Cột Title
+                let detail = row.querySelector("td:nth-child(3)").innerText.toLowerCase(); // Cột Detail
+
+                if (title.includes(searchValue) || detail.includes(searchValue) || searchValue === "") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+    </script>
+
+
     <body class="bg-light">
         <div class="container py-5">
             <div class="row justify-content-center">
@@ -26,15 +45,15 @@
                             </c:if>
 
                             <!-- Form tìm kiếm -->
-                            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-3" onsubmit="return validateSearch()">
-                                <input type="hidden" name="service" value="searchById">
+                            <form action="javascript:void(0);" class="mb-3">
                                 <div class="input-group">
-                                    <span class="input-group-text">Search by ID</span>
-                                    <input type="text" class="form-control" id="searchID" name="searchID" 
-                                           placeholder="Enter Service ID" value="${searchID}">
-                                    <button type="submit" class="btn btn-primary">Search</button>
+                                    <span class="input-group-text">Search</span>
+                                    <input type="text" class="form-control" id="searchInput" 
+                                           placeholder="Enter Title or Detail" onkeyup="searchServices()">
                                 </div>
                             </form>
+
+
 
                             <!-- Bộ lọc trạng thái -->
                             <div class="mb-3">
@@ -56,7 +75,7 @@
                                             <th>Detail</th>
                                             <th>Category</th>
                                             <th onclick="sortTable()" style="cursor: pointer;">Service Price <span id="sortIcon">🔽</span></th>
-                                            <th>Sale Price</th>
+                                            <th>Sale Off</th>
                                             <th>Image</th>
                                             <th>Status</th>
                                             <th>Actions</th>
@@ -144,49 +163,49 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            function validateSearch() {
-                let searchInput = document.getElementById("searchID").value.trim();
-                if (searchInput === "") {
-                    alert("Please enter a Service ID to search!");
-                    return false;
-                }
-                return true;
-            }
+                                                        function validateSearch() {
+                                                            let searchInput = document.getElementById("searchID").value.trim();
+                                                            if (searchInput === "") {
+                                                                alert("Please enter a Service ID to search!");
+                                                                return false;
+                                                            }
+                                                            return true;
+                                                        }
 
-            function filterStatus() {
-                let filter = document.getElementById("statusFilter").value;
-                let rows = document.querySelectorAll(".service-row");
-                rows.forEach(row => {
-                    let status = row.getAttribute("data-status");
-                    if (filter === "all" || status === filter) {
-                        row.style.display = "";
-                    } else {
-                        row.style.display = "none";
-                    }
-                });
-            }
+                                                        function filterStatus() {
+                                                            let filter = document.getElementById("statusFilter").value;
+                                                            let rows = document.querySelectorAll(".service-row");
+                                                            rows.forEach(row => {
+                                                                let status = row.getAttribute("data-status");
+                                                                if (filter === "all" || status === filter) {
+                                                                    row.style.display = "";
+                                                                } else {
+                                                                    row.style.display = "none";
+                                                                }
+                                                            });
+                                                        }
 
-            let ascending = true;
-            function sortTable() {
-                let table = document.getElementById("serviceTable");
-                let rows = Array.from(table.getElementsByClassName("service-row"));
-                let icon = document.getElementById("sortIcon");
+                                                        let ascending = true;
+                                                        function sortTable() {
+                                                            let table = document.getElementById("serviceTable");
+                                                            let rows = Array.from(table.getElementsByClassName("service-row"));
+                                                            let icon = document.getElementById("sortIcon");
 
-                rows.sort((a, b) => {
-                    let priceA = parseFloat(a.querySelector(".service-price").innerText);
-                    let priceB = parseFloat(b.querySelector(".service-price").innerText);
-                    return ascending ? priceA - priceB : priceB - priceA;
-                });
+                                                            rows.sort((a, b) => {
+                                                                let priceA = parseFloat(a.querySelector(".service-price").innerText);
+                                                                let priceB = parseFloat(b.querySelector(".service-price").innerText);
+                                                                return ascending ? priceA - priceB : priceB - priceA;
+                                                            });
 
-                ascending = !ascending;
-                icon.textContent = ascending ? "🔽" : "🔼";
+                                                            ascending = !ascending;
+                                                            icon.textContent = ascending ? "🔽" : "🔼";
 
-                rows.forEach(row => table.querySelector("tbody").appendChild(row));
-            }
+                                                            rows.forEach(row => table.querySelector("tbody").appendChild(row));
+                                                        }
 
-            function confirmDelete() {
-                return confirm("Are you sure you want to delete this service?");
-            }
+                                                        function confirmDelete() {
+                                                            return confirm("Are you sure you want to delete this service?");
+                                                        }
         </script>
     </body>
 </html>
