@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 import model.Service;
 import model.ServiceCategory;
@@ -34,26 +33,35 @@ public class ManagerServiceController extends HttpServlet {
             service = "listservice";
         }
 
+        int categoryID = 0; // Khai báo categoryID bên ngoài switch để tránh xung đột
+
         try {
             switch (service.toLowerCase()) {
                 case "listservice":
                     int page = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
                     int pageSize = 5; // Số dịch vụ mỗi trang
-                    List<Service> allServices = db.getServices();
-                    int totalServices = allServices.size();
+                    String search = request.getParameter("search") != null ? request.getParameter("search") : "";
+                    categoryID = request.getParameter("categoryID") != null ? Integer.parseInt(request.getParameter("categoryID")) : 0;
+
+                    // Gọi hàm searchServices để lấy danh sách dịch vụ với tìm kiếm và phân trang
+                    List<Service> list = db.searchServices(search, categoryID, page, pageSize);
+
+                    // Tính tổng số trang
+                    int totalServices = db.getTotalServicesForSearch(search, categoryID);
                     int totalPages = (int) Math.ceil((double) totalServices / pageSize);
 
                     if (page < 1) page = 1;
                     if (page > totalPages) page = totalPages;
 
-                    int start = (page - 1) * pageSize;
-                    int end = Math.min(start + pageSize, totalServices);
-
-                    List<Service> list = allServices.subList(start, end);
+                    // Lấy danh sách danh mục để hiển thị trong bộ lọc
+                    List<ServiceCategory> categories = db.getServiceCategories();
 
                     request.setAttribute("list", list);
                     request.setAttribute("currentPage", page);
                     request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("search", search);
+                    request.setAttribute("categoryID", categoryID);
+                    request.setAttribute("categories", categories);
                     request.getRequestDispatcher("/manager/view/managerlistservice.jsp").forward(request, response);
                     break;
 
@@ -77,9 +85,9 @@ public class ManagerServiceController extends HttpServlet {
                 case "viewdetail":
                     int viewID = Integer.parseInt(request.getParameter("serviceID"));
                     Service viewService = db.getServiceByID(viewID);
-                    List<ServiceCategory> categories = db.getServiceCategories();
+                    List<ServiceCategory> viewCategories = db.getServiceCategories();
                     request.setAttribute("service", viewService);
-                    request.setAttribute("categories", categories);
+                    request.setAttribute("categories", viewCategories);
                     request.getRequestDispatcher("/manager/view/viewservice.jsp").forward(request, response);
                     break;
 
@@ -109,7 +117,8 @@ public class ManagerServiceController extends HttpServlet {
                     int serviceID = Integer.parseInt(request.getParameter("serviceID"));
                     String serviceName = request.getParameter("serviceName");
                     String serviceDetail = request.getParameter("serviceDetail");
-                    int categoryID = Integer.parseInt(request.getParameter("categoryID"));
+                    // Sử dụng categoryID đã khai báo trước đó thay vì khai báo lại
+                    categoryID = Integer.parseInt(request.getParameter("categoryID"));
                     float servicePrice = Float.parseFloat(request.getParameter("servicePrice"));
                     float salePrice = Float.parseFloat(request.getParameter("salePrice"));
                     String imageURL = request.getParameter("imageURL");
@@ -134,7 +143,7 @@ public class ManagerServiceController extends HttpServlet {
 
                 case "delete":
                     int deleteServiceID = Integer.parseInt(request.getParameter("serviceID"));
-                    db.deleteService(deleteServiceID); // Giả định có hàm deleteService trong ServiceDBContext
+                    db.deleteService(deleteServiceID);
                     response.sendRedirect(request.getContextPath() + "/manager/listservice?message=Service deleted successfully!");
                     break;
 

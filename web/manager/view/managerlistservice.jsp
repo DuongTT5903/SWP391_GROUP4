@@ -9,24 +9,6 @@
         <title>Manager List Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
-    <script>
-        function searchServices() {
-            let searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
-            let rows = document.querySelectorAll(".service-row");
-
-            rows.forEach(row => {
-                let title = row.querySelector("td:nth-child(2)").innerText.toLowerCase(); // Cột Title
-                let detail = row.querySelector("td:nth-child(3)").innerText.toLowerCase(); // Cột Detail
-
-                if (title.includes(searchValue) || detail.includes(searchValue) || searchValue === "") {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        }
-    </script>
-
 
     <body class="bg-light">
         <div class="container py-5">
@@ -38,32 +20,37 @@
                         </div>
                         <div class="card-body">
                             <!-- Thông báo -->
-                            <c:if test="${not empty message}">
+                            <c:if test="${not empty param.message}">
                                 <div class="alert alert-success text-center" role="alert">
-                                    ${message}
+                                    ${param.message}
                                 </div>
                             </c:if>
 
                             <!-- Form tìm kiếm -->
-                            <form action="javascript:void(0);" class="mb-3">
+                            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-3">
                                 <div class="input-group">
                                     <span class="input-group-text">Search</span>
-                                    <input type="text" class="form-control" id="searchInput" 
-                                           placeholder="Enter Title or Detail" onkeyup="searchServices()">
+                                    <input type="text" class="form-control" id="searchInput" name="search" 
+                                           placeholder="Enter Title or Detail" value="${search}">
+                                    <button type="submit" class="btn btn-primary">Search</button>
                                 </div>
                             </form>
 
-
-
-                            <!-- Bộ lọc trạng thái -->
-                            <div class="mb-3">
-                                <label for="statusFilter" class="form-label">Filter by Status:</label>
-                                <select class="form-select w-auto d-inline-block" id="statusFilter" onchange="filterStatus()">
-                                    <option value="all">All</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
-                            </div>
+                            <!-- Bộ lọc theo danh mục -->
+                            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Category</span>
+                                    <select name="categoryID" class="form-select" onchange="this.form.submit()">
+                                        <option value="0" ${categoryID == 0 ? 'selected' : ''}>All Categories</option>
+                                        <c:forEach var="category" items="${categories}">
+                                            <option value="${category.categoryID}" ${categoryID == category.categoryID ? 'selected' : ''}>
+                                                ${category.categoryName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                    <input type="hidden" name="search" value="${search}">
+                                </div>
+                            </form>
 
                             <!-- Bảng danh sách dịch vụ -->
                             <div class="table-responsive">
@@ -79,7 +66,7 @@
                                             <th>Image</th>
                                             <th>Status</th>
                                             <th>Actions</th>
-                                            <th>Delete</th> <!-- Thêm cột Delete -->
+                                            <th>Delete</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -128,18 +115,18 @@
                             <nav aria-label="Page navigation" class="mt-3">
                                 <ul class="pagination justify-content-center">
                                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage - 1}" 
+                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage - 1}&search=${search}&categoryID=${categoryID}" 
                                            aria-label="Previous">
                                             <span aria-hidden="true">« Previous</span>
                                         </a>
                                     </li>
                                     <c:forEach begin="1" end="${totalPages}" var="i">
                                         <li class="page-item ${currentPage == i ? 'active' : ''}">
-                                            <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${i}">${i}</a>
+                                            <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${i}&search=${search}&categoryID=${categoryID}">${i}</a>
                                         </li>
                                     </c:forEach>
                                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage + 1}" 
+                                        <a class="page-link" href="${pageContext.request.contextPath}/manager/listservice?page=${currentPage + 1}&search=${search}&categoryID=${categoryID}" 
                                            aria-label="Next">
                                             <span aria-hidden="true">Next »</span>
                                         </a>
@@ -163,49 +150,27 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                                        function validateSearch() {
-                                                            let searchInput = document.getElementById("searchID").value.trim();
-                                                            if (searchInput === "") {
-                                                                alert("Please enter a Service ID to search!");
-                                                                return false;
-                                                            }
-                                                            return true;
-                                                        }
+            let ascending = true;
+            function sortTable() {
+                let table = document.getElementById("serviceTable");
+                let rows = Array.from(table.getElementsByClassName("service-row"));
+                let icon = document.getElementById("sortIcon");
 
-                                                        function filterStatus() {
-                                                            let filter = document.getElementById("statusFilter").value;
-                                                            let rows = document.querySelectorAll(".service-row");
-                                                            rows.forEach(row => {
-                                                                let status = row.getAttribute("data-status");
-                                                                if (filter === "all" || status === filter) {
-                                                                    row.style.display = "";
-                                                                } else {
-                                                                    row.style.display = "none";
-                                                                }
-                                                            });
-                                                        }
+                rows.sort((a, b) => {
+                    let priceA = parseFloat(a.querySelector(".service-price").innerText);
+                    let priceB = parseFloat(b.querySelector(".service-price").innerText);
+                    return ascending ? priceA - priceB : priceB - priceA;
+                });
 
-                                                        let ascending = true;
-                                                        function sortTable() {
-                                                            let table = document.getElementById("serviceTable");
-                                                            let rows = Array.from(table.getElementsByClassName("service-row"));
-                                                            let icon = document.getElementById("sortIcon");
+                ascending = !ascending;
+                icon.textContent = ascending ? "🔽" : "🔼";
 
-                                                            rows.sort((a, b) => {
-                                                                let priceA = parseFloat(a.querySelector(".service-price").innerText);
-                                                                let priceB = parseFloat(b.querySelector(".service-price").innerText);
-                                                                return ascending ? priceA - priceB : priceB - priceA;
-                                                            });
+                rows.forEach(row => table.querySelector("tbody").appendChild(row));
+            }
 
-                                                            ascending = !ascending;
-                                                            icon.textContent = ascending ? "🔽" : "🔼";
-
-                                                            rows.forEach(row => table.querySelector("tbody").appendChild(row));
-                                                        }
-
-                                                        function confirmDelete() {
-                                                            return confirm("Are you sure you want to delete this service?");
-                                                        }
+            function confirmDelete() {
+                return confirm("Are you sure you want to delete this service?");
+            }
         </script>
     </body>
 </html>

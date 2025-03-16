@@ -66,6 +66,118 @@ public class ServiceDBContext {
 
         return serviceCategories;
     }
+    public List<Service> searchServices(String search, int categoryID, int page, int pageSize) {
+    List<Service> services = new ArrayList<>();
+    UserDBContext userDB = new UserDBContext();
+
+    String sql = """
+        SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, s.CategoryID, s.ServicePrice, s.SalePrice, 
+               s.ImageURL, s.status, s.authorID, sc.CategoryName, sc.CategoryDetail 
+        FROM services s 
+        INNER JOIN servicecategories sc ON s.CategoryID = sc.CategoryID
+        WHERE s.status = 1 
+        AND (? IS NULL OR s.ServiceName LIKE ? OR s.ServiceDetail LIKE ?)
+        AND (? = 0 OR s.CategoryID = ?)
+        ORDER BY s.ServiceID DESC
+        LIMIT ? OFFSET ?""";
+
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        // Thiết lập tham số tìm kiếm
+        if (search == null || search.trim().isEmpty()) {
+            stmt.setNull(1, java.sql.Types.VARCHAR);
+            stmt.setNull(2, java.sql.Types.VARCHAR);
+            stmt.setNull(3, java.sql.Types.VARCHAR);
+        } else {
+            String searchPattern = "%" + search.trim() + "%";
+            stmt.setString(1, search);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+        }
+
+        // Thiết lập tham số cho categoryID
+        if (categoryID == 0) {
+            stmt.setInt(4, 0);
+            stmt.setInt(5, 0);
+        } else {
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, categoryID);
+        }
+
+        // Thiết lập phân trang
+        stmt.setInt(6, pageSize); // LIMIT
+        stmt.setInt(7, (page - 1) * pageSize); // OFFSET
+
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            ServiceCategory category = new ServiceCategory(
+                rs.getInt("CategoryID"),
+                rs.getString("CategoryName"),
+                rs.getString("CategoryDetail")
+            );
+
+            Service service = new Service(
+                rs.getInt("ServiceID"),
+                rs.getString("ServiceName"),
+                rs.getString("ServiceDetail"),
+                category,
+                rs.getFloat("ServicePrice"),
+                rs.getFloat("SalePrice"),
+                rs.getString("ImageURL"),
+                rs.getBoolean("status"),
+                userDB.getUserByID(rs.getInt("authorID"))
+            );
+            services.add(service);
+        }
+    } catch (SQLException e) {
+        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
+    }
+    return services;
+}
+
+// Hàm đếm tổng số dịch vụ để hỗ trợ phân trang
+public int getTotalServicesForSearch(String search, int categoryID) {
+    int total = 0;
+    String sql = """
+        SELECT COUNT(*) as total 
+        FROM services s 
+        INNER JOIN servicecategories sc ON s.CategoryID = sc.CategoryID
+        WHERE s.status = 1 
+        AND (? IS NULL OR s.ServiceName LIKE ? OR s.ServiceDetail LIKE ?)
+        AND (? = 0 OR s.CategoryID = ?)""";
+
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        if (search == null || search.trim().isEmpty()) {
+            stmt.setNull(1, java.sql.Types.VARCHAR);
+            stmt.setNull(2, java.sql.Types.VARCHAR);
+            stmt.setNull(3, java.sql.Types.VARCHAR);
+        } else {
+            String searchPattern = "%" + search.trim() + "%";
+            stmt.setString(1, search);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
+        }
+
+        if (categoryID == 0) {
+            stmt.setInt(4, 0);
+            stmt.setInt(5, 0);
+        } else {
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, categoryID);
+        }
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            total = rs.getInt("total");
+        }
+    } catch (SQLException e) {
+        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error counting services for search", e);
+    }
+    return total;
+}
 
     /**
      *
@@ -567,7 +679,9 @@ public class ServiceDBContext {
             } catch (SQLException ex) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
             }
+            
         }
+        
     }
 
     /**
