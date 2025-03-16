@@ -59,7 +59,7 @@ public class BlogListController extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
 
         // Gọi DAO để lấy danh sách bài viết
-        List<Post> posts = postDAO.getPosts(filterCategory, filterAuthor, filterStatus, searchTitle, sortBy, page, pageSize);
+        List<Post> posts = postDAO.getPosts1(filterCategory, filterAuthor, filterStatus, searchTitle, sortBy, page, pageSize);
 
         // Đưa dữ liệu lên JSP
         request.setAttribute("categories", categories);
