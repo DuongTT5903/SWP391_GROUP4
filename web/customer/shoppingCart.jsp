@@ -83,9 +83,23 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\shoppingCart"">Cart</a></li>
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
+                                    </c:otherwise>
+                                </c:choose>
                             <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
-                            <li class="nav-item"><a class="nav-link " href="#">Reservations</a></li>
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\reservation">Reservations</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
+                                    </c:otherwise>
+                                </c:choose>
                         </ul>
                     </div>
                 </div>
@@ -100,79 +114,76 @@
 
             <c:if test="${not empty cartItems}">
                 <table class="table table-bordered">
-                    <thead>
+                    <thead class="bg-dark text-white">
                         <tr>
                             <th>#</th>
                             <th>Tên dịch vụ</th>
                             <th>Giá</th>
                             <th>Số lượng</th>
-                            <!--                            <th>Số người</th>-->
-                            <th>Chức năng</th>
+                            <th>Tổng giá</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="s" items="${cartItems}" varStatus="status">
+                        <c:forEach var="s" items="${cartItems}" varStatus="status">                      
                             <tr>
-                                <td>${status.index + 1}</td>
+                                <!-- Checkbox cập nhật trạng thái -->
+                                <td>
+                                    <form action="UpdateCartStatus" method="post">
+                                        <input type="hidden" name="serviceID" value="${s.service.serviceID}">
+                                        <input type="hidden" name="userID" value="${s.user.userID}">
+                                        <input type="checkbox" name="checkService" value="true"
+                                               ${s.checkService ? "checked" : ""} 
+                                               onchange="this.form.submit()">
+                                    </form>            
+                                </td>
+
+                                <!-- Hiển thị thông tin dịch vụ -->
                                 <td>${s.service.serviceName}</td>
-                                <td>${(s.service.servicePrice * (100 - s.service.salePrice))/100}00VNĐ<td>
+                                <td>${(s.service.servicePrice * (100 - s.service.salePrice)) / 100}00 VNĐ</td>
+
+                                <!-- Cập nhật số lượng -->
+                                <td>
                                     <form action="UpdateCart" method="POST">
-                                        <input type="hidden" name="UpdateID" value="${s.service.serviceID}">
+                                        <input type="hidden" name="serviceID" value="${s.service.serviceID}">
+                                        <input type="hidden" name="userID" value="${s.user.userID}">
                                         <div class="input-group d-flex align-items-center">
-                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="increase">+</button>
-                                            <span class="mx-3 text-center" style="min-width: 20px;">${s.amount}</span>
                                             <button class="btn btn-secondary px-3" type="submit" name="update" value="decrease">-</button>
+                                            <span class="mx-3 text-center" style="min-width: 20px;">${s.amount}</span>
+                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="increase">+</button>
                                         </div>
                                     </form>
                                 </td>
 
-                                <!--                                <td>
-                                                                    <form action="UpdateCart" method="POST">
-                                                                        <input type="hidden" name="UpdateID" value="${s.service.serviceID}">
-                                                                        <div class="input-group d-flex align-items-center">
-                                                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="increasePersons">+</button>
-                                                                            <span class="mx-3 text-center" style="min-width: 20px;">${s.numberOfPerson}</span>
-                                                                            <button class="btn btn-secondary px-3" type="submit" name="update" value="decreasePersons">-</button>
-                                                                        </div>
-                                                                    </form>
-                                                                </td>-->
-
-
-
-                                <td>
-                                    <form action="DeleteCart" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này khỏi giỏ hàng?');">
-                                        <input type="hidden" name="DeleteID" value="${s.service.serviceID}">
-                                        <button type="submit" class="btn btn-danger">Xóa</button>
-                                    </form>
-                                </td>
+                                <!-- Hiển thị tổng giá -->
+                                <td>${s.amount * (s.service.servicePrice * (100 - s.service.salePrice)) / 100}00 VNĐ</td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
             </c:if>
             <p>Tổng Thanh Toán: ${total} VNĐ</p>
-            <nav class="mt-4">
+               <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage - 1}&search=${param.search}&category=${param.category}">« Trang trước</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage - 1}&search=${param.search}&category=${param.category}"><<</a>
                     </li>
 
                     <!-- Hiển thị các số trang -->
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
                         </li>
                     </c:forEach>
 
                     <!-- Nút Trang Sau -->
                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/shoppingCart?page=${currentPage + 1}&search=${param.search}&category=${param.category}">Trang sau »</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage + 1}&search=${param.search}&category=${param.category}">>></a>
                     </li>
                 </ul>
             </nav>
             <c:if test="${not empty cartItems}">
-                <a href="${pageContext.request.contextPath}/reservation" class="btn btn-primary" style="margin-bottom: 5px">Thanh toán</a>
+                <a href="${pageContext.request.contextPath}\customer\reservation" class="btn btn-primary" style="margin-bottom: 5px">Thanh toán</a>
             </c:if>
             <div class="w3-container w3-black w3-padding-32">
                 <h1>Subscribe</h1>

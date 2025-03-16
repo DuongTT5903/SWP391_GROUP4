@@ -135,7 +135,13 @@
             <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
                 <a href="${pageContext.request.contextPath}/blogList" class="w3-bar-item w3-button">Blogs</a>
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
-                <a href="${pageContext.request.contextPath}/reservation"  class="w3-bar-item w3-button">Reservations</a>
+                <c:choose>
+                    <c:when test="${sessionScope.roleID == '4'}">
+                        <a href="${pageContext.request.contextPath}/reservation" class="w3-bar-item w3-button">Reservations</a>
+                    </c:when>
+                    <c:otherwise>                       
+                    </c:otherwise>
+                </c:choose>
                 <c:if test="${sessionScope.roleID == '2'}">
                     <a href="${pageContext.request.contextPath}/manager/listservice" class="w3-bar-item w3-button">Service Manager</a>
                 </c:if>

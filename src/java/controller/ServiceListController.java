@@ -138,7 +138,6 @@ public class ServiceListController extends HttpServlet {
         request.setAttribute("services", services);
         request.setAttribute("search", search);
         request.setAttribute("categoryID", categoryID);
-
         request.getRequestDispatcher("/view/serviceList.jsp").forward(request, response);
     }
 
@@ -154,10 +153,7 @@ public class ServiceListController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Default behavior: Load service list
-        ServiceDBContext s = new ServiceDBContext();
-        List<Service> services = s.getServices(); // Fetch services from DAO
-        request.setAttribute("services", services); // Set it in the request scope
-        request.getRequestDispatcher("/view/serviceList.jsp").forward(request, response);
+        processRequest(request, response);
     }
 
     /**

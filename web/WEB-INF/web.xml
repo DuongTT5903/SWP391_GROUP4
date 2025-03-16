@@ -112,6 +112,10 @@
         <servlet-name>VerifyOTPController</servlet-name>
         <servlet-class>controller.VerifyOTPController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UpdateCartStatus</servlet-name>
+        <servlet-class>controller.UpdateCartStatus</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -182,7 +186,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ShoppingCartController</servlet-name>
-        <url-pattern>/shoppingCart</url-pattern>
+        <url-pattern>/customer/shoppingCart</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ManagerPostListController</servlet-name>
@@ -210,7 +214,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ReservationController</servlet-name>
-        <url-pattern>/reservation</url-pattern>
+        <url-pattern>/customer/reservation</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ManagerServiceController</servlet-name>
@@ -255,5 +259,9 @@
     <servlet-mapping>
         <servlet-name>VerifyOTPController</servlet-name>
         <url-pattern>/verify</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateCartStatus</servlet-name>
+        <url-pattern>/customer/UpdateCartStatus</url-pattern>
     </servlet-mapping>
 </web-app>

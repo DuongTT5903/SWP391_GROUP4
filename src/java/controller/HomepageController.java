@@ -114,12 +114,7 @@ public class HomepageController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching sliders.");
-        }
-        HttpSession session = request.getSession();
-        // Nếu chưa có thời gian truy cập, lưu thời gian bắt đầu
-        if (session.getAttribute("startTime") == null) {
-            session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
-        }
+        }     
         request.getRequestDispatcher("view/homepage.jsp").forward(request, response);
     }
 

@@ -107,7 +107,7 @@
     </script>
     <body>
         <div class="container">
-            <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
+               <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
                 <div class="container-fluid">
                     <c:choose>
                         <c:when test="${sessionScope.roleID == '4'}">
@@ -139,13 +139,27 @@
                                 <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
                             </h3>
                         </c:otherwise>
-                    </c:choose>
+                    </c:choose> 
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\shoppingCart">Cart</a></li>
+                             <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                     <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                     <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
+                                    </c:otherwise>
+                                </c:choose>
                             <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
-                            <li class="nav-item"><a class="nav-link " href="#">Reservations</a></li>
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/reservation">Reservations</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
+                                    </c:otherwise>
+                                </c:choose>
                         </ul>
                     </div>
                 </div>
@@ -154,38 +168,37 @@
             <h2 class="text-center">Service List</h2>
             <!-- Hộp tìm kiếm -->
             <form action="serviceList" method="GET" class="mb-4 d-flex gap-2">
+                <select name="category" class="form-select" style="width: 250px;">
+                    <option value="0" ${param.category == '0' ? 'selected' : ''}>Tất cả loại</option>
+                    <option value="1" ${param.category == '1' ? 'selected' : ''}>Nha Khoa</option>
+                    <option value="2" ${param.category == '2' ? 'selected' : ''}>Y tế tổng quát</option>
+                    <option value="3" ${param.category == '3' ? 'selected' : ''}>Tiêm chủng</option>
+                </select>
 
-                <select name="category" class="form-select " style="width: 250px;">
-                    <option value="0">Tất cả loại</option>
-                    <option value="1">Nha Khoa</option>
-                    <option value="2">Y tế tổng quát</option>
-                    <option value="3">Tiêm chủng</option>
+                <select name="sort" class="form-select" style="width: 250px;">
+                    <option value="servicename1" ${param.sort == 'servicename1' ? 'selected' : ''}>A->Z</option>
+                    <option value="servicename2" ${param.sort == 'servicename2' ? 'selected' : ''}>Z->A</option>
+                    <option value="price1" ${param.sort == 'price1' ? 'selected' : ''}>Giá tăng dần</option>
+                    <option value="price2" ${param.sort == 'price2' ? 'selected' : ''}>Giá giảm dần</option>
+                    <option value="saleprice1" ${param.sort == 'saleprice1' ? 'selected' : ''}>Sale tăng dần</option>
+                    <option value="saleprice2" ${param.sort == 'saleprice2' ? 'selected' : ''}>Sale giảm dần</option>
                 </select>
-                <select name="sort" class="form-select " style="width: 250px;">
-                    <option value="servicename1">A->Z</option>
-                    <option value="servicename2">Z->A</option>
-                    <option value="price1">Giá tăng dần</option>
-                    <option value="price2">Giá giảm dần</option>
-                    <option value="saleprice1">Sale tăng dần</option>
-                    <option value="saleprice2">Sale giảm dần</option>
-                </select>
-                <div class="input-group ">
-                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm..." value="">
+
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm..." value="${param.search}">
                     <button class="btn btn-primary" type="submit">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
                 </div>
-
             </form>
-
             <!-- Danh sách dịch vụ -->
-            <center>  <div class="service-list" style="width: 750px; ">
+            <center>  <div class="service-list row-3" >
                     <c:forEach var="service" items="${services}">
                         <div class="service-item">
                             <a href="serviceDetail.jsp?id=${service.serviceID}" style="text-decoration: none;">
-                                <h3>${service.serviceName}</h3>
+                                <h3><b>${service.serviceName}</b></h3>
                             </a>
-                            <p>${service.serviceDetail}</p>
+                            <p><img src="${service.imageURL}" alt="${service.serviceName}" class="service-image" style="color:inherit"></p>
                             <c:choose> <c:when test="${service.servicePrice != service.servicePrice*(100-service.salePrice)/100}">
                                     <p><span class="price">${service.servicePrice}00VNĐ</span>
                                     </c:when>
@@ -194,11 +207,19 @@
                                 </c:choose>
                                 <span class="sale-price">${service.servicePrice*(100-service.salePrice)/100}00VNĐ</span></p>
                             <div class="buttons">
-                                <!-- Add to Cart Form -->                            
-                                <form action="AddCart" method="POST" onsubmit="return showNotification();">
+                                <!-- Add to Cart Form --> 
+                                <c:choose>
+                                <c:when test="${sessionScope.roleID == '4'}">
+                                  <form action="AddCart" method="POST" onsubmit="return showNotification();">
                                     <input type="hidden" name="serviceID" value="${service.serviceID}">
                                     <button class="btn btn-success" type="submit">Thêm vào giỏ hàng</button>
-                                </form>
+                                </form>  
+                                </c:when>
+                                    <c:otherwise>
+                                        <button class="btn btn-success"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;color: white">Thêm vào giỏ hàng</a></button><br>
+                                    </c:otherwise>
+                                </c:choose>
+                                
                                 <!-- Feedback Button -->
                                 <button class="btn btn-outline-secondary" >Phản Hồi</button>
                             </div>
@@ -208,11 +229,11 @@
                 </div>
             </center>
             <!-- Phân trang -->
-            <nav class="mt-4">
+             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage - 1}&search=${param.search}&category=${param.category}">« Trang trước</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage - 1}&search=${param.search}&category=${param.category}"><<</a>
                     </li>
 
                     <!-- Hiển thị các số trang -->
@@ -224,7 +245,7 @@
 
                     <!-- Nút Trang Sau -->
                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage + 1}&search=${param.search}&category=${param.category}">Trang sau »</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage + 1}&search=${param.search}&category=${param.category}">>></a>
                     </li>
                 </ul>
             </nav>

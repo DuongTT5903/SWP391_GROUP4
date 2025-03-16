@@ -22,12 +22,8 @@ public class BaseRequiredFilter implements Filter {
             "/login", // Trang đăng nhập
             "/register", // Trang đăng ký
             "/homepage",
-            "/serviceList",
-            "/shoppingCart",
-            "/AddCart",
-            "/UpdateCart",
-            "/reservation",
-            "/DeleteCart",
+            "/serviceList",          
+            "/AddCart",            
             "/blogDetail",
             "/blogList",
             "/reset",
