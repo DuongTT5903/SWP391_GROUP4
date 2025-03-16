@@ -19,12 +19,15 @@
             }
         </style>
     </head>
+    
     <body class="bg-light">
+          <jsp:include page="/manager/headermanager.jsp" />
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-md-8">
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white">
+                          
                             <h2 class="mb-0">Service Detail & Edit</h2>
                         </div>
                         <div class="card-body">

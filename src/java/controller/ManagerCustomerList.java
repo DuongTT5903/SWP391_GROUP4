@@ -35,7 +35,43 @@ public class ManagerCustomerList extends HttpServlet {
         if ("updateStatus".equals(action)) {
             int userID = Integer.parseInt(request.getParameter("userID"));
             boolean newStatus = request.getParameter("status").equals("1");
+
             db.updateUserStatus(userID, newStatus);
+
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+
+            if (name == null || email == null) {
+                User user = db.getUserByID(userID);
+                if (user != null) {
+                    name = user.getName();
+                    email = user.getEmail();
+                }
+            }
+
+            if (name != null && email != null) {
+                String subject, content;
+                if (newStatus) {
+                    subject = "Tài khoản của bạn đã được mở khóa!";
+                    content = "<h1>Xin chào " + name + ",</h1>"
+                            + "<p>Tài khoản của bạn đã được mở khóa và có thể đăng nhập lại.</p>"
+                            + "<p>Nếu bạn gặp vấn đề gì, vui lòng liên hệ với quản trị viên.</p>";
+                } else {
+                    subject = "Tài khoản của bạn đã bị khóa!";
+                    content = "<h1>Xin chào " + name + ",</h1>"
+                            + "<p>Tài khoản của bạn đã bị khóa do vi phạm chính sách.</p>"
+                            + "<p>Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.</p>";
+                }
+
+                try {
+                    resetService emailService = new resetService();
+                    emailService.sendEmail1(email, subject, content);
+                    System.out.println("Email đã gửi đến: " + email);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
             response.sendRedirect(request.getContextPath() + "/manager/customerList");
             return;
         }
@@ -91,22 +127,22 @@ public class ManagerCustomerList extends HttpServlet {
         }
     }
 
- private String hashPassword(String password) {
-    String salt = "RANDOM_SALT"; // Nên lưu salt riêng cho từng user
-    try {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hashedBytes = md.digest((salt + password).getBytes(StandardCharsets.UTF_8));
-        BigInteger number = new BigInteger(1, hashedBytes);
-        StringBuilder hexString = new StringBuilder(number.toString(16));
+    private String hashPassword(String password) {
+        String salt = "RANDOM_SALT"; // Nên lưu salt riêng cho từng user
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = md.digest((salt + password).getBytes(StandardCharsets.UTF_8));
+            BigInteger number = new BigInteger(1, hashedBytes);
+            StringBuilder hexString = new StringBuilder(number.toString(16));
 
-        while (hexString.length() < 64) {
-            hexString.insert(0, '0');
+            while (hexString.length() < 64) {
+                hexString.insert(0, '0');
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
         }
-        return hexString.toString();
-    } catch (NoSuchAlgorithmException e) {
-        throw new RuntimeException("Lỗi khi mã hóa mật khẩu", e);
     }
-}
 
     private String validateInput(String name, String email, String phone, String username, String password, UserDBContext db) {
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty() || password.isEmpty()) {

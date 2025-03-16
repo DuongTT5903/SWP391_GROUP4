@@ -57,7 +57,7 @@
                     <a class="nav-link" href="postList"><i class="fas fa-list"></i> Post List</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="userList"><i class="fas fa-users"></i> User List</a>
+                    <a class="nav-link" href="customerList"><i class="fas fa-users"></i> User List</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="listservice"><i class="fas fa-tags"></i> Service List</a>
