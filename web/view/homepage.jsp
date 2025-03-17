@@ -533,17 +533,17 @@
                                     <p class="service-title" style="text-decoration: none;">${service.serviceDetail}</p>
                                 </div>
                             </a>
-                            <form action="AddCart" method="post">
-                                <input type="hidden" name="serviceID" value="${service.serviceID}">    
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                      <button type="submit" class="add-to-cart">Add to Cart</button>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <button class="add-to-cart"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">Add to Cart</a></button>
-                                    </c:otherwise>
-                                </c:choose>
-                            </form>
+                            <c:choose>
+                                <c:when test="${sessionScope.roleID == '4'}">
+                                    <form action="AddCart" method="post">
+                                        <input type="hidden" name="serviceID" value="${service.serviceID}">  
+                                        <button type="submit" class="add-to-cart">Add to Cart</button>
+                                    </form>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="add-to-cart"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">Add to Cart</a></button>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </c:forEach>
