@@ -8,7 +8,14 @@
         <title>Manage Posts</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="styles.css">
-    <jsp:include page="/view/head.jsp" />
+        <jsp:include page="/view/head.jsp" />
+        <style>
+            .blog-image {
+                width: 100%; /* Ảnh chiếm toàn bộ chiều rộng của container */
+                height: 200px; /* Đặt chiều cao cố định */
+                object-fit: cover; /* Cắt ảnh để phù hợp mà không bị méo */
+            }
+        </style>
     </head>
     <body class="container py-4">
          
@@ -59,12 +66,12 @@
         <div class="blog-list">
             <% if (posts != null && !posts.isEmpty()) { 
                 for (Post p : posts) { %>
-                <div class="blog-item">
-                    <div class="row">
+                <div class="blog-item card mb-3">
+                    <div class="row g-0">
                         <div class="col-md-3">
-                            <img src="<%= p.getImageLink() %>" class="img-fluid rounded">
+                            <img src="<%= p.getImageLink() %>" class="img-fluid rounded blog-image">
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9 p-3">
                             <h2>
                                 <a href="blogDetail?blogID=<%= p.getId() %>" class="blog-title">
                                     <%= p.getTitle() %>
