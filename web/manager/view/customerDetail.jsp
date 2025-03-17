@@ -1,3 +1,10 @@
+<%-- 
+    Document   : userDetail
+    Created on : Jan 23, 2025, 9:30:14 AM
+    Author     : yugio
+--%>
+
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
@@ -30,14 +37,6 @@
 
         <div class="container">
             <h2>Chi tiết người dùng</h2>
-
-            <!-- Hiển thị lỗi nếu có -->
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger" role="alert">
-                    ${error}
-                </div>
-            </c:if>
-
             <form action="${pageContext.request.contextPath}/manager/customerDetail" method="POST">
                 <input type="hidden" name="userID" value="${user.userID}">
                 <div class="mb-3">
@@ -59,12 +58,11 @@
                     <label for="username" class="form-label">Tên tài khoản</label>
                     <input type="text" class="form-control" id="username" name="username" value="${user.username}" required>
                 </div>
-                <div class="mb-3">
+               <div class="mb-3">
                     <label for="password" class="form-label">Mật khẩu</label>
                     <input type="password" class="form-control" id="password" name="password">
                     <small class="text-muted">Để trống nếu không muốn đổi mật khẩu.</small>
                 </div>
-
                 <div class="mb-3">
                     <label for="phone" class="form-label">Số điện thoại</label>
                     <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" required>
@@ -72,11 +70,12 @@
                 <div class="mb-3">
                     <label for="role" class="form-label">Vai trò</label>
                     <select class="form-control" id="role" name="role">
+                     
                         <option value="Customer" ${user.role == 'Customer' ? 'selected' : ''}>Customer</option>
                     </select>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="${pageContext.request.contextPath}/manager/customerList" class="btn btn-secondary">Quay lại</a>
+                    <a href="${pageContext.request.contextPath}/admin/userList" class="btn btn-secondary">Quay lại</a>
                     <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </form>
