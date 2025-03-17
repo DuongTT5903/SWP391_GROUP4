@@ -534,8 +534,15 @@
                                 </div>
                             </a>
                             <form action="AddCart" method="post">
-                                <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                <button type="submit" class="add-to-cart">Add to Cart</button>
+                                <input type="hidden" name="serviceID" value="${service.serviceID}">    
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                      <button type="submit" class="add-to-cart">Add to Cart</button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button class="add-to-cart"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">Add to Cart</a></button>
+                                    </c:otherwise>
+                                </c:choose>
                             </form>
                         </div>
                     </div>
