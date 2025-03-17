@@ -210,7 +210,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UpdateCart</servlet-name>
-        <url-pattern>/UpdateCart</url-pattern>
+        <url-pattern>/customer/UpdateCart</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ReservationController</servlet-name>
