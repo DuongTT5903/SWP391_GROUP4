@@ -83,6 +83,8 @@ public class UpdateCart extends HttpServlet {
        }else{
            if(amount!=1){
               amount = amount-1;   
+           }else{
+              reservationDB.deleteCart(serviceID, userID);
            }
        }
        reservationDB.updateCart(amount, serviceID, userID);

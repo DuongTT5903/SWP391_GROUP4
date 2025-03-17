@@ -194,6 +194,30 @@ public class ReservationDBContext {
             }
         }
     }
+   public void deleteCart( int serviceID, int userID) {
+        PreparedStatement stm = null;
+        try {
+            String sql = "DELETE FROM carts "
+                    + " WHERE serviceID = ? and userID = ?";
+            stm = DBContext.getConnection().prepareStatement(sql);         
+            stm.setInt(1, serviceID);
+            stm.setInt(2, userID);
+            // ✅ Use executeUpdate() instead
+            stm.executeUpdate();
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Dịch vụ đã được thêm thành công: {0}", serviceID);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi thêm dịch vụ", ex);
+        } finally {
+            try {
+                if (stm != null) {
+                    stm.close();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
+            }
+        }
+    }
 
     public List<Cart> getAllCart() {
         Connection conn = null;
@@ -268,6 +292,7 @@ public class ReservationDBContext {
         return carts;
 
     }
+    
 public List<Cart> getCart2(String search,int userID, int categoryID, int page, int pageSize) {
     List<Cart> carts = new ArrayList<>();
       String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
