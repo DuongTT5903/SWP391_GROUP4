@@ -125,13 +125,9 @@ public class ServiceListController extends HttpServlet {
 
         List<Service> services = serviceDAO.getServices(search, categoryID, currentPage, recordsPerPage, type, sort);
         int totalRecords = services.size(); // Hàm lấy tổng số bản ghi từ DB
-        int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-
-        HttpSession session = request.getSession();
+        int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);  
         // Nếu chưa có thời gian truy cập, lưu thời gian bắt đầu
-        if (session.getAttribute("startTime") == null) {
-            session.setAttribute("startTime", Instant.now().getEpochSecond()); // Lưu timestamp hiện tại
-        }
+       
         // Gửi dữ liệu qua JSP
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);

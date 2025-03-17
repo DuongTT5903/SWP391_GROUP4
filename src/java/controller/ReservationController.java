@@ -38,6 +38,7 @@ public class ReservationController extends HttpServlet {
         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+        int userID=user.getUserID();
         ReservationDBContext reservationDB = new ReservationDBContext();
         Customer customer;
         if (user == null) {
@@ -69,7 +70,7 @@ public class ReservationController extends HttpServlet {
         }
 
         // Lấy dữ liệu từ cookie giỏ hàng
-        List<Cart> carts = reservationDB.getCart2(search, categoryID, currentPage, recordsPerPage);
+        List<Cart> carts = reservationDB.getCart2(search,userID,categoryID ,currentPage, recordsPerPage);
         int total = 0;
         for (Cart c : carts) {           
                 total += c.getService().getServicePrice() * (100 - c.getService().getSalePrice()) * 10 * c.getAmount();         

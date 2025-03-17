@@ -7,7 +7,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.Cart;
+import model.User;
 
 /**
  * Servlet hiển thị giỏ hàng
@@ -26,6 +28,9 @@ public class ShoppingCartController extends HttpServlet {
             throws ServletException, IOException {
         int currentPage = 1;
         int recordsPerPage = 6;
+        HttpSession session = request.getSession();
+        User user =(User)session.getAttribute("user");
+        int userID=user.getUserID();
         String pageParam = request.getParameter("page");
         if (pageParam != null && !pageParam.trim().isEmpty()) {
             try {
@@ -38,7 +43,7 @@ public class ShoppingCartController extends HttpServlet {
 
         int totalRecords = reservationDB.getAllCart().size(); // Hàm lấy tổng số bản ghi từ DB
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
-        List<Cart> cartItems = reservationDB.getCart("", 0, currentPage, recordsPerPage);
+        List<Cart> cartItems = reservationDB.getCart("",userID ,0, currentPage, recordsPerPage);
         if (cartItems.isEmpty()) {
             request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
         }

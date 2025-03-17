@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dal.ReservationDBContext;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -72,72 +73,20 @@ public class UpdateCart extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String updateID = request.getParameter("UpdateID");
+        int userID = Integer.parseInt(request.getParameter("userID"));
+        int serviceID = Integer.parseInt(request.getParameter("serviceID"));
         String update = request.getParameter("update");
-        // Kiểm tra nếu deleteID null hoặc rỗng thì bỏ qua xử lý
-        if (updateID == null || updateID.trim().isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/shoppingCart");
-            return;
-        }
-
-        String cartData = "";
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("cart")) {
-                    cartData = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        String newCartData = new String();
-        for (String item : cartData.split("-")) {
-            if (item.isEmpty()) {
-                continue;
-            }
-
-            String[] parts = item.split("/");
-            if (parts.length < 2) {
-                continue;
-            }
-            String[] info = parts[0].split("~");
-            String existingServiceID = info[1];
-            int quantity = Integer.parseInt(info[2]);
-            int numberOfPeople = Integer.parseInt(parts[1]);
-
-            if (existingServiceID.equals(updateID)) {
-                if (update.equals("increase")) {
-                    quantity += 1;
-                } else if (update.equals("decrease")) {
-                     if(quantity!=1)
-                    {
-                   quantity -= 1;
-                    }
-                } else if (update.equals("increasePersons")) {
-                    numberOfPeople += 1;
-                } else if (update.equals("decreasePersons")) {
-                    if(numberOfPeople!=1)
-                    {
-                    numberOfPeople -= 1;
-                    }
-                }
-            }
-            newCartData += "~" + existingServiceID + "~" + quantity + "/" + numberOfPeople + "-";
-
-        }
-        // Nếu giỏ hàng trống, chuyển hướng luôn
-        if (cartData.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/shoppingCart");
-            return;
-        }
-
-        ArrayList<String> cartItems = new ArrayList<>(Arrays.asList(cartData.split("-")));
-        Cookie cartCookie = new Cookie("cart", newCartData);
-        cartCookie.setMaxAge(cartItems.isEmpty() ? 0 : 60 * 60 * 24);
-        response.addCookie(cartCookie);
-
-        // Chuyển hướng về trang giỏ hàng
-        response.sendRedirect(request.getContextPath() + "/shoppingCart");
+       ReservationDBContext  reservationDB = new  ReservationDBContext();
+       int amount = reservationDB.getCartByID(serviceID, userID).getAmount();
+       if("increase".equals(update)){
+         amount = amount+1;  
+       }else{
+           if(amount!=1){
+              amount = amount-1;   
+           }
+       }
+       reservationDB.updateCart(amount, serviceID, userID);
+       response.sendRedirect(request.getHeader("Referer"));
     }
 
 /**

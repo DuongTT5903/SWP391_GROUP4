@@ -10,13 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Cart;
 import model.Customer;
-import model.ReservationDetail;
 import model.Service;
 import model.ServiceCategory;
 import model.User;
@@ -236,23 +234,24 @@ public class ReservationDBContext {
         return carts;
     }
 
-    public List<Cart> getCart(String search, int categoryID, int page, int pageSize) {
+    public List<Cart> getCart(String search,int userID ,int categoryID, int page, int pageSize) {
         List<Cart> carts = new ArrayList<>();
         String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
                 + "FROM carts c "
                 + "JOIN services s ON c.serviceID = s.serviceID "
                 + "JOIN users u ON c.userID = u.userID "
-                + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) "
+                + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) AND (c.userID = ?) "
                 + "AND (? = 0 OR s.categoryID = ?) "
                 + "LIMIT ?, ?";
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, search.isEmpty() ? "" : search);
             stmt.setString(2, search.isEmpty() ? "%" : "%" + search + "%");
-            stmt.setInt(3, categoryID);
+            stmt.setInt(3, userID);
             stmt.setInt(4, categoryID);
-            stmt.setInt(5, (page - 1) * pageSize);
-            stmt.setInt(6, pageSize);
+            stmt.setInt(5, categoryID);
+            stmt.setInt(6, (page - 1) * pageSize);
+            stmt.setInt(7, pageSize);
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -269,27 +268,24 @@ public class ReservationDBContext {
         return carts;
 
     }
-public List<Cart> getCart2(String search, int categoryID, int page, int pageSize) {
+public List<Cart> getCart2(String search,int userID, int categoryID, int page, int pageSize) {
     List<Cart> carts = new ArrayList<>();
-    String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName, s.servicePrice, s.salePrice " +
-                 "FROM carts c " +
-                 "JOIN services s ON c.serviceID = s.serviceID " +
-                 "JOIN users u ON c.userID = u.userID " +
-                 "WHERE (? IS NULL OR ? = '' OR s.serviceName LIKE ?) " +
-                 "AND (? = 0 OR s.categoryID = ?) " +
-                 "AND c.checkService = true " + // ✅ Thêm khoảng trắng
-                 "LIMIT ?, ?";
+      String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
+                + "FROM carts c "
+                + "JOIN services s ON c.serviceID = s.serviceID "
+                + "JOIN users u ON c.userID = u.userID "
+                + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) AND (c.userID = ?) "
+                + "AND (? = 0 OR s.categoryID = ?) "
+                + "LIMIT ?, ?";
 
-    try (Connection conn = DBContext.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-        stmt.setString(1, search.isEmpty() ? null : search);
-        stmt.setString(2, search.isEmpty() ? "" : search);
-        stmt.setString(3, search.isEmpty() ? "%" : "%" + search + "%");
-        stmt.setInt(4, categoryID);
-        stmt.setInt(5, categoryID);
-        stmt.setInt(6, (page - 1) * pageSize);
-        stmt.setInt(7, pageSize);
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, search.isEmpty() ? "" : search);
+            stmt.setString(2, search.isEmpty() ? "%" : "%" + search + "%");
+            stmt.setInt(3, userID);
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, categoryID);
+            stmt.setInt(6, (page - 1) * pageSize);
+            stmt.setInt(7, pageSize);
 
         ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
@@ -389,6 +385,6 @@ public List<Cart> getCart2(String search, int categoryID, int page, int pageSize
         LocalDate today = LocalDate.now();
         System.out.println("" + r.getCartByID(1, 4));
         System.out.println("" + r.getAllCart().size());
-        System.out.println("" + r.getCart("", 0, 1, 1).get(0).getId());
+       
     }
 }

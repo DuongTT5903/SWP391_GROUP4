@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import model.User;
 
 /**
  *
@@ -78,9 +79,9 @@ public class AddCart extends HttpServlet {
             throws ServletException, IOException {
         String service = request.getParameter("serviceID");
         HttpSession session = request.getSession();
-        String user =  (String)session.getAttribute("roleID");
+        User user =(User)session.getAttribute("user");
         int serviceID= Integer.parseInt(service);
-        int userID=Integer.parseInt(user);
+        int userID=user.getUserID();
         int amount=1;
         ReservationDBContext reservationDB = new ReservationDBContext();
         if(reservationDB.getCartByID(serviceID, userID) != null){
