@@ -44,7 +44,7 @@ public class ManagerServiceController extends HttpServlet {
                     categoryID = request.getParameter("categoryID") != null ? Integer.parseInt(request.getParameter("categoryID")) : 0;
 
                     // Gọi hàm searchServices để lấy danh sách dịch vụ với tìm kiếm và phân trang
-                    List<Service> list = db.searchServices(search, categoryID, page, pageSize);
+                    List<Service> list = db.searchServices1(search, categoryID, page, pageSize);
 
                     // Tính tổng số trang
                     int totalServices = db.getTotalServicesForSearch(search, categoryID);
