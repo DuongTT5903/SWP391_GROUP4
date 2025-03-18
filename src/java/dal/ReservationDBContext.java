@@ -4,13 +4,18 @@
  */
 package dal;
 
+import static dal.DBContext.getConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Cart;
@@ -142,6 +147,7 @@ public class ReservationDBContext {
         }
         return customer;
     }
+
     public void addCart(int serviceID, int userID, int amount) {
         PreparedStatement stm = null;
         try {
@@ -194,12 +200,13 @@ public class ReservationDBContext {
             }
         }
     }
-   public void deleteCart( int serviceID, int userID) {
+
+    public void deleteCart(int serviceID, int userID) {
         PreparedStatement stm = null;
         try {
             String sql = "DELETE FROM carts "
                     + " WHERE serviceID = ? and userID = ?";
-            stm = DBContext.getConnection().prepareStatement(sql);         
+            stm = DBContext.getConnection().prepareStatement(sql);
             stm.setInt(1, serviceID);
             stm.setInt(2, userID);
             // ✅ Use executeUpdate() instead
@@ -258,7 +265,7 @@ public class ReservationDBContext {
         return carts;
     }
 
-    public List<Cart> getCart(String search,int userID ,int categoryID, int page, int pageSize) {
+    public List<Cart> getCart(String search, int userID, int categoryID, int page, int pageSize) {
         List<Cart> carts = new ArrayList<>();
         String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
                 + "FROM carts c "
@@ -292,10 +299,10 @@ public class ReservationDBContext {
         return carts;
 
     }
-    
-public List<Cart> getCart2(String search,int userID, int categoryID, int page, int pageSize) {
-    List<Cart> carts = new ArrayList<>();
-      String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
+
+    public List<Cart> getCart2(String search, int userID, int categoryID, int page, int pageSize) {
+        List<Cart> carts = new ArrayList<>();
+        String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
                 + "FROM carts c "
                 + "JOIN services s ON c.serviceID = s.serviceID "
                 + "JOIN users u ON c.userID = u.userID "
@@ -312,37 +319,36 @@ public List<Cart> getCart2(String search,int userID, int categoryID, int page, i
             stmt.setInt(6, (page - 1) * pageSize);
             stmt.setInt(7, pageSize);
 
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            int categoryID1 = rs.getObject("categoryID") != null ? rs.getInt("categoryID") : -1;
-            ServiceCategory category = new ServiceCategory(categoryID1, "", "");
-            User user = new User(rs.getInt("userID"), rs.getString("authorName"), true, "", "", "", "", "", "");
-            Service service = new Service(
-                rs.getInt("serviceID"),
-                rs.getString("serviceName"),
-                "",
-                category,
-                rs.getInt("servicePrice"),
-                rs.getInt("salePrice"),
-                "",
-                true,
-                user
-            );
-            Cart cart = new Cart(
-                rs.getInt("ID"),
-                rs.getBoolean("checkService"),
-                rs.getInt("amount"),
-                service,
-                user
-            );
-            carts.add(cart);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int categoryID1 = rs.getObject("categoryID") != null ? rs.getInt("categoryID") : -1;
+                ServiceCategory category = new ServiceCategory(categoryID1, "", "");
+                User user = new User(rs.getInt("userID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+                Service service = new Service(
+                        rs.getInt("serviceID"),
+                        rs.getString("serviceName"),
+                        "",
+                        category,
+                        rs.getInt("servicePrice"),
+                        rs.getInt("salePrice"),
+                        "",
+                        true,
+                        user
+                );
+                Cart cart = new Cart(
+                        rs.getInt("ID"),
+                        rs.getBoolean("checkService"),
+                        rs.getInt("amount"),
+                        service,
+                        user
+                );
+                carts.add(cart);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return carts;
     }
-    return carts;
-}
-
 
     public Cart getCartByID(int serviceID, int userID) {
         Connection conn = null;
@@ -405,11 +411,120 @@ public List<Cart> getCart2(String search,int userID, int categoryID, int page, i
         }
     }
 
-    public static void main(String[] args) {
-        ReservationDBContext r = new ReservationDBContext();
-        LocalDate today = LocalDate.now();
-        System.out.println("" + r.getCartByID(1, 4));
-        System.out.println("" + r.getAllCart().size());
-       
+    public Map<Integer, Integer> getReservationStatusCount() {
+        Map<Integer, Integer> statusCount = new HashMap<>();
+        String sql = "SELECT Status, COUNT(*) AS count FROM Reservations GROUP BY Status";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int status = rs.getInt("Status");
+                int count = rs.getInt("count");
+                statusCount.put(status, count);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statusCount;
     }
+
+    public Map<String, Double> getServiceRatings() {
+        Map<String, Double> serviceRatings = new HashMap<>();
+        String sql = "SELECT s.ServiceName, AVG(f.Rated) AS avgRating "
+                + "FROM Feedbacks f "
+                + "JOIN Services s ON f.ServiceID = s.ServiceID "
+                + "WHERE f.Status = 1 "
+                + "GROUP BY s.ServiceName";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String serviceName = rs.getString("ServiceName");
+                double avgRating = rs.getDouble("avgRating");
+                serviceRatings.put(serviceName, avgRating);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return serviceRatings;
+    }
+
+  public Map<String, Integer> getReservationsLast7Days() {
+    Map<String, Integer> reservationTrends = new LinkedHashMap<>();
+
+    String sql = "SELECT DATE(CreationDate) AS date, COUNT(*) AS count \n"
+               + "FROM Reservations \n"
+               + "WHERE Status = 1 \n"
+               + "AND DATE(CreationDate) BETWEEN CURDATE() - INTERVAL 6 DAY AND CURDATE() \n"
+               + "GROUP BY DATE(CreationDate) \n"
+               + "ORDER BY DATE(CreationDate) ASC;";
+
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            String date = rs.getString("date"); // Lấy ngày dưới dạng String
+            int count = rs.getInt("count"); // Lấy số lượt đặt chỗ
+            reservationTrends.put(date, count);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return reservationTrends;
+}
+
+
+    public int getNewReservationsCount() {
+        int newReservations = 0;
+        String sql = "SELECT COUNT(DISTINCT UserID) AS newReservations FROM Reservations "
+                + "WHERE DATE(CreationDate) >= CURDATE() - INTERVAL 7 DAY";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                newReservations = rs.getInt("newReservations");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newReservations;
+    }
+
+    public Map<String, Double> getRevenueByCategory() {
+        Map<String, Double> revenueMap = new HashMap<>();
+        String sql = "SELECT sc.CategoryName, SUM(rd.Amount * s.ServicePrice) AS Revenue "
+                + "FROM ReservationDetails rd "
+                + "JOIN Services s ON rd.ServiceID = s.ServiceID "
+                + "JOIN ServiceCategories sc ON s.CategoryID = sc.CategoryID "
+                + "JOIN Reservations r ON rd.ReservationID = r.ReservationID "
+                + "WHERE r.Status = 1 "
+                + "AND r.CreationDate >= CURDATE() - INTERVAL 6 DAY "
+                + "GROUP BY sc.CategoryName "
+                + "ORDER BY Revenue DESC";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String categoryName = rs.getString("CategoryName");
+                double revenue = rs.getDouble("Revenue");
+                revenueMap.put(categoryName, revenue);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return revenueMap;
+    }
+
+    public static void main(String[] args) {
+        ReservationDBContext db = new ReservationDBContext();
+        Map<Integer, Integer> result = db.getReservationStatusCount();
+
+        for (Map.Entry<Integer, Integer> entry : result.entrySet()) {
+            System.out.println("Status: " + entry.getKey() + " - Count: " + entry.getValue());
+
+        }
+    }
+
 }

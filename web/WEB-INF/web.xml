@@ -116,6 +116,10 @@
         <servlet-name>UpdateCartStatus</servlet-name>
         <servlet-class>controller.UpdateCartStatus</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminDashboardController</servlet-name>
+        <servlet-class>controller.AdminDashboardController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -263,5 +267,9 @@
     <servlet-mapping>
         <servlet-name>UpdateCartStatus</servlet-name>
         <url-pattern>/customer/UpdateCartStatus</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminDashboardController</servlet-name>
+        <url-pattern>/admin/dashboard</url-pattern>
     </servlet-mapping>
 </web-app>
