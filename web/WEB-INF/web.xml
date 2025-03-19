@@ -120,6 +120,18 @@
         <servlet-name>AdminDashboardController</servlet-name>
         <servlet-class>controller.AdminDashboardController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Feedback</servlet-name>
+        <servlet-class>controller.Feedback</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerSilderListController</servlet-name>
+        <servlet-class>controller.ManagerSilderListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ManagerSliderDetailController</servlet-name>
+        <servlet-class>controller.ManagerSliderDetailController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -271,5 +283,17 @@
     <servlet-mapping>
         <servlet-name>AdminDashboardController</servlet-name>
         <url-pattern>/admin/dashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Feedback</servlet-name>
+        <url-pattern>/feedback</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerSilderListController</servlet-name>
+        <url-pattern>/manager/sliderList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ManagerSliderDetailController</servlet-name>
+        <url-pattern>/manager/sliderDetail</url-pattern>
     </servlet-mapping>
 </web-app>

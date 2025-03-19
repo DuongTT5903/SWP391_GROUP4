@@ -17,9 +17,12 @@
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
         <title>Home Page</title>
     </head>
     <body class="w3-content" style="max-width:max-content ; a {
@@ -83,11 +86,51 @@
             .custom-header a:hover {
                 color: #d1d1d1;
             }
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                right: 0;
+                background-color: white;
+                min-width: 150px;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 1;
+                border-radius: 5px;
+            }
+
+            .dropdown-content a {
+                color: black;
+                padding: 10px;
+                text-decoration: none;
+                display: block;
+            }
+
+            .dropdown-content a:hover {
+                background-color: #f1f1f1;
+            }
+
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+
+            .icon-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-size: 18px;
+            }
         </style>
         <nav id="mySidebar" class="w3-sidebar w3-bar-block w3-collapse w3-top custom-sidebar" style="z-index:3;">
             <div class="w3-container w3-display-container w3-padding-16">
                 <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
-
+                <!-- Font Awesome -->
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+                <!-- Bootstrap Icons -->
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
                 <!-- Login / User Info Section -->
                 <c:choose>
                     <c:when test="${sessionScope.roleID == '4'}">
@@ -97,6 +140,8 @@
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="customerDashboard.jsp">Go to Dashboard</a>
+                        
+
                     </c:when>
                     <c:when test="${sessionScope.roleID == '2'}">
                         <h3 class="w3-wide">
@@ -742,6 +787,8 @@
                 </div>
             </div>
         </div>
+        <!-- Bootstrap 5 JavaScript -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     </body>
 </html>
