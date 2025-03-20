@@ -132,6 +132,10 @@
         <servlet-name>ManagerSliderDetailController</servlet-name>
         <servlet-class>controller.ManagerSliderDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminSettingList</servlet-name>
+        <servlet-class>controller.AdminSettingList</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -295,5 +299,9 @@
     <servlet-mapping>
         <servlet-name>ManagerSliderDetailController</servlet-name>
         <url-pattern>/manager/sliderDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminSettingList</servlet-name>
+        <url-pattern>/admin/settingList</url-pattern>
     </servlet-mapping>
 </web-app>

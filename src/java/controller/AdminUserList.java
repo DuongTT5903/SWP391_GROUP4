@@ -1,5 +1,6 @@
 package controller;
 
+import dal.SettingDBContext;
 import dal.UserDBContext;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -11,21 +12,30 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Role;
 import model.User;
 
 public class AdminUserList extends HttpServlet {
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            UserDBContext db = new UserDBContext();
-            List<User> users = db.getUsers();
-            request.setAttribute("users", users);
-        } catch (Exception e) {
-            request.setAttribute("error", "Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
-        }
-        request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
+@Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    UserDBContext db = new UserDBContext();
+    SettingDBContext stDB = new SettingDBContext();
+    
+    try {
+        List<User> users = db.getUsers();
+        List<Role> roles = stDB.getRolesWithStatus1(); // Lấy danh sách vai trò có status = 1
+        
+        request.setAttribute("users", users);
+        request.setAttribute("roles", roles);
+        
+    } catch (Exception e) {
+        e.printStackTrace(); // Ghi log lỗi để dễ debug
+        request.setAttribute("error", "Không thể tải danh sách người dùng. Vui lòng thử lại sau.");
     }
+
+    request.getRequestDispatcher("/admin/userList.jsp").forward(request, response);
+}
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

@@ -143,24 +143,23 @@ public class UserDBContext {
      * @param pass
      * @param phone
      */
- public void signup(String name, boolean gender, String email, String user, String pass, String phone) {
-    try {
-        Connection conn = new DBContext().getConnection();
-        String sql = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID) VALUES (?, ?, ?, ?, ?, ?, 4)";
+    public void signup(String name, boolean gender, String email, String user, String pass, String phone) {
+        try {
+            Connection conn = new DBContext().getConnection();
+            String sql = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID) VALUES (?, ?, ?, ?, ?, ?, 4)";
 
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setString(1, name);
-        ps.setBoolean(2, gender); // Chuyển đổi trực tiếp sang boolean
-        ps.setString(3, email);
-        ps.setString(4, user);
-        ps.setString(5, pass);
-        ps.setString(6, phone);
-        ps.executeUpdate();
-    } catch (Exception ex) {
-        ex.printStackTrace(System.out);
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, name);
+            ps.setBoolean(2, gender); // Chuyển đổi trực tiếp sang boolean
+            ps.setString(3, email);
+            ps.setString(4, user);
+            ps.setString(5, pass);
+            ps.setString(6, phone);
+            ps.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace(System.out);
+        }
     }
-}
-
 
     private static Connection connection = DBContext.getConnection();
 
@@ -172,12 +171,16 @@ public class UserDBContext {
      */
     public User getUserByUsername(String username, String password) {
         User user = null;
-        String query = "         SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, u.roleID, u.imageURL, us.userID\n" +
-"FROM users u \n" +
-"INNER JOIN userstatus us ON u.userID = us.userID\n" +
-"WHERE BINARY u.username = ? \n" +
-"AND BINARY u.password = ? \n" +
-"AND us.status = 1;";
+        String query = "       SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, \n"
+                + "       u.roleID, u.imageURL, us.userID\n"
+                + "FROM users u\n"
+                + "INNER JOIN userstatus us ON u.userID = us.userID\n"
+                + "INNER JOIN roles r ON u.roleID = r.roleID\n"
+                + "INNER JOIN roleStatus rs ON r.roleID = rs.roleID\n"
+                + "WHERE BINARY u.username = ?\n"
+                + "AND BINARY u.password = ?\n"
+                + "AND us.status = 1\n"
+                + "AND rs.status = 1;";
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -239,7 +242,8 @@ public class UserDBContext {
         }
         return users;
     }
-  public List<User> getUsers1() {
+
+    public List<User> getUsers1() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, r.roleName, u.imageURL , us.Status "
                 + "FROM Users u INNER JOIN Roles r ON u.roleID = r.roleID "
@@ -299,6 +303,7 @@ public class UserDBContext {
 //        }
 //        return users;
 //    }
+
     /**
      *
      * @param userID
@@ -332,7 +337,6 @@ public class UserDBContext {
         return user;
     }
 
-
     /**
      *
      * @param username
@@ -364,7 +368,10 @@ public class UserDBContext {
      */
     public Role getRole(int roleID) {
         Role role = null;
-        String sql = "SELECT roleID, roleName FROM Roles WHERE roleID = ?";
+        String sql = "SELECT r.roleID, r.roleName \" +\n" +
+"                     \"FROM Roles r \" +\n" +
+"                     \"INNER JOIN roleStatus rs ON r.roleID = rs.roleID \" +\n" +
+"                     \"WHERE r.roleID = ? AND rs.status = 1";
 
         try (PreparedStatement stm = connection.prepareStatement(sql)) {
             stm.setInt(1, roleID);
@@ -599,13 +606,14 @@ public class UserDBContext {
         }
         return false;
     }
+
     public boolean isUserExistsUE(String username, String email) {
         try (Connection conn = DBContext.getConnection()) {
             String sql = "SELECT COUNT(*) FROM Users WHERE username = ? OR email = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, email);
-            
+
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0; // Nếu số lượng > 0 thì user/email đã tồn tại
@@ -737,42 +745,41 @@ public class UserDBContext {
         }
         return false;  // Return false if there was an error or no rows were updated
     }
- public boolean activateAccount(String username) {
-    Connection connection = null;
-    PreparedStatement ps = null;
-    try {
-        connection = getConnection();  // Ensure this method returns a valid connection
-        if (connection == null || connection.isClosed()) {
-            throw new SQLException("Connection is not available");
-        }
 
-        String sql = "UPDATE UserStatus " +
-                     "SET Status = 1 " +
-                     "WHERE UserID = (SELECT UserID FROM Users WHERE Username = ?)";
-        ps = connection.prepareStatement(sql);
-        ps.setString(1, username);
-
-        int rowsUpdated = ps.executeUpdate();
-        return rowsUpdated > 0;  // Return true if the status was updated successfully
-    } catch (SQLException e) {
-        LOGGER.log(Level.SEVERE, "Error activating account", e);
-    } finally {
-        // Close resources safely
+    public boolean activateAccount(String username) {
+        Connection connection = null;
+        PreparedStatement ps = null;
         try {
-            if (ps != null) {
-                ps.close();
+            connection = getConnection();  // Ensure this method returns a valid connection
+            if (connection == null || connection.isClosed()) {
+                throw new SQLException("Connection is not available");
             }
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-            }
+
+            String sql = "UPDATE UserStatus "
+                    + "SET Status = 1 "
+                    + "WHERE UserID = (SELECT UserID FROM Users WHERE Username = ?)";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+
+            int rowsUpdated = ps.executeUpdate();
+            return rowsUpdated > 0;  // Return true if the status was updated successfully
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error closing resources", e);
+            LOGGER.log(Level.SEVERE, "Error activating account", e);
+        } finally {
+            // Close resources safely
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if (connection != null && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Error closing resources", e);
+            }
         }
+        return false;  // Return false if there was an error or no rows were updated
     }
-    return false;  // Return false if there was an error or no rows were updated
-}
-
-
 
     private static class LOGGER {
 

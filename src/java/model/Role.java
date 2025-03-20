@@ -11,6 +11,15 @@ package model;
 public class Role {
    private int roleID;
     private String roleName;
+      private RoleStatus status;
+
+    public void setStatus(RoleStatus status) {
+        this.status = status;
+    }
+
+    public RoleStatus getStatus() {
+        return status;
+    }
 
     /**
      *

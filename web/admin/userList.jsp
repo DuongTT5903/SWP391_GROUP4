@@ -155,12 +155,12 @@
                 <div class="mb-3">
                     <label for="role" class="form-label">Vai trò</label>
                     <select class="form-control" id="role" name="role">
-                        <option value="1">Admin</option>
-                        <option value="2">Manager</option>
-                        <option value="3">Staff</option>
-                        <option value="4">Customer</option>
+                        <c:forEach var="role" items="${roles}">
+                            <option value="${role.roleID}">${role.roleName}</option>
+                        </c:forEach>
                     </select>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Thêm</button>
             </form>
         </div>
