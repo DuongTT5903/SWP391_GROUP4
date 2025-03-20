@@ -8,10 +8,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Manager List Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <style>
+            .action-buttons {
+                display: flex;
+                gap: 5px;
+            }
+        </style>
     </head>
 
     <body class="bg-light">
-          <jsp:include page="/manager/headermanager.jsp" />
+        <jsp:include page="/manager/headermanager.jsp" />
         <div class="container py-5">
             <div class="row justify-content-center">
                 <div class="col-md-12">
@@ -93,11 +99,18 @@
                                                     </form>
                                                 </td>
                                                 <td>
-                                                    <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
-                                                        <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                                        <input type="hidden" name="service" value="viewDetail">
-                                                        <button type="submit" class="btn btn-sm btn-info">View</button>
-                                                    </form>
+                                                    <div class="action-buttons">
+                                                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
+                                                            <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                                            <input type="hidden" name="service" value="viewDetail">
+                                                            <button type="submit" class="btn btn-sm btn-info">Edit</button>
+                                                        </form>
+                                                        <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
+                                                            <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                                            <input type="hidden" name="service" value="view">
+                                                            <button type="submit" class="btn btn-sm btn-success">View</button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0" onsubmit="return confirmDelete()">
@@ -173,5 +186,4 @@
                 return confirm("Are you sure you want to delete this service?");
             }
         </script>
-    </body>
-</html>
+   

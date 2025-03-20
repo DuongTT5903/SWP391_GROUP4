@@ -88,6 +88,13 @@ public class ManagerServiceController extends HttpServlet {
                     List<ServiceCategory> viewCategories = db.getServiceCategories();
                     request.setAttribute("service", viewService);
                     request.setAttribute("categories", viewCategories);
+                    request.getRequestDispatcher("/manager/view/editservice.jsp").forward(request, response);
+                    break;
+
+                case "view":
+                    int viewServiceID = Integer.parseInt(request.getParameter("serviceID"));
+                    Service serviceToView = db.getServiceByID(viewServiceID);
+                    request.setAttribute("service", serviceToView);
                     request.getRequestDispatcher("/manager/view/viewservice.jsp").forward(request, response);
                     break;
 
@@ -117,7 +124,6 @@ public class ManagerServiceController extends HttpServlet {
                     int serviceID = Integer.parseInt(request.getParameter("serviceID"));
                     String serviceName = request.getParameter("serviceName");
                     String serviceDetail = request.getParameter("serviceDetail");
-                    // Sử dụng categoryID đã khai báo trước đó thay vì khai báo lại
                     categoryID = Integer.parseInt(request.getParameter("categoryID"));
                     float servicePrice = Float.parseFloat(request.getParameter("servicePrice"));
                     float salePrice = Float.parseFloat(request.getParameter("salePrice"));

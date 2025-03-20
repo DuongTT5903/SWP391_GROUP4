@@ -18,6 +18,17 @@
                 font-size: 14px;
                 display: none;
             }
+            .detail-item {
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-bottom: 10px;
+                position: relative;
+            }
+            .remove-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
         </style>
     </head>
     <body class="bg-light">
@@ -38,10 +49,23 @@
                                            required placeholder="Enter service name">
                                 </div>
 
+                                <!-- Phần chi tiết với nhiều mục -->
                                 <div class="mb-3">
-                                    <label for="serviceDetail" class="form-label required">Details</label>
-                                    <textarea class="form-control" id="serviceDetail" name="serviceDetail" rows="3" 
-                                              required placeholder="Enter service details"></textarea>
+                                    <label class="form-label required">Service Details</label>
+                                    <div id="detailItems">
+                                        <div class="detail-item">
+                                            <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeDetailItem(this)">X</button>
+                                            <div class="mb-2">
+                                                <label class="form-label">Detail Text</label>
+                                                <textarea class="form-control" name="detailText_0" rows="2" required placeholder="Enter detail text"></textarea>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label">Detail Image URL</label>
+                                                <input type="text" class="form-control" name="detailImage_0" placeholder="Enter image URL (optional)">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-success btn-sm mt-2" onclick="addDetailItem()">Add New Detail</button>
                                 </div>
 
                                 <div class="mb-3">
@@ -64,7 +88,7 @@
                                 <div class="mb-3">
                                     <label for="salePrice" class="form-label">Sale Off</label>
                                     <input type="number" step="0.01" class="form-control" id="salePrice" 
-                                           name="salePrice" required placeholder="Enter sale price (optional)">
+                                           name="salePrice" placeholder="Enter sale price (optional)">
                                     <div id="salePriceError" class="error-message">Sale Price must be less than Price and non-negative.</div>
                                 </div>
 
@@ -88,65 +112,85 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                                function validateForm() {
-                                    let isValid = true;
+            let detailIndex = 1;
 
-                                    let serviceName = document.getElementById("serviceName").value.trim();
-                                    let serviceDetail = document.getElementById("serviceDetail").value.trim();
-                                    let servicePrice = parseFloat(document.getElementById("servicePrice").value);
-                                    let salePrice = document.getElementById("salePrice").value ? parseFloat(document.getElementById("salePrice").value) : null;
-                                    let imageURL = document.getElementById("imageURL").value.trim();
+            function addDetailItem() {
+                let container = document.getElementById("detailItems");
+                let newItem = document.createElement("div");
+                newItem.className = "detail-item";
+                newItem.innerHTML = `
+                    <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeDetailItem(this)">X</button>
+                    <div class="mb-2">
+                        <label class="form-label">Detail Text</label>
+                        <textarea class="form-control" name="detailText_${detailIndex}" rows="2" required placeholder="Enter detail text"></textarea>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Detail Image URL</label>
+                        <input type="text" class="form-control" name="detailImage_${detailIndex}" placeholder="Enter image URL (optional)">
+                    </div>
+                `;
+                container.appendChild(newItem);
+                detailIndex++;
+            }
 
-                                    // Reset thông báo lỗi
-                                    document.getElementById("priceError").style.display = "none";
-                                    document.getElementById("salePriceError").style.display = "none";
+            function removeDetailItem(button) {
+                button.parentElement.remove();
+            }
 
-                                    // Kiểm tra nếu các trường chỉ chứa dấu cách
-                                    if (serviceName === "") {
-                                        alert("Service Name không được để trống hoặc chỉ chứa dấu cách!");
-                                        isValid = false;
-                                    }
+            function validateForm() {
+                let isValid = true;
 
-                                    if (serviceDetail === "") {
-                                        alert("Service Detail không được để trống hoặc chỉ chứa dấu cách!");
-                                        isValid = false;
-                                    }
+                let serviceName = document.getElementById("serviceName").value.trim();
+                let servicePrice = parseFloat(document.getElementById("servicePrice").value);
+                let salePrice = document.getElementById("salePrice").value ? parseFloat(document.getElementById("salePrice").value) : null;
+                let imageURL = document.getElementById("imageURL").value.trim();
 
-                                    // Validate servicePrice
-                                    if (isNaN(servicePrice) || servicePrice <= 0) {
-                                        document.getElementById("priceError").style.display = "block";
-                                        isValid = false;
-                                    }
+                document.getElementById("priceError").style.display = "none";
+                document.getElementById("salePriceError").style.display = "none";
 
-                                    // Validate salePrice
-                                    if (salePrice !== null) {
-                                        if (salePrice < 0 || salePrice >= servicePrice) {
-                                            document.getElementById("salePriceError").style.display = "block";
-                                            isValid = false;
-                                        }
-                                    }
+                if (serviceName === "") {
+                    alert("Service Name không được để trống hoặc chỉ chứa dấu cách!");
+                    isValid = false;
+                }
 
-                                    // Validate imageURL nếu có nhập
-                                    if (imageURL !== "" && !isValidURL(imageURL)) {
-                                        alert("Image URL không hợp lệ. Vui lòng nhập URL đúng định dạng!");
-                                        isValid = false;
-                                    }
+                let detailTexts = document.querySelectorAll("[name^='detailText_']");
+                detailTexts.forEach(textarea => {
+                    if (textarea.value.trim() === "") {
+                        alert("Detail Text không được để trống hoặc chỉ chứa dấu cách!");
+                        isValid = false;
+                    }
+                });
 
-                                    return isValid;
-                                }
+                if (isNaN(servicePrice) || servicePrice <= 0) {
+                    document.getElementById("priceError").style.display = "block";
+                    isValid = false;
+                }
 
-    // Hàm kiểm tra URL hợp lệ
-                                function isValidURL(str) {
-                                    let pattern = new RegExp('^(https?:\\/\\/)?' + // Protocol
-                                            '((([a-zA-Z0-9$_.+!*\'(),-]+:\\S*)?@)?' + // Basic auth (optional)
-                                            '(([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})|' + // Domain name
-                                            '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR IPv4
-                                            '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+]*)*' + // Port and path
-                                            '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' + // Query string
-                                            '(\\#[-a-zA-Z0-9_]*)?$', 'i'); // Fragment locator
-                                    return pattern.test(str);
-                                }
+                if (salePrice !== null) {
+                    if (salePrice < 0 || salePrice >= servicePrice) {
+                        document.getElementById("salePriceError").style.display = "block";
+                        isValid = false;
+                    }
+                }
 
+                if (imageURL !== "" && !isValidURL(imageURL)) {
+                    alert("Image URL không hợp lệ. Vui lòng nhập URL đúng định dạng!");
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function isValidURL(str) {
+                let pattern = new RegExp('^(https?:\\/\\/)?' + 
+                    '((([a-zA-Z0-9$_.+!*\'(),-]+:\\S*)?@)?' + 
+                    '(([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})|' + 
+                    '((\\d{1,3}\\.){3}\\d{1,3}))' + 
+                    '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+]*)*' + 
+                    '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' + 
+                    '(\\#[-a-zA-Z0-9_]*)?$', 'i');
+                return pattern.test(str);
+            }
         </script>
     </body>
 </html>
