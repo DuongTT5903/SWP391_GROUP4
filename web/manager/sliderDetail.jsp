@@ -5,61 +5,87 @@
     <head>
         <meta charset="UTF-8">
         <title>Slider Detail</title>
-        <!-- Link Bootstrap CSS nếu cần -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <!-- Bootstrap 5 -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+            .form-container {
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+                border-radius: 10px;
+                background: #fff;
+                box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            }
+            .btn-custom {
+                transition: 0.3s;
+            }
+            .btn-custom:hover {
+                transform: scale(1.05);
+            }
+            .form-check-input {
+                width: 20px;
+                height: 20px;
+            }
+            .preview-img {
+                max-width: 100%;
+                border-radius: 5px;
+                margin-top: 10px;
+                box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+            }
+        </style>
     </head>
     <body>
-        <div class="container mt-4">
-            <h1>Chi tiết Slider</h1>
-            <!-- Form chỉnh sửa slider -->
-            <form action="sliderDetail" method="post">
-                <!-- Ẩn slideID để biết chúng ta đang sửa slider nào -->
-                <input type="hidden" name="id" value="${slider.slideID}" />
 
-                <div class="form-group">
-                    <label for="title">Tiêu đề:</label>
-                    <input type="text" class="form-control" id="title" name="title"
-                           value="${slider.title}" required>
-                </div>
+        <div class="container">
+            <div class="form-container p-4">
+                <h3 class="text-center mb-4">Chi tiết Slider</h3>
 
-                <div class="form-group">
-                    <label for="backLink">Backlink:</label>
-                    <input type="text" class="form-control" id="backLink" name="backLink"
-                           value="${slider.backLink}" required>
-                </div>
+                <!-- Form chỉnh sửa slider -->
+                <form action="sliderDetail" method="post">
+                    <!-- Ẩn slideID -->
+                    <input type="hidden" name="id" value="${slider.slideID}" />
 
-                <div class="form-group">
-                    <label for="img">URL Ảnh:</label>
-                    <input type="text" class="form-control" id="img" name="img"
-                           value="${slider.img}" required>
-                </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Tiêu đề:</label>
+                        <input type="text" class="form-control" id="title" name="title" value="${slider.title}" required>
+                    </div>
 
-                <!-- Hiển thị ảnh mẫu (nếu có) -->
-                <div class="form-group">
-                    <c:if test="${not empty slider.img}">
-                        <img src="${slider.img}" alt="${slider.title}" style="max-width: 300px;" />
-                    </c:if>
-                </div>
+                    <div class="mb-3">
+                        <label for="backLink" class="form-label">Backlink:</label>
+                        <input type="text" class="form-control" id="backLink" name="backLink" value="${slider.backLink}" required>
+                    </div>
 
-                <div class="form-group form-check">
-                    <input type="checkbox" class="form-check-input" id="status" name="status"
-                           <c:if test="${slider.status}">checked</c:if>>
-                    <label class="form-check-label" for="status">Hiển thị</label>
-                </div>
+                    <div class="mb-3">
+                        <label for="img" class="form-label">URL Ảnh:</label>
+                        <input type="text" class="form-control" id="img" name="img" value="${slider.img}" required>
+                    </div>
 
-<!--                <div class="form-group">
-                    <label for="notes">Ghi chú:</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3">{slider.notes}</textarea>
-                </div>-->
+                    <!-- Hiển thị ảnh mẫu (nếu có) -->
+                    <div class="mb-3 text-center">
+                        <c:if test="${not empty slider.img}">
+                            <img src="${slider.img}" alt="${slider.title}" class="preview-img">
+                        </c:if>
+                    </div>
 
-                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                <a href="${pageContext.request.contextPath}/manager/sliderList" class="btn btn-secondary">Quay lại</a>
-            </form>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="status" name="status" <c:if test="${slider.status}">checked</c:if>>
+                            <label class="form-check-label" for="status">Hiển thị</label>
+                        </div>
+
+                        <!-- Nút thao tác -->
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary btn-custom">Lưu thay đổi</button>
+                            <a href="${pageContext.request.contextPath}/manager/sliderList" class="btn btn-secondary btn-custom">Quay lại</a>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <!-- Link Bootstrap JS nếu cần -->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     </body>
 </html>

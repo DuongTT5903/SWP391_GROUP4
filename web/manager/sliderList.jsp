@@ -81,7 +81,7 @@
                     <!-- Giả sử bạn đã set các biến pageIndex, totalPages -->
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == pageIndex ? 'active' : ''}">
-                            <a class="page-link" href="manager/sliderList?action=list&page=${i}&search=${search}&status=${status}">${i}</a>
+                            <a class="page-link" href="sliderList?action=list&page=${i}&search=${search}&status=${status}">${i}</a>
                         </li>
                     </c:forEach>
                 </ul>
@@ -94,3 +94,4 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     </body>
 </html>
+
