@@ -67,7 +67,8 @@
                                 <!-- Các nút hành động -->
                                 <a href="sliderList?action=hide&slideID=${slider.slideID}" class="btn btn-warning btn-sm action-btn">Ẩn</a>
                                 <a href="sliderList?action=show&slideID=${slider.slideID}" class="btn btn-success btn-sm action-btn">Hiển thị</a>
-                                <a href="sliderDetail?slideID=${slider.slideID}" class="btn btn-info btn-sm action-btn">Sửa</a>
+                                <a href="${pageContext.request.contextPath}/manager/sliderDetail?id=${slider.slideID}" 
+                                   class="btn btn-info btn-sm">Chi tiết</a>
                             </td>
                         </tr>
                     </c:forEach>

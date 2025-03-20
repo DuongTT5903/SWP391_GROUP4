@@ -199,6 +199,45 @@ public class SliderDBContext {
 //        }
 //        return null;
 //    }
+    public Slider getSliderById(int slideID) {
+        String sql = "SELECT SlideID, title, backLink, img, status, authorID FROM slider WHERE SlideID = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setInt(1, slideID);
+            try (ResultSet rs = stm.executeQuery()) {
+                if (rs.next()) {
+                    Slider slider = new Slider();
+                    slider.setSlideID(rs.getInt("SlideID"));
+                    slider.setTitle(rs.getString("title"));
+                    slider.setBackLink(rs.getString("backLink"));
+                    slider.setImg(rs.getString("img"));
+                    slider.setStatus(rs.getBoolean("status"));
+                    // Nếu bạn có cột notes trong DB:
+//                    slider.setNotes(rs.getString("notes"));
+                    // Nếu cần lấy thêm thông tin author:
+                    // slider.setAuthor(new User(rs.getInt("authorID")));
+                    return slider;
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
+    public void updateSlider(Slider slider) {
+        String sql = "UPDATE slider SET title = ?, backLink = ?, img = ?, status = ? WHERE SlideID = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
+            stm.setString(1, slider.getTitle());
+            stm.setString(2, slider.getBackLink());
+            stm.setString(3, slider.getImg());
+            stm.setBoolean(4, slider.isStatus());
+            // Nếu có cột notes:
+//            stm.setString(5, slider.getNotes());
+            stm.setInt(5, slider.getSlideID());
+            stm.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 
 }
