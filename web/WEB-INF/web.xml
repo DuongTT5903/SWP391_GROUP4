@@ -125,8 +125,8 @@
         <servlet-class>controller.Feedback</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ManagerSilderListController</servlet-name>
-        <servlet-class>controller.ManagerSilderListController</servlet-class>
+        <servlet-name>ManagerSliderListController</servlet-name>
+        <servlet-class>controller.ManagerSliderListController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ManagerSliderDetailController</servlet-name>
@@ -289,7 +289,7 @@
         <url-pattern>/feedback</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ManagerSilderListController</servlet-name>
+        <servlet-name>ManagerSliderListController</servlet-name>
         <url-pattern>/manager/sliderList</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

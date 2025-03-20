@@ -152,6 +152,7 @@
                         <a href="${pageContext.request.contextPath}/manager/customerList">Go to Customer List</a>
                         <a href="${pageContext.request.contextPath}/manager/feedbackdetail">Go to Feedback</a>
                         <a href="${pageContext.request.contextPath}/manager/postList">Go to Post List</a>
+                        <a href="${pageContext.request.contextPath}/manager/sliderList">Go to Slider List</a>
                     </c:when>
                     <c:when test="${sessionScope.roleID == '3'}">
                         <h3 class="w3-wide">
