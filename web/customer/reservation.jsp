@@ -147,7 +147,7 @@
                                 <td>${s.service.serviceName}</td>
                                 <td>${(s.service.servicePrice * (100 - s.service.salePrice)) / 100}00 VNĐ</td>
                                 <td>
-                                   ${s.amount}
+                                    ${s.amount}
                                 </td>
                                 <td>${s.amount * (s.service.servicePrice * (100 - s.service.salePrice)) / 100}00 VNĐ</td>
                             </tr>
@@ -157,7 +157,7 @@
             </c:if>
             <p>Tổng thanh toán:${total} VNĐ</p>
 
-             <nav class="mt-4">
+            <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
@@ -177,107 +177,41 @@
                     </li>
                 </ul>
             </nav>
-
-
             <form action="reservation" method="POST" class="mt-4">
                 <div class="row g-3">
-                    <c:if test="${sessionScope.roleID == '4'}">
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Họ và tên:</label>
-                            <input type="text"  name="name" class="form-control" value="${sessionScope.user.username}" style="background-color: gray" readonly>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="email" name="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" value="${sessionScope.user.email}" >
+                        <div class="invalid-feedback">
+                            ${errors.email}
                         </div>
-
-                        <div class="col-md-6">
-                            <label for="address" class="form-label">Địa chỉ:</label>
-                            <input type="text"  name="address" class="form-control" value="${customer.address}" style="background-color: gray" readonly>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email:</label>
-                            <input type="email"  name="email" class="form-control" value="${sessionScope.user.email}" style="background-color: gray" readonly>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="phone" class="form-label">Số điện thoại:</label>
-                            <input type="tel"  name="phone" class="form-control" value="${sessionScope.user.phone}" style="background-color: gray" readonly>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="gender" class="form-label">Giới tính:</label>
-                            <select class="form-select" name="gender" readonly>
-                                <c:if test="${sessionScope.user.gender==false}">
-                                    <option value="0">Nam</option>
-                                </c:if>
-                                <c:if test="${sessionScope.user.gender==true}">
-                                    <option value="1">Nữ</option>
-                                </c:if>
-                            </select>
-                        </div>
-                    </c:if>
-                    <c:if test="${sessionScope.roleID != '4'}">
-                        <div class="col-md-6">
-                            <label for="name" class="form-label">Họ và tên:</label>
-                            <input type="text" name="name" class="form-control ${not empty errors.name ? 'is-invalid' : ''}">
-                            <div class="invalid-feedback">
-                                ${errors.name}
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="address" class="form-label">Địa chỉ:</label>
-                            <input type="text" name="address" class="form-control ${not empty errors.address ? 'is-invalid' : ''}">
-                            <div class="invalid-feedback">
-                                ${errors.address}
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email:</label>
-                            <input type="email" name="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" >
-                            <div class="invalid-feedback">
-                                ${errors.email}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="phone" class="form-label">Số điện thoại:</label>
-                            <input type="tel" name="phone" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}">
-                            <div class="invalid-feedback">
-                                ${errors.phone}
-                            </div>
-                        </div>
-
-
-                        <div class="col-md-6">
-                            <label for="gender" class="form-label">Giới tính:</label>
-                            <select class="form-select" name="gender" required>
-                                <option value="0">Nam</option>
-                                <option value="1">Nữ</option>
-                            </select>
-                        </div>
-                        <div class="col-md-12">
-                            <label for="note" class="form-label">Ghi chú (nếu có):</label>
-                            <small class="form-text text-muted">Nhập ghi chú thêm cho việc đặt chỗ(tối đa 500 ký tự).</small>
-                            <textarea name="note" class="form-control ${not empty errors.note ? 'is-invalid' : ''}" rows="3" ></textarea>
-                            <div class="invalid-feedback">
-                                ${errors.note}
-                            </div>
-                        </div>
-
-
-                    </c:if>
-                </div>
-                <div class="col-md-12">
-                    <label class="form-label">Phương thức thanh toán:</label>
-                    <div class="btn-group w-100">
-                        <input type="radio" class="btn-check" id="creditCard" name="payment" value="0" onclick="toggleCardDetails(true)" >
-                        <label class="btn btn-outline-primary" for="creditCard">Thẻ tín dụng</label>
-
-                        <input type="radio" class="btn-check" id="bankApp" name="payment" value="1" onclick="toggleCardDetails(false)" >
-                        <label class="btn btn-outline-secondary" for="bankApp">Bank App</label>
                     </div>
-                    <div class="text-danger">${errors.payment}</div>
-                </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Số điện thoại:</label>
+                        <input type="tel" name="phone" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}" value="${sessionScope.user.phone}" >
+                        <div class="invalid-feedback">
+                            ${errors.phone}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="address" class="form-label">Địa chỉ:</label>
+                        <input type="text" name="address" class="form-control ${not empty errors.address ? 'is-invalid' : ''}" value="${customer.address}">
+                        <div class="invalid-feedback">
+                            ${errors.address}
+                        </div>
+                    </div>               
+                    <div class="col-md-12">
+                        <label class="form-label">Phương thức thanh toán:</label>
+                        <div class="btn-group w-100">
+                            <input type="radio" class="btn-check" id="creditCard" name="payment" value="0" onclick="toggleCardDetails(true)" >
+                            <label class="btn btn-outline-primary" for="creditCard">Thẻ tín dụng</label>
 
+                            <input type="radio" class="btn-check" id="bankApp" name="payment" value="1" onclick="toggleCardDetails(false)" >
+                            <label class="btn btn-outline-secondary" for="bankApp">VP Payment</label>
+                        </div>
+                        <div class="text-danger">${errors.payment}</div>
+                    </div>
+                </div>
                 <div class="col-md-12 mt-3" id="cardDetails" style="display: none;">
                     <div class="row g-3">
                         <div class="col-md-6">

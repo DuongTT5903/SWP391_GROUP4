@@ -525,6 +525,7 @@ public class ReservationDBContext {
             System.out.println("Status: " + entry.getKey() + " - Count: " + entry.getValue());
 
         }
+        
     }
 
 }

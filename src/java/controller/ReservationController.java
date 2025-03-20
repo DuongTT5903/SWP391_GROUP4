@@ -82,6 +82,11 @@ public class ReservationController extends HttpServlet {
         int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
 
         // Gửi dữ liệu qua JSP
+        session.setAttribute("currentPage", currentPage);
+        session.setAttribute("totalPages", totalPages);
+        session.setAttribute("total", total);
+        session.setAttribute("cartItems", carts);
+        session.setAttribute("customer", customer);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("total", total);
@@ -100,14 +105,13 @@ public class ReservationController extends HttpServlet {
         String address = request.getParameter("address");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String gender = request.getParameter("gender");
-        String note = request.getParameter("note");
         String payment = request.getParameter("payment");
         Customer customer = (Customer) session.getAttribute("customer");
         List<ReservationDetail> cartItems = (List<ReservationDetail>) session.getAttribute("cartItems");
         int total = (int) session.getAttribute("total");
         int currentPage = (int) session.getAttribute("currentPage");
         int totalPages = (int) session.getAttribute("totalPages");
+        
         // Kiểm tra lỗi nhập liệu
         if (name == null || name.length() < 6 || name.length() > 50) {
             errors.put("name", "Họ và tên phải từ 6 đến 50 ký tự.");
@@ -124,9 +128,6 @@ public class ReservationController extends HttpServlet {
 
         if (phone == null || !phone.matches("^0[3789][0-9]{8}$")) {
             errors.put("phone", "Số điện thoại phải bắt đầu bằng 03, 07, 08 hoặc 09 và có tổng cộng 10 chữ số.");
-        }
-        if (note != null && note.length() > 500) {
-            errors.put("note", "Ghi chú không được vượt quá 500 ký tự.");
         }
         if (payment == null) {
             errors.put("payment", "Vui lòng chọn phương thức thanh toán.");
@@ -151,17 +152,16 @@ public class ReservationController extends HttpServlet {
             if (expirationDate == null || expirationDate.trim().isEmpty()) {
                 errors.put("expirationDate", "Vui lòng nhập ngày hết hạn.");
             }
-            session.setAttribute("cardName", cardName);
-            session.setAttribute("cardNumber", cardNumber);
-            session.setAttribute("CVV", CVV);
+            request.setAttribute("cardName", cardName);
+            request.setAttribute("cardNumber", cardNumber);
+            request.setAttribute("CVV", CVV);
             request.setAttribute("expirationDate", expirationDate);
         }
-        if (!errors.isEmpty()) {
+        if (!errors.isEmpty()) {         
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("total", total);
             request.setAttribute("cartItems", cartItems);
-            request.setAttribute("customer", customer);
             request.setAttribute("errors", errors);
             request.getRequestDispatcher("reservation.jsp").forward(request, response);
             return;
@@ -171,12 +171,10 @@ public class ReservationController extends HttpServlet {
         session.removeAttribute("total");
         session.removeAttribute("cartItems");
         session.removeAttribute("customer");
-        session.setAttribute("name", name);
-        session.setAttribute("address", address);
-        session.setAttribute("email", email);
-        session.setAttribute("phone", phone);
-        session.setAttribute("gender", gender);
-        session.setAttribute("note", note);
+        request.setAttribute("payment", payment);
+        request.setAttribute("address", address);
+        request.setAttribute("email", email);
+        request.setAttribute("phone", phone);
         response.setContentType("text/html;charset=UTF-8");
         response.sendRedirect(request.getContextPath() + "/customer/reservation_complete");
 
