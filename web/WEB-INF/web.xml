@@ -136,6 +136,14 @@
         <servlet-name>AdminSettingList</servlet-name>
         <servlet-class>controller.AdminSettingList</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ReservationListController</servlet-name>
+        <servlet-class>controller.ReservationListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReservationDetailController</servlet-name>
+        <servlet-class>controller.ReservationDetailController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -303,5 +311,13 @@
     <servlet-mapping>
         <servlet-name>AdminSettingList</servlet-name>
         <url-pattern>/admin/settingList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReservationListController</servlet-name>
+        <url-pattern>/staff/reservationlist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReservationDetailController</servlet-name>
+        <url-pattern>/staff/reservationdetail</url-pattern>
     </servlet-mapping>
 </web-app>

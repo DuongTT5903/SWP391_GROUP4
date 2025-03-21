@@ -5,6 +5,7 @@
 package model;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -22,9 +23,19 @@ public class Reservation {
     private int status;
     private int paymentMethod;
     private float totalPrice;
+    private List<ReservationDetail> details; // Danh sách chi tiết đặt chỗ
+
+    // Constructor, getters, setters...
+
     public Reservation() {
     }
+ public List<ReservationDetail> getDetails() {
+        return details;
+    }
 
+    public void setDetails(List<ReservationDetail> details) {
+        this.details = details;
+    }
     public Reservation(int reservationID, String customerName, String email, String address, String phone, Date creationDate, User userID, int status, int paymentMethod, float totalPrice) {
         this.reservationID = reservationID;
         this.customerName = customerName;

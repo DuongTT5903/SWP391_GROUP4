@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Cart;
 import model.Customer;
+import model.Reservation;
+import model.ReservationDetail;
 import model.Service;
 import model.ServiceCategory;
 import model.User;
@@ -29,6 +31,225 @@ import model.User;
  * @author admin
  */
 public class ReservationDBContext {
+    public Reservation getReservationById(int reservationID) {
+    Reservation reservation = null;
+    String sql = "SELECT * FROM Reservations WHERE reservationID = ?";
+
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setInt(1, reservationID);
+
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                reservation = new Reservation();
+                reservation.setReservationID(rs.getInt("reservationID"));
+                reservation.setCustomerName(rs.getString("customerName"));
+                reservation.setEmail(rs.getString("email"));
+                reservation.setPhone(rs.getString("phone"));
+                reservation.setAddress(rs.getString("address"));
+                reservation.setCreationDate(rs.getDate("creationDate"));
+                reservation.setStatus(rs.getInt("status"));
+                reservation.setTotalPrice(rs.getFloat("totalPrice"));
+              
+
+                // Lấy danh sách chi tiết dịch vụ đã đặt
+                List<ReservationDetail> details = getReservationDetails(reservationID);
+                reservation.setDetails(details);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error fetching reservation by ID: " + e.getMessage());
+    }
+
+    return reservation;
+}
+    public List<ReservationDetail> getReservationDetails(int reservationID) {
+    List<ReservationDetail> details = new ArrayList<>();
+    String sql = "SELECT rd.DetailID, rd.ServiceID, s.ServiceName, s.Category, s.Thumbnail, rd.Amount, rd.NumberOfPerson "
+               + "FROM ReservationDetails rd "
+               + "JOIN Services s ON rd.ServiceID = s.ServiceID "
+               + "WHERE rd.ReservationID = ?";
+
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        pstmt.setInt(1, reservationID);
+
+        try (ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                ReservationDetail detail = new ReservationDetail();
+                detail.setDetailID(rs.getInt("DetailID"));
+                detail.setRevationID(reservationID);
+
+                // Tạo đối tượng Service
+                Service service = new Service();
+                service.setServiceID(rs.getInt("ServiceID"));
+                service.setServiceName(rs.getString("ServiceName"));
+               
+                detail.setService(service);
+
+                detail.setAmount(rs.getInt("Amount"));
+                detail.setNumberOfPerson(rs.getInt("NumberOfPerson"));
+                details.add(detail);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error fetching reservation details: " + e.getMessage());
+    }
+
+    return details;
+}
+    public List<Reservation> getReservations(Integer status, String fromDate, String toDate, Integer staffId,
+                                         String searchQuery, String sortBy, int page, int pageSize) {
+    List<Reservation> reservations = new ArrayList<>();
+    String sql = "SELECT * FROM Reservations WHERE 1=1";
+
+    // Thêm điều kiện lọc vào câu lệnh SQL
+    if (status != null) {
+        sql += " AND status = ?";
+    }
+    if (fromDate != null && !fromDate.isEmpty()) {
+        sql += " AND creationDate >= ?";
+    }
+    if (toDate != null && !toDate.isEmpty()) {
+        sql += " AND creationDate <= ?";
+    }
+    if (staffId != null) {
+        sql += " AND staffID = ?";
+    }
+    if (searchQuery != null && !searchQuery.isEmpty()) {
+        sql += " AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)";
+    }
+
+    // Thêm sắp xếp (nếu có)
+    if (sortBy != null && !sortBy.isEmpty()) {
+        sql += " ORDER BY " + sortBy;
+    }
+
+    // Thêm phân trang
+    sql += " LIMIT ? OFFSET ?";
+
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        int paramIndex = 1;
+
+        // Thiết lập các tham số cho câu lệnh SQL
+        if (status != null) {
+            pstmt.setInt(paramIndex++, status);
+        }
+        if (fromDate != null && !fromDate.isEmpty()) {
+            pstmt.setString(paramIndex++, fromDate);
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            pstmt.setString(paramIndex++, toDate);
+        }
+        if (staffId != null) {
+            pstmt.setInt(paramIndex++, staffId);
+        }
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            String searchPattern = "%" + searchQuery + "%";
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+        }
+
+        // Thiết lập phân trang
+        pstmt.setInt(paramIndex++, pageSize);
+        pstmt.setInt(paramIndex++, (page - 1) * pageSize);
+
+        // Thực thi câu lệnh SQL và lấy kết quả
+        try (ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Reservation reservation = new Reservation();
+                reservation.setReservationID(rs.getInt("reservationID"));
+                reservation.setCustomerName(rs.getString("customerName"));
+                reservation.setEmail(rs.getString("email"));
+                reservation.setPhone(rs.getString("phone"));
+                reservation.setAddress(rs.getString("address"));
+                reservation.setCreationDate(rs.getDate("creationDate"));
+                reservation.setStatus(rs.getInt("status"));
+                reservation.setTotalPrice(rs.getFloat("totalPrice"));
+
+                // Bỏ phần chi tiết (ReservationDetail)
+                // List<ReservationDetail> details = getReservationDetails(reservation.getReservationID());
+                // reservation.setDetails(details);
+
+                reservations.add(reservation);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error fetching reservations: " + e.getMessage());
+    }
+
+    // Debug: In ra số lượng bản ghi được lấy
+    System.out.println("Total reservations fetched: " + reservations.size());
+
+    return reservations;
+}
+    
+public int countReservations(Integer status, String fromDate, String toDate, Integer staffId, String searchQuery) {
+    String sql = "SELECT COUNT(*) AS total FROM Reservations WHERE 1=1";
+
+    // Thêm điều kiện lọc vào câu lệnh SQL
+    if (status != null) {
+        sql += " AND status = ?";
+    }
+    if (fromDate != null && !fromDate.isEmpty()) {
+        sql += " AND creationDate >= ?";
+    }
+    if (toDate != null && !toDate.isEmpty()) {
+        sql += " AND creationDate <= ?";
+    }
+    if (staffId != null) {
+        sql += " AND staffID = ?";
+    }
+    if (searchQuery != null && !searchQuery.isEmpty()) {
+        sql += " AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)";
+    }
+
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        int paramIndex = 1;
+
+        // Thiết lập các tham số cho câu lệnh SQL
+        if (status != null) {
+            pstmt.setInt(paramIndex++, status);
+        }
+        if (fromDate != null && !fromDate.isEmpty()) {
+            pstmt.setString(paramIndex++, fromDate);
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            pstmt.setString(paramIndex++, toDate);
+        }
+        if (staffId != null) {
+            pstmt.setInt(paramIndex++, staffId);
+        }
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            String searchPattern = "%" + searchQuery + "%";
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+        }
+
+        // Thực thi câu lệnh SQL và lấy kết quả
+        try (ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error counting reservations: " + e.getMessage());
+    }
+
+    return 0; // Trả về 0 nếu có lỗi
+}
 
     public int ReservationID() {
         String sql = "SELECT COUNT(*)"
@@ -525,7 +746,6 @@ public class ReservationDBContext {
             System.out.println("Status: " + entry.getKey() + " - Count: " + entry.getValue());
 
         }
-        
     }
 
 }
