@@ -4,6 +4,7 @@
  */
 package dal;
 
+import static dal.DBContext.connection;
 import static dal.DBContext.getConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +32,21 @@ import model.User;
  * @author admin
  */
 public class ReservationDBContext {
+    public int getCartCount(int userID) {
+    int count = 0;
+    String sql = "SELECT COUNT(*) FROM Cart WHERE userID = ?";
+    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        ps.setInt(1, userID);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            count = rs.getInt(1);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return count;
+}
+
     public Reservation getReservationById(int reservationID) {
     Reservation reservation = null;
     String sql = "SELECT * FROM Reservations WHERE reservationID = ?";
@@ -335,39 +351,56 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
         }
     }
 
-    public Customer getCustomerByID(int ID) {
-        Customer customer = null;  // Use null to handle cases where no customer is found
-        String sql = "SELECT u.*, c.CustomerID, c.Address "
-                + "FROM customer c JOIN users u ON c.userID = u.userID "
-                + "WHERE c.userID = ?";
+public Customer getCustomerByID(int ID) {
+    Customer customer = null;
+    String query = """
+            SELECT u.userID, u.name, u.gender, u.email, u.username, u.phone, 
+                   c.CustomerID, c.Address 
+            FROM customer c 
+            INNER JOIN users u ON c.userID = u.userID 
+            WHERE c.userID = ?""";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, ID);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {  // Use if instead of while since userID should be unique
-                User author = new User(
-                        rs.getInt("UserID"),
-                        rs.getString("Name"),
-                        rs.getBoolean("Gender"),
-                        rs.getString("Email"),
-                        rs.getString("Username"),
-                        rs.getString("Password"),
-                        rs.getString("Phone"),
-                        "", ""
-                );
-                customer = new Customer(
-                        rs.getInt("CustomerID"),
-                        author,
-                        rs.getString("Address") // Corrected field name
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (conn == null) {
+            Logger.getLogger(ReservationDBContext.class.getName()).log(Level.SEVERE, "Database connection is null");
+            return null;
         }
-        return customer;
+
+        stmt.setInt(1, ID);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Boolean gender = (rs.getObject("gender") != null) ? rs.getBoolean("gender") : null;
+
+            User user = new User(
+                    rs.getInt("userID"),
+                    rs.getString("name"),
+                    gender,
+                    rs.getString("email"),
+                    rs.getString("username"),
+                    null, // Không lưu mật khẩu
+                    rs.getString("phone"),
+                    "", "" // Giá trị rỗng nếu cần
+            );
+
+            customer = new Customer(
+                    rs.getInt("CustomerID"),
+                    user,
+                    rs.getString("Address")
+            );
+        } else {
+            Logger.getLogger(ReservationDBContext.class.getName()).log(Level.INFO, "No customer found for userID: " + ID);
+        }
+    } catch (SQLException e) {
+        Logger.getLogger(ReservationDBContext.class.getName()).log(Level.SEVERE, "Error fetching customer", e);
     }
+
+    return customer;
+}
+
+
 
     public void addCart(int serviceID, int userID, int amount) {
         PreparedStatement stm = null;
@@ -520,7 +553,40 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
         return carts;
 
     }
+    public List<Cart> getCart1(String search, int userID, int categoryID, int page, int pageSize) {
+        List<Cart> carts = new ArrayList<>();
+        String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
+                + "FROM carts c "
+                + "JOIN services s ON c.serviceID = s.serviceID "
+                + "JOIN users u ON c.userID = u.userID "
+                + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) AND (c.userID = ?) "
+                + "AND (? = 0 OR s.categoryID = ?) AND  c.CheckService='1'  "
+                + "LIMIT ?, ?";
 
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, search.isEmpty() ? "" : search);
+            stmt.setString(2, search.isEmpty() ? "%" : "%" + search + "%");
+            stmt.setInt(3, userID);
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, categoryID);
+            stmt.setInt(6, (page - 1) * pageSize);
+            stmt.setInt(7, pageSize);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                int categoryID1 = rs.getObject("categoryID") != null ? rs.getInt("categoryID") : -1;
+                ServiceCategory category = new ServiceCategory(categoryID1, "", "");
+                User user = new User(rs.getInt("userID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+                Service service = new Service(rs.getInt("serviceID"), rs.getString("serviceName"), "", category, rs.getInt("servicePrice"), rs.getInt("salePrice"), "", true, user);
+                Cart cart = new Cart(rs.getInt("ID"), rs.getBoolean("checkService"), rs.getInt("amount"), service, user);
+                carts.add(cart);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return carts;
+
+    }
     public List<Cart> getCart2(String search, int userID, int categoryID, int page, int pageSize) {
         List<Cart> carts = new ArrayList<>();
         String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
@@ -738,13 +804,20 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
         return revenueMap;
     }
 
-    public static void main(String[] args) {
+ public static void main(String[] args) {
         ReservationDBContext db = new ReservationDBContext();
-        Map<Integer, Integer> result = db.getReservationStatusCount();
+        
+        int testID = 6; // Thay bằng một userID có trong database
+        
+        Customer customer = db.getCustomerByID(testID);
 
-        for (Map.Entry<Integer, Integer> entry : result.entrySet()) {
-            System.out.println("Status: " + entry.getKey() + " - Count: " + entry.getValue());
-
+        if (customer != null) {
+            System.out.println("Customer ID: " + customer.getCustomerID());
+            System.out.println("Name: " + customer.getUser().getName());
+            System.out.println("Email: " + customer.getUser().getEmail());
+            System.out.println("Address: " + customer.getAddress());
+        } else {
+            System.out.println("Không tìm thấy khách hàng với ID: " + testID);
         }
     }
 

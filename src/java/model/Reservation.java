@@ -1,16 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author admin
- */
 public class Reservation {
 
     private int reservationID;
@@ -19,24 +11,16 @@ public class Reservation {
     private String address;
     private String phone;
     private Date creationDate;
-    private User userID;
+    private int userID;
     private int status;
     private int paymentMethod;
     private float totalPrice;
     private List<ReservationDetail> details; // Danh sách chi tiết đặt chỗ
 
-    // Constructor, getters, setters...
-
     public Reservation() {
     }
- public List<ReservationDetail> getDetails() {
-        return details;
-    }
 
-    public void setDetails(List<ReservationDetail> details) {
-        this.details = details;
-    }
-    public Reservation(int reservationID, String customerName, String email, String address, String phone, Date creationDate, User userID, int status, int paymentMethod, float totalPrice) {
+    public Reservation(int reservationID, String customerName, String email, String address, String phone, Date creationDate, int userID, int status, int paymentMethod, float totalPrice) {
         this.reservationID = reservationID;
         this.customerName = customerName;
         this.email = email;
@@ -49,6 +33,7 @@ public class Reservation {
         this.totalPrice = totalPrice;
     }
 
+    // Getters và Setters
     public int getReservationID() {
         return reservationID;
     }
@@ -97,11 +82,11 @@ public class Reservation {
         this.creationDate = creationDate;
     }
 
-    public User getUserID() {
+    public int getUserID() {
         return userID;
     }
 
-    public void setUserID(User userID) {
+    public void setUserID(int userID) {
         this.userID = userID;
     }
 
@@ -127,5 +112,30 @@ public class Reservation {
 
     public void setTotalPrice(float totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public List<ReservationDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<ReservationDetail> details) {
+        this.details = details;
+        calculateTotalPrice(); // Cập nhật tổng tiền
+    }
+
+    public void setReservationDetails(List<ReservationDetail> cartItems) {
+        this.details = cartItems;
+        calculateTotalPrice(); // Tự động cập nhật tổng tiền khi set danh sách chi tiết
+    }
+
+    // Phương thức tính tổng tiền đặt chỗ
+    public void calculateTotalPrice() {
+        float total = 0;
+        if (details != null) {
+            for (ReservationDetail item : details) {
+                total += item.getPrice();
+            }
+        }
+        this.totalPrice = total;
     }
 }

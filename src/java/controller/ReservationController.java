@@ -1,193 +1,159 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controller;
 
+import dal.CartDBContext;
 import dal.ReservationDBContext;
 import java.io.IOException;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 import model.Cart;
 import model.Customer;
+import model.Reservation;
 import model.ReservationDetail;
+import model.Service;
 import model.User;
 
-/**
- *
- * @author trung
- */
 public class ReservationController extends HttpServlet {
 
-    /**
-     *
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        int userID=user.getUserID();
-        ReservationDBContext reservationDB = new ReservationDBContext();
-        Customer customer;
+ List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
+session.setAttribute("checkItem", checkItem);
         if (user == null) {
-            customer = null;
-        } else {
-            customer = reservationDB.getCustomerByID(user.getUserID());
-        }
-        // Kiểm tra categoryID, tránh lỗi khi parse số
-        int categoryID = 0;
-        String categoryParam = request.getParameter("category");
-        if (categoryParam != null && !categoryParam.trim().isEmpty()) {
-            try {
-                categoryID = Integer.parseInt(categoryParam);
-            } catch (NumberFormatException e) {
-                categoryID = 0; // Nếu lỗi, đặt mặc định là 0
-            }
+            response.sendRedirect("login.jsp");
+            return;
         }
 
-        // Kiểm tra số trang, tránh lỗi khi parse số
-        int currentPage = 1;
+        String search = request.getParameter("search") != null ? request.getParameter("search") : "";
+        int userID = user.getUserID();
+
+        ReservationDBContext reservationDB = new ReservationDBContext();
+        Customer customer = reservationDB.getCustomerByID(userID);
+        session.setAttribute("customer", customer);
+
+        int categoryID = parseInteger(request.getParameter("category"), 0);
+        int currentPage = parseInteger(request.getParameter("page"), 1);
         int recordsPerPage = 6;
-        String pageParam = request.getParameter("page");
-        if (pageParam != null && !pageParam.trim().isEmpty()) {
-            try {
-                currentPage = Integer.parseInt(pageParam);
-            } catch (NumberFormatException e) {
-                currentPage = 1; // Nếu lỗi, đặt mặc định là trang 1
+
+       
+
+       
+        float totalPrice = 0;
+        for (Cart c : checkItem) { 
+            Service service = c.getService();
+            if (service != null) {
+                totalPrice += c.getService().getServicePrice() * (100 - c.getService().getSalePrice()) * 0.01 * c.getAmount();
             }
         }
 
-        // Lấy dữ liệu từ cookie giỏ hàng
-        List<Cart> carts = reservationDB.getCart2(search,userID,categoryID ,currentPage, recordsPerPage);
-        int total = 0;
-        for (Cart c : carts) {           
-                total += c.getService().getServicePrice() * (100 - c.getService().getSalePrice()) * 10 * c.getAmount();         
-        }
-        if (carts.isEmpty()) {
+        session.setAttribute("totalPrice", totalPrice);
+
+        if (checkItem.isEmpty()) {
             request.setAttribute("cartMessage", "Giỏ hàng của bạn đang trống.");
         }
-        int totalRecords = carts.size();
-        int totalPages = (int) Math.ceil(totalRecords * 1.0 / recordsPerPage);
 
-        // Gửi dữ liệu qua JSP
+        int totalRecords = checkItem.size();
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
         session.setAttribute("currentPage", currentPage);
         session.setAttribute("totalPages", totalPages);
-        session.setAttribute("total", total);
-        session.setAttribute("cartItems", carts);
-        session.setAttribute("customer", customer);
-        request.setAttribute("currentPage", currentPage);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("total", total);
-        request.setAttribute("cartItems", carts);
-        request.setAttribute("customer", customer);       
+        session.setAttribute("checkItem", checkItem);
+
         request.getRequestDispatcher("reservation.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Default behavior: Load service list
         HttpSession session = request.getSession();
         Map<String, String> errors = new HashMap<>();
+
+        Customer customer = (Customer) session.getAttribute("customer");
+        List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
+session.setAttribute("checkItem", checkItem);
+        if (checkItem == null || checkItem.isEmpty()) {
+            response.sendRedirect("cart.jsp");
+            return;
+        }
+
+        List<ReservationDetail> reservationDetails = new ArrayList<>();
+
+        // Convert Cart to ReservationDetail
+        for (Cart c : checkItem) {
+            ReservationDetail detail = new ReservationDetail();
+            detail.setService(c.getService());
+            detail.setAmount(c.getAmount());
+            detail.setNumberOfPerson(c.getGetNumberOfPerson());
+            reservationDetails.add(detail);
+        }
+
+        Reservation reservation = new Reservation();
+        reservation.setReservationDetails(reservationDetails);
+
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
-        String payment = request.getParameter("payment");
-        Customer customer = (Customer) session.getAttribute("customer");
-        List<ReservationDetail> cartItems = (List<ReservationDetail>) session.getAttribute("cartItems");
-        int total = (int) session.getAttribute("total");
-        int currentPage = (int) session.getAttribute("currentPage");
-        int totalPages = (int) session.getAttribute("totalPages");
-        
-        // Kiểm tra lỗi nhập liệu
-        if (name == null || name.length() < 6 || name.length() > 50) {
-            errors.put("name", "Họ và tên phải từ 6 đến 50 ký tự.");
+        int paymentMethod = parseInteger(request.getParameter("payment"), -1);
+
+        if (paymentMethod == -1) {
+            errors.put("payment", "Phương thức thanh toán không hợp lệ.");
         }
 
-        if (address == null || address.length() < 40 || address.length() > 200) {
-            errors.put("address", "Địa chỉ phải từ 40 đến 200 ký tự.");
-        }
+        reservation.setCustomerName(name);
+        reservation.setEmail(email);
+        reservation.setAddress(address);
+        reservation.setPhone(phone);
+        reservation.setUserID(customer.getCustomerID());
+        reservation.setPaymentMethod(paymentMethod);
 
-        String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
-        if (email == null || !email.matches(emailPattern)) {
-            errors.put("email", "Email không hợp lệ. Vui lòng nhập email đúng định dạng (ví dụ: example@email.com).");
-        }
+        CartDBContext cartDB = new CartDBContext();
+        int reservationID = cartDB.addReservation(reservation);
 
-        if (phone == null || !phone.matches("^0[3789][0-9]{8}$")) {
-            errors.put("phone", "Số điện thoại phải bắt đầu bằng 03, 07, 08 hoặc 09 và có tổng cộng 10 chữ số.");
-        }
-        if (payment == null) {
-            errors.put("payment", "Vui lòng chọn phương thức thanh toán.");
-        } else if ("0".equals(payment)) { // Nếu chọn thẻ tín dụng
-            String cardName = request.getParameter("cardName");
-            String cardNumber = request.getParameter("cardNumber");
-            String CVV = request.getParameter("CVV");
-            String expirationDate = request.getParameter("expirationDate");
-
-            if (cardName == null || cardName.trim().length() < 6) {
-                errors.put("cardName", "Tên chủ thẻ phải có ít nhất 6 ký tự.");
+        if (reservationID > 0) {
+            if (cartDB.hasExpiredServices(reservationID)) {
+                errors.put("expired", "Có dịch vụ trong giỏ hàng đã hết hạn.");
             }
 
-            if (cardNumber == null || !cardNumber.matches("\\d{13,19}")) {
-                errors.put("cardNumber", "Số thẻ phải có từ 13 đến 19 chữ số.");
-            }
+            if (errors.isEmpty()) {
+                float totalPrice = (Float) session.getAttribute("totalPrice");
+                String totalPriceStr = String.valueOf(totalPrice);
 
-            if (CVV == null || !CVV.matches("\\d{3,4}")) {
-                errors.put("CVV", "CVV phải có 3-4 chữ số.");
-            }
+                boolean success = cartDB.checkoutReservation(
+                    reservationID, totalPriceStr, name, phone, email, address
+                );
 
-            if (expirationDate == null || expirationDate.trim().isEmpty()) {
-                errors.put("expirationDate", "Vui lòng nhập ngày hết hạn.");
+                if (success) {
+                    session.removeAttribute("checkItem");
+                    session.removeAttribute("totalPrice");
+                    response.sendRedirect(request.getContextPath() + "/customer/shoppingCart");
+                    return;
+                } else {
+                    errors.put("checkout", "Thanh toán thất bại, vui lòng thử lại.");
+                }
             }
-            request.setAttribute("cardName", cardName);
-            request.setAttribute("cardNumber", cardNumber);
-            request.setAttribute("CVV", CVV);
-            request.setAttribute("expirationDate", expirationDate);
+        } else {
+            errors.put("reservation", "Không thể tạo đơn đặt chỗ.");
         }
-        if (!errors.isEmpty()) {         
-            request.setAttribute("currentPage", currentPage);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("total", total);
-            request.setAttribute("cartItems", cartItems);
-            request.setAttribute("errors", errors);
-            request.getRequestDispatcher("reservation.jsp").forward(request, response);
-            return;
-        }
-        session.removeAttribute("currentPage");
-        session.removeAttribute("totalPages");
-        session.removeAttribute("total");
-        session.removeAttribute("cartItems");
-        session.removeAttribute("customer");
-        request.setAttribute("payment", payment);
-        request.setAttribute("address", address);
-        request.setAttribute("email", email);
-        request.setAttribute("phone", phone);
-        response.setContentType("text/html;charset=UTF-8");
-        response.sendRedirect(request.getContextPath() + "/customer/reservation_complete");
 
+        request.setAttribute("errors", errors);
+        request.getRequestDispatcher("reservation.jsp").forward(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+    private int parseInteger(String value, int defaultValue) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }

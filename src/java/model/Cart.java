@@ -12,6 +12,15 @@ public class Cart {
     private int id;
    private boolean checkService;
    private int amount;
+   private int getNumberOfPerson;
+
+    public void setGetNumberOfPerson(int getNumberOfPerson) {
+        this.getNumberOfPerson = getNumberOfPerson;
+    }
+
+    public int getGetNumberOfPerson() {
+        return getNumberOfPerson;
+    }
    private Service service;
    private User user;
     public Cart() {

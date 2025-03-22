@@ -61,6 +61,10 @@ public class ReservationDetail {
     public void setNumberOfPerson(int numberOfPerson) {
         this.numberOfPerson = numberOfPerson;
     }
+public float getPrice() {
+  return service != null ? service.getServicePrice() * service.getSalePrice() * amount : 0;
+
+}
 
     /**
      *

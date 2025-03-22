@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Service" %>
@@ -141,7 +142,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="s" items="${cartItems}" varStatus="status">                      
+                        <c:forEach var="s" items="${checkItem}" varStatus="status">                      
                             <tr>
                                 <td>${status.index + 1}</td>
                                 <td>${s.service.serviceName}</td>
@@ -179,6 +180,13 @@
             </nav>
             <form action="reservation" method="POST" class="mt-4">
                 <div class="row g-3">
+                     <div class="col-md-6">
+                        <label for="email" class="form-label">Name:</label>
+                        <input type="name" name="name" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" value="${sessionScope.user.name}" >
+                        <div class="invalid-feedback">
+                            ${errors.email}
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email:</label>
                         <input type="email" name="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" value="${sessionScope.user.email}" >

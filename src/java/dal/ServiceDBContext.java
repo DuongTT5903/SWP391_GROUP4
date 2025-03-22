@@ -751,7 +751,29 @@ public int getTotalServicesForSearch(String search, int categoryID) {
         }
         
     }
+public Service getServiceById(int serviceId) {
+        Service service = null;
+        String sql = "SELECT * FROM Services WHERE ServiceID = ?";
 
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, serviceId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    service = new Service();
+                    service.setServiceID(rs.getInt("ServiceID"));
+                    service.setServiceName(rs.getString("ServiceName"));
+                    service.setServiceDetail(rs.getString("ServiceDetail"));
+                    service.setServicePrice(rs.getFloat("ServicePrice"));
+                    // Set other Service properties as needed
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error getting service", ex);
+        }
+        return service;
+    }
     /**
      *
      * @param args
