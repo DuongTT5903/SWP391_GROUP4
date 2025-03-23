@@ -165,25 +165,31 @@ public void deleteFeedback(int fid) {
     return feedback;
     }
     public void addFeedback(Feedback feedback) {
-        String sql = "INSERT INTO Feedbacks (FeedbackDetail, CustomerID, Rated, imglink, ServiceID, CreationDate, Status) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+    String sql = "INSERT INTO Feedbacks (FeedbackDetail, CustomerID, Rated, imglink, ServiceID, CreationDate, Status) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, feedback.getFeedbackDetail());
-            ps.setInt(2, feedback.getCustomerID());   // Hoặc feedback.getUser().getUserID()
-            ps.setInt(3, feedback.getRated());
-            ps.setString(4, feedback.getImgLink());
-            // Giả sử feedback.getServices() != null
-            ps.setInt(5, feedback.getServices().getServiceID());
-            // Lấy ngày hiện tại hoặc feedback.getCreationDate()
-            ps.setDate(6, new java.sql.Date(new Date().getTime()));
-            ps.setBoolean(7, true); // Status = true => feedback hiển thị, tuỳ logic
+        ps.setString(1, feedback.getFeedbackDetail());
+        ps.setInt(2, feedback.getCustomerID());   // Hoặc feedback.getUser().getUserID() nếu cần
+        ps.setInt(3, feedback.getRated());
+        ps.setString(4, feedback.getImgLink());
+        // Giả sử feedback.getServices() không null
+        ps.setInt(5, feedback.getServices().getServiceID());
+        
+        // Sử dụng ngày tạo có sẵn từ đối tượng feedback nếu không null, ngược lại lấy ngày hiện tại
+        java.sql.Date creationDate = (feedback.getCreationDate() != null)
+                ? new java.sql.Date(feedback.getCreationDate().getTime())
+                : new java.sql.Date(new Date().getTime());
+        ps.setDate(6, creationDate);
+        
+        // Sử dụng trạng thái đã có trong feedback
+        ps.setBoolean(7, feedback.isStatus());
 
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        ps.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
 
     // Lấy danh sách feedback cho 1 service
     public List<Feedback> getFeedbackByServiceID(int serviceID) {

@@ -120,7 +120,7 @@ public class FeedbackController extends HttpServlet {
 
         // Chuyển hướng sau khi gửi feedback
         // Có thể về trang chi tiết dịch vụ / trang cảm ơn
-        response.sendRedirect(request.getContextPath() + "/feedback-success.jsp");
+        response.sendRedirect(request.getContextPath() + "/homepage");
     }
 
     /**
