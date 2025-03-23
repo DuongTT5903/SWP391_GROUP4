@@ -121,8 +121,8 @@
         <servlet-class>controller.AdminDashboardController</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>Feedback</servlet-name>
-        <servlet-class>controller.Feedback</servlet-class>
+        <servlet-name>FeedbackController</servlet-name>
+        <servlet-class>controller.FeedbackController</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ManagerSliderListController</servlet-name>
@@ -297,7 +297,7 @@
         <url-pattern>/admin/dashboard</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>Feedback</servlet-name>
+        <servlet-name>FeedbackController</servlet-name>
         <url-pattern>/feedback</url-pattern>
     </servlet-mapping>
     <servlet-mapping>

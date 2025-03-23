@@ -140,6 +140,8 @@
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
                         <a href="customerDashboard.jsp">Go to Dashboard</a>
+                        <a href="${pageContext.request.contextPath}/feedback?servicesID=1">Go to Feedback test with serviceID=1</a>
+                        <!-- <//%= p.getId() %> -->
                         
 
                     </c:when>

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -162,5 +163,51 @@ public void deleteFeedback(int fid) {
         Logger.getLogger(FeedbackDBContext.class.getName()).log(Level.SEVERE, "Error fetching feedback by ID", ex);
     }
     return feedback;
+    }
+    public void addFeedback(Feedback feedback) {
+        String sql = "INSERT INTO Feedbacks (FeedbackDetail, CustomerID, Rated, imglink, ServiceID, CreationDate, Status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, feedback.getFeedbackDetail());
+            ps.setInt(2, feedback.getCustomerID());   // Hoặc feedback.getUser().getUserID()
+            ps.setInt(3, feedback.getRated());
+            ps.setString(4, feedback.getImgLink());
+            // Giả sử feedback.getServices() != null
+            ps.setInt(5, feedback.getServices().getServiceID());
+            // Lấy ngày hiện tại hoặc feedback.getCreationDate()
+            ps.setDate(6, new java.sql.Date(new Date().getTime()));
+            ps.setBoolean(7, true); // Status = true => feedback hiển thị, tuỳ logic
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Lấy danh sách feedback cho 1 service
+    public List<Feedback> getFeedbackByServiceID(int serviceID) {
+        List<Feedback> list = new ArrayList<>();
+        String sql = "SELECT * FROM Feedbacks WHERE ServiceID = ? AND Status = 1";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, serviceID);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Feedback f = new Feedback();
+                f.setId(rs.getInt("FeedbackID"));
+                f.setFeedbackDetail(rs.getString("FeedbackDetail"));
+                f.setCustomerID(rs.getInt("CustomerID"));
+                f.setRated(rs.getInt("Rated"));
+                f.setImgLink(rs.getString("imglink"));
+                // ...
+                // Tuỳ bạn có join sang Services, Users để lấy thêm thông tin
+                list.add(f);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }
-}
+
