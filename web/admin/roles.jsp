@@ -29,17 +29,26 @@
             background-color: #f8f9fa;
             border-bottom: 2px solid #ddd;
         }
+        .error {
+            color: red;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container mt-4">
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Quản lý Roles</h2>
             <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary">Quay lại</a>
         </div>
-        
+
+        <c:if test="${not empty error}">
+            <div class="error">${error}</div>
+        </c:if>
+
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm kiếm tên role..">
-        
+
         <div id="table-container">
             <table id="myTable" class="table">
                 <thead>
@@ -66,9 +75,9 @@
                                 </c:choose>
                             </td>
                             <td>
-                                <a href="editRole?id=${role.roleID}" class="btn btn-warning">Sửa</a>
-                                
-                                <form action="settingList" method="post" style="display:inline;">
+                                <a href="${pageContext.request.contextPath}/admin/editRole?id=${role.roleID}" class="btn btn-warning">Sửa</a>
+
+                                <form action="${pageContext.request.contextPath}/admin/settingList" method="post" style="display:inline;">
                                     <input type="hidden" name="roleID" value="${role.roleID}">
                                     <input type="hidden" name="currentStatus" value="${role.status.status}">
                                     <button type="submit" class="btn btn-info">
@@ -79,7 +88,7 @@
                                     </button>
                                 </form>
 
-                                <form action="deleteRole" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa role này?');">
+                                <form action="${pageContext.request.contextPath}/admin/deleteRole" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn xóa role này?');">
                                     <input type="hidden" name="roleID" value="${role.roleID}">
                                     <button type="submit" class="btn btn-danger">Xóa</button>
                                 </form>
@@ -89,21 +98,10 @@
                 </tbody>
             </table>
         </div>
-        
-        <button class="btn btn-success mt-3" onclick="showAddRoleForm()">Thêm role mới</button>
-        
-        <div id="addRoleForm" style="display: none;">
-            <h3>Thêm role mới</h3>
-            <form action="addRole" method="POST">
-                <div class="mb-3">
-                    <label for="roleName" class="form-label">Tên Role</label>
-                    <input type="text" class="form-control" id="roleName" name="roleName" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Thêm</button>
-            </form>
-        </div>
+
+        <a href="${pageContext.request.contextPath}/admin/addRole" class="btn btn-success mt-3">Thêm role mới</a>
     </div>
-    
+
     <script>
         function myFunction() {
             var input = document.getElementById("myInput");
@@ -117,10 +115,6 @@
                     tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
                 }
             }
-        }
-        function showAddRoleForm() {
-            var form = document.getElementById("addRoleForm");
-            form.style.display = form.style.display === "none" ? "block" : "none";
         }
     </script>
 </body>
