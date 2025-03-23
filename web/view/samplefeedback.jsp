@@ -6,45 +6,77 @@
     <head>
         <title>Feedback</title>
         <style>
-            /* Style cơ bản, tuỳ chỉnh thêm */
+            body {
+                font-family: Arial, sans-serif;
+            }
             .sidebar {
                 float: left;
-                width: 25%;
-                background: #f0f0f0;
+                width: 20%;
+                background-color: #f0f0f0;
+                padding: 10px;
             }
             .mainContent {
                 float: left;
-                width: 70%;
+                width: 75%;
                 margin-left: 5%;
             }
             label {
                 display: block;
                 margin-top: 10px;
             }
+            .serviceResult {
+                border: 1px solid #ccc;
+                padding: 8px;
+                margin: 5px 0;
+            }
+            .serviceResult a {
+                color: blue;
+            }
         </style>
     </head>
     <body>
+        <!-- Sidebar: chứa form search + categories -->
         <div class="sidebar">
             <h3>Search Service</h3>
-            <form action="<%= request.getContextPath()%>/search" method="get">
-                <input type="text" name="q" placeholder="Search..." />
+            <!-- Form tìm kiếm dịch vụ -->
+            <form action="<%= request.getContextPath()%>/samplesearchservice" method="get">
+                <input type="text" name="q" placeholder="Nhập tên dịch vụ..." 
+                       value="<%= request.getParameter("q") != null ? request.getParameter("q") : ""%>"/>
                 <button type="submit">Search</button>
             </form>
+
             <h4>Categories</h4>
             <ul>
                 <c:forEach var="cat" items="${categories}">
                     <li>${cat.categoryName}</li>
                 </c:forEach>
             </ul>
-            <!-- Thêm các link tĩnh, contact... -->
+            <!-- Bạn cũng có thể thêm các link tĩnh, contact... ở đây -->
         </div>
 
+        <!-- Main content: Hiển thị form Feedback + kết quả tìm kiếm (nếu có) -->
         <div class="mainContent">
             <h1>Give Feedback</h1>
 
-            <!-- Form gửi feedback -->
+            <!-- Nếu người dùng đã tìm kiếm và có danh sách service trả về trong 'services',
+                 ta hiển thị luôn ở đây (hoặc bạn có thể tạo trang riêng).
+                 Giả sử Controller trả về List<Service> trong request attribute tên "services". -->
+            <c:if test="${not empty services}">
+                <h2>Search Results</h2>
+                <c:forEach var="svc" items="${services}">
+                    <div class="serviceResult">
+                        <strong>${svc.serviceName}</strong><br>
+                        Giá: ${svc.servicePrice} <br>
+                        <a href="<%= request.getContextPath()%>/feedback?serviceID=${svc.serviceID}">
+                            Give Feedback
+                        </a>
+                    </div>
+                </c:forEach>
+            </c:if>
+
+            <!-- Form gửi feedback (như trước đây) -->
             <form action="<%= request.getContextPath()%>/feedback" method="post">
-                <!-- Nếu feedback cho 1 dịch vụ cụ thể, ta có trường ẩn -->
+                <!-- Kiểm tra nếu có service được chọn -->
                 <%
                     Service service = (Service) request.getAttribute("service");
                     if (service != null) {
@@ -55,7 +87,6 @@
                     }
                 %>
 
-                <!-- Thông tin user (nếu đăng nhập) -->
                 <%
                     User user = (User) request.getAttribute("user");
                     if (user != null) {
@@ -65,11 +96,10 @@
                 <p>Gender: <c:if test="<%= user.isGender()%>">Male</c:if><c:if test="<%= !user.isGender()%>">Female</c:if></p>
                 <p>Email: <%= user.getEmail()%></p>
                 <p>Mobile: <%= user.getPhone()%></p>
-                <!-- Ở đây, ta không cần input, vì user đã đăng nhập -->
                 <%
                 } else {
                 %>
-                <!-- Trường hợp user chưa đăng nhập, cho nhập contact info -->
+                <!-- Nếu user chưa đăng nhập, cho nhập thủ công -->
                 <label>Full Name:</label>
                 <input type="text" name="fullName" required />
 

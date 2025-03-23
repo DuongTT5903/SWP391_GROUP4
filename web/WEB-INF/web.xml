@@ -148,6 +148,10 @@
         <servlet-name>sampleFeedbackController</servlet-name>
         <servlet-class>controller.sampleFeedbackController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>sampleSearchServiceController</servlet-name>
+        <servlet-class>controller.sampleSearchServiceController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -327,5 +331,9 @@
     <servlet-mapping>
         <servlet-name>sampleFeedbackController</servlet-name>
         <url-pattern>/samplefeedback</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>sampleSearchServiceController</servlet-name>
+        <url-pattern>/samplesearchservice</url-pattern>
     </servlet-mapping>
 </web-app>
