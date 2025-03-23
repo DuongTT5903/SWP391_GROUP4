@@ -66,7 +66,6 @@
                         <tr>
                             <th>Service</th>
                             <th>Amount</th>
-                            <th>Number of Persons</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,7 +73,6 @@
                             <tr>
                                 <td><%= detail.getService().getServiceName() %></td>
                                 <td><%= detail.getAmount() %></td>
-                                <td><%= detail.getNumberOfPerson() %></td>
                             </tr>
                         <% } %>
                     </tbody>

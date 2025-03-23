@@ -47,64 +47,7 @@
     </style>
     <body >
         <div class="container">
-            <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
-                <div class="container-fluid">
-                    <c:choose>
-                        <c:when test="${sessionScope.roleID == '4'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>       
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '2'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '3'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '1'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:otherwise>
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
-                            </h3>
-                        </c:otherwise>
-                    </c:choose> 
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
-                                    </c:when>
-                                    <c:otherwise>
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
-                                    </c:otherwise>
-                                </c:choose>
-                            <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/reservation">Reservations</a></li>
-                                    </c:when>
-                                    <c:otherwise>
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
-                                    </c:otherwise>
-                                </c:choose>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-
+            <jsp:include page="./headerCustomer.jsp" />
             <form action="reservation" method="GET" class="row g-3">
                 <div class="row" style="margin-top: 50px">
                     <div class="col-md-4">
@@ -130,7 +73,7 @@
                 <p class="text-danger fw-bold">${cartMessage}</p>
             </c:if>
 
-            <c:if test="${not empty cartItems}">
+          <c:if test="${not empty cartItems}">
                 <table class="table table-bordered">
                     <thead class="bg-secondary">
                         <tr>
@@ -180,7 +123,7 @@
             </nav>
             <form action="reservation" method="POST" class="mt-4">
                 <div class="row g-3">
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         <label for="email" class="form-label">Name:</label>
                         <input type="name" name="name" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" value="${sessionScope.user.name}" >
                         <div class="invalid-feedback">
@@ -251,61 +194,8 @@
                 <div class="col-md-12 text-center mt-4">
                     <button type="submit" class="btn btn-success">Đặt lịch</button>
                 </div>                   
-            </form>
-
-            <div class="w3-container w3-black w3-padding-32" style="margin-top: 15px">
-                <h1>Subscribe</h1>
-                <p>To get special offers and VIP treatment:</p>
-                <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail" style="width:100%"></p>
-                <button type="button" class="w3-button w3-red w3-margin-bottom">Subscribe</button>
-            </div>
-            <footer class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">
-                <div class="w3-row-padding">
-                    <div class="w3-col s4">
-                        <h4>Contact</h4>
-                        <p>Questions? Go ahead.</p>
-                        <form action="/action_page.php" target="_blank">
-                            <p><input class="w3-input w3-border" type="text" placeholder="Name" name="Name" required></p>
-                            <p><input class="w3-input w3-border" type="text" placeholder="Email" name="Email" required></p>
-                            <p><input class="w3-input w3-border" type="text" placeholder="Subject" name="Subject" required></p>
-                            <p><input class="w3-input w3-border" type="text" placeholder="Message" name="Message" required></p>
-                            <button type="submit" class="w3-button w3-block w3-black">Send</button>
-                        </form>
-                    </div>
-
-                    <div class="w3-col s4">
-                        <h4>About</h4>
-                        <p><a href="#">About us</a></p>
-                        <p><a href="#">We're hiring</a></p>
-                        <p><a href="#">Support</a></p>
-                        <p><a href="#">Find store</a></p>
-                        <p><a href="#">Shipment</a></p>
-                        <p><a href="#">Payment</a></p>
-                        <p><a href="#">Gift card</a></p>
-                        <p><a href="#">Return</a></p>
-                        <p><a href="#">Help</a></p>
-                    </div>
-
-                    <div class="w3-col s4 w3-justify">
-                        <h4>Store</h4>
-                        <p><i class="fa fa-fw fa-map-marker"></i> Company Name</p>
-                        <p><i class="fa fa-fw fa-phone"></i> 0044123123</p>
-                        <p><i class="fa fa-fw fa-envelope"></i> ex@mail.com</p>
-                        <h4>We accept</h4>
-                        <p><i class="fa fa-fw fa-cc-amex"></i> Amex</p>
-                        <p><i class="fa fa-fw fa-credit-card"></i> Credit Card</p>
-                        <br>
-                        <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
-                        <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
-                        <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
-                        <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
-                        <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
-                        <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
-                    </div>
-                </div>
-            </footer>
-
-            <div class="w3-black w3-center w3-padding-24">Footer Contents Add later <a href="https://www.w3schools.com/w3css/default.asp" title="W3.CSS" target="_blank" class="w3-hover-opacity">CSS on W3</a></div>
+            </form>        
+            <jsp:include page="./footerCustomer.jsp" />
         </div>
         <script>
             function toggleCardDetails(show) {

@@ -152,6 +152,14 @@
         <servlet-name>sampleSearchServiceController</servlet-name>
         <servlet-class>controller.sampleSearchServiceController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MyReservationController</servlet-name>
+        <servlet-class>controller.MyReservationController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReservationInfoController</servlet-name>
+        <servlet-class>controller.ReservationInfoController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -335,5 +343,13 @@
     <servlet-mapping>
         <servlet-name>sampleSearchServiceController</servlet-name>
         <url-pattern>/samplesearchservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MyReservationController</servlet-name>
+        <url-pattern>/customer/myReservation</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReservationInfoController</servlet-name>
+        <url-pattern>/customer/reservationInfo</url-pattern>
     </servlet-mapping>
 </web-app>

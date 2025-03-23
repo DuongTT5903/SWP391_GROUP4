@@ -107,7 +107,7 @@
     </script>
     <body>
         <div class="container">
-               <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
+            <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
                 <div class="container-fluid">
                     <c:choose>
                         <c:when test="${sessionScope.roleID == '4'}">
@@ -143,12 +143,12 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                             <c:choose>
+                                <c:choose>
                                     <c:when test="${sessionScope.roleID == '4'}">
-                                     <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
                                     </c:when>
                                     <c:otherwise>
-                                     <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
                                     </c:otherwise>
                                 </c:choose>
                             <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
@@ -158,6 +158,14 @@
                                     </c:when>
                                     <c:otherwise>
                                     <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
+                                    </c:otherwise>
+                                </c:choose>
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">Reservations History</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations History</a></li>
                                     </c:otherwise>
                                 </c:choose>
                         </ul>
@@ -199,7 +207,7 @@
                                 <h3><b>${service.serviceName}</b></h3>
                             </a>
                             <p><img src="${service.imageURL}" alt="${service.serviceName}" class="service-image" style="color:inherit"></p>
-                            <c:choose> <c:when test="${service.servicePrice != service.servicePrice*(100-service.salePrice)/100}">
+                                <c:choose> <c:when test="${service.servicePrice != service.servicePrice*(100-service.salePrice)/100}">
                                     <p><span class="price">${service.servicePrice}00VNĐ</span>
                                     </c:when>
                                     <c:otherwise>
@@ -209,17 +217,17 @@
                             <div class="buttons">
                                 <!-- Add to Cart Form --> 
                                 <c:choose>
-                                <c:when test="${sessionScope.roleID == '4'}">
-                                  <form action="AddCart" method="POST" onsubmit="return showNotification();">
-                                    <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                    <button class="btn btn-success" type="submit">Thêm vào giỏ hàng</button>
-                                </form>  
-                                </c:when>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                        <form action="AddCart" method="POST" onsubmit="return showNotification();">
+                                            <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                            <button class="btn btn-success" type="submit">Thêm vào giỏ hàng</button>
+                                        </form>  
+                                    </c:when>
                                     <c:otherwise>
                                         <button class="btn btn-success"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;color: white">Thêm vào giỏ hàng</a></button><br>
                                     </c:otherwise>
                                 </c:choose>
-                                
+
                                 <!-- Feedback Button -->
                                 <button class="btn btn-outline-secondary" >Phản Hồi</button>
                             </div>
@@ -229,7 +237,7 @@
                 </div>
             </center>
             <!-- Phân trang -->
-             <nav class="mt-4">
+            <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
