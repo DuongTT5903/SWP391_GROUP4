@@ -144,6 +144,10 @@
         <servlet-name>ReservationDetailController</servlet-name>
         <servlet-class>controller.ReservationDetailController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>sampleFeedbackController</servlet-name>
+        <servlet-class>controller.sampleFeedbackController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -319,5 +323,9 @@
     <servlet-mapping>
         <servlet-name>ReservationDetailController</servlet-name>
         <url-pattern>/staff/reservationdetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>sampleFeedbackController</servlet-name>
+        <url-pattern>/samplefeedback</url-pattern>
     </servlet-mapping>
 </web-app>
