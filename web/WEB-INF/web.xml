@@ -161,6 +161,10 @@
         <servlet-name>ReservationInfoController</servlet-name>
         <servlet-class>controller.ReservationInfoController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MedicalExaminationController</servlet-name>
+        <servlet-class>controller.MedicalExaminationController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -328,9 +332,9 @@
     <servlet-mapping>
         <servlet-name>AdminSettingList</servlet-name>
         <url-pattern>/admin/settingList</url-pattern>
-        <url-pattern>/admin/addRole</url-pattern> <!-- Thêm ánh xạ cho /admin/addRole -->
-        <url-pattern>/admin/editRole</url-pattern> <!-- Thêm ánh xạ cho /admin/editRole -->
-        <url-pattern>/admin/deleteRole</url-pattern> <!-- Thêm ánh xạ cho /admin/deleteRole -->
+        <url-pattern>/admin/addRole</url-pattern>
+        <url-pattern>/admin/editRole</url-pattern>
+        <url-pattern>/admin/deleteRole</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ReservationListController</servlet-name>
@@ -355,5 +359,19 @@
     <servlet-mapping>
         <servlet-name>ReservationInfoController</servlet-name>
         <url-pattern>/customer/reservationInfo</url-pattern>
+    </servlet-mapping>
+    <servlet-class>controller.AdminSettingList</servlet-class>
+    <servlet-class>controller.AdminSettingList</servlet-class>
+    <servlet-mapping>
+        <servlet-name>MedicalExaminationController</servlet-name>
+        <url-pattern>/staff/examination/list</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicalExaminationController</servlet-name>
+        <url-pattern>/staff/examination/detail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicalExaminationController</servlet-name>
+        <url-pattern>/staff/examination/add</url-pattern>
     </servlet-mapping>
 </web-app>
