@@ -1,9 +1,13 @@
 package model;
 
+import java.util.List;
+
 /**
  * Represents a service with details, price, category, and author information.
  */
 public class Service {
+
+    public static List<Cart> getServiceID;
 
     private int serviceID;
     private String serviceName;

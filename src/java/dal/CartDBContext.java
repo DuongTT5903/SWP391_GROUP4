@@ -5,11 +5,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Cart;
+import model.Customer;
 import model.Reservation;
 import model.ReservationDetail;
 import model.Service;
 
 public class CartDBContext extends DBContext {
+public boolean removeCheckedItems(int userID, List<Cart> checkItem) {
+    // Step 1: Build the IN clause dynamically based on the size of checkItem
+    StringBuilder inClause = new StringBuilder();
+    for (int i = 0; i < checkItem.size(); i++) {
+        if (i > 0) {
+            inClause.append(", ");
+        }
+        inClause.append("?");
+    }
+    
+    // Step 2: Prepare the SQL query with the dynamic IN clause
+    String query = "DELETE FROM Carts WHERE userID = ? AND serviceID IN (" + inClause.toString() + ")";
+    
+    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        // Set the userID parameter
+        stmt.setInt(1, userID);
+
+        // Step 3: Set the serviceIDs dynamically into the PreparedStatement
+        for (int i = 0; i < checkItem.size(); i++) {
+            stmt.setInt(i + 2, checkItem.get(i).getService().getServiceID());  // Setting service IDs starting from index 2
+        }
+
+        // Step 4: Execute the update and check the result
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+
+
+
 
     // Thêm đặt chỗ mới
 public int addReservation(Reservation reservation) {
@@ -97,7 +132,7 @@ public int addReservation(Reservation reservation) {
     // Thanh toán đơn đặt chỗ
     public boolean checkoutReservation(int reservationID, String total, String name, String phone, String email, String address) {
 
-        String sql = "UPDATE Reservations SET CustomerName=?, Email=?, Address=?, Phone=?,  TotalPrice=?, Status=1 WHERE ReservationID=?";
+        String sql = "UPDATE Reservations SET CustomerName=?, Email=?, Address=?, Phone=?,  TotalPrice=?, Status=0 WHERE ReservationID=?";
 
         try (Connection conn = DBContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -116,18 +151,79 @@ public int addReservation(Reservation reservation) {
         }
         return false;
     }
-    public void addReservationDetail(ReservationDetail detail) {
-    try {
-        String sql = "INSERT INTO ReservationDetails (reservationID, serviceID, amount, numberOfPerson) VALUES (?, ?, ?, ?)";
-        PreparedStatement stm = connection.prepareStatement(sql);
-        stm.setInt(1, detail.getRevationID());
-        stm.setInt(2, detail.getService().getServiceID());
-        stm.setInt(3, detail.getAmount());
-        stm.setInt(4, detail.getNumberOfPerson());
-        stm.executeUpdate();
+public boolean addReservationDetail(ReservationDetail detail) {
+    try (Connection conn = getConnection()) {
+        String sql = "INSERT INTO ReservationDetails (reservationID, serviceID, amount) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, detail.getRevationID());
+            stmt.setInt(2, detail.getService().getServiceID());
+            stmt.setInt(3, detail.getAmount());
+           
+            
+            int rowsAffected = stmt.executeUpdate();
+            // If at least one row was affected, return true
+            return rowsAffected > 0;
+        }
     } catch (SQLException e) {
         e.printStackTrace();
+        return false;  // Return false if there was an exception
     }
 }
 
+
+    // Phương thức giả lập kết nối cơ sở dữ liệu (cần thay thế bằng phương thức thực tế của bạn)
+
+
+
+
+
+
+    public static void main(String[] args) {
+        // Create mock Cart data
+        List<Cart> checkItem = new ArrayList<>();
+        
+        // Mock Cart items
+        Service service1 = new Service(1, "Service 1", "", null, 100, 10, "", true, null);
+        Service service2 = new Service(2, "Service 2", "", null, 200, 20, "", true, null);
+        
+        // Mock Cart objects
+        Cart cart1 = new Cart(1, true, 2, service1, null); // 2 items of Service 1
+        Cart cart2 = new Cart(2, true, 1, service2, null); // 1 item of Service 2
+        
+        checkItem.add(cart1);
+        checkItem.add(cart2);
+        
+        // Print checkItem contents before removal
+        System.out.println("Before removal:");
+        for (Cart cart : checkItem) {
+            System.out.println("Service ID: " + cart.getService().getServiceID() + ", Amount: " + cart.getAmount());
+        }
+
+        // Simulate a userID for testing
+        int userID = 4;  // Assuming user ID is 4
+        
+        // Call the method to remove checked items
+        CartDBContext cartDB = new CartDBContext();
+        boolean result = cartDB.removeCheckedItems(userID, checkItem);
+
+        // Print result of removal
+        if (result) {
+            System.out.println("Checked items removed successfully.");
+        } else {
+            System.out.println("Failed to remove checked items.");
+        }
+
+        // Print checkItem contents after removal (if the list was updated properly)
+        System.out.println("After removal:");
+        for (Cart cart : checkItem) {
+            System.out.println("Service ID: " + cart.getService().getServiceID() + ", Amount: " + cart.getAmount());
+        }
+    }
+
+
+
+    private void closeConnection(Connection conn, PreparedStatement ps) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

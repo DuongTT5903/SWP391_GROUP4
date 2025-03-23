@@ -2,22 +2,22 @@ package controller;
 
 import dal.CartDBContext;
 import dal.ReservationDBContext;
-import java.io.IOException;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
 import model.Cart;
 import model.Customer;
 import model.Reservation;
 import model.ReservationDetail;
 import model.Service;
 import model.User;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ReservationController extends HttpServlet {
 
@@ -26,12 +26,18 @@ public class ReservationController extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
- List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
-session.setAttribute("checkItem", checkItem);
+        List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
+        
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;
         }
+
+        if (checkItem == null) {
+            checkItem = new ArrayList<>();
+        }
+
+        session.setAttribute("checkItem", checkItem);
 
         String search = request.getParameter("search") != null ? request.getParameter("search") : "";
         int userID = user.getUserID();
@@ -44,11 +50,8 @@ session.setAttribute("checkItem", checkItem);
         int currentPage = parseInteger(request.getParameter("page"), 1);
         int recordsPerPage = 6;
 
-       
-
-       
         float totalPrice = 0;
-        for (Cart c : checkItem) { 
+        for (Cart c : checkItem) {
             Service service = c.getService();
             if (service != null) {
                 totalPrice += c.getService().getServicePrice() * (100 - c.getService().getSalePrice()) * 0.01 * c.getAmount();
@@ -79,7 +82,7 @@ session.setAttribute("checkItem", checkItem);
 
         Customer customer = (Customer) session.getAttribute("customer");
         List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
-session.setAttribute("checkItem", checkItem);
+
         if (checkItem == null || checkItem.isEmpty()) {
             response.sendRedirect("cart.jsp");
             return;
@@ -87,12 +90,18 @@ session.setAttribute("checkItem", checkItem);
 
         List<ReservationDetail> reservationDetails = new ArrayList<>();
 
-        // Convert Cart to ReservationDetail
+        // Convert Cart to ReservationDetail and add to reservationDetails list
         for (Cart c : checkItem) {
             ReservationDetail detail = new ReservationDetail();
-            detail.setService(c.getService());
-            detail.setAmount(c.getAmount());
-            detail.setNumberOfPerson(c.getGetNumberOfPerson());
+
+            Service service = c.getService();
+            int amount = c.getAmount();
+        
+
+            detail.setService(service);
+            detail.setAmount(amount);
+            
+
             reservationDetails.add(detail);
         }
 
@@ -113,13 +122,19 @@ session.setAttribute("checkItem", checkItem);
         reservation.setEmail(email);
         reservation.setAddress(address);
         reservation.setPhone(phone);
-        reservation.setUserID(customer.getCustomerID());
+        reservation.setUserID(customer.getUser().getUserID());
         reservation.setPaymentMethod(paymentMethod);
 
         CartDBContext cartDB = new CartDBContext();
-        int reservationID = cartDB.addReservation(reservation);
+
+        int reservationID = cartDB.addReservation(reservation); // Insert Reservation
 
         if (reservationID > 0) {
+            for (ReservationDetail detail : reservationDetails) {
+                detail.setRevationID(reservationID); // Set the ReservationID for each detail
+                cartDB.addReservationDetail(detail); // Insert ReservationDetail
+            }
+
             if (cartDB.hasExpiredServices(reservationID)) {
                 errors.put("expired", "Có dịch vụ trong giỏ hàng đã hết hạn.");
             }
@@ -129,10 +144,16 @@ session.setAttribute("checkItem", checkItem);
                 String totalPriceStr = String.valueOf(totalPrice);
 
                 boolean success = cartDB.checkoutReservation(
-                    reservationID, totalPriceStr, name, phone, email, address
+                        reservationID, totalPriceStr, name, phone, email, address
                 );
 
+                for (ReservationDetail detail : reservationDetails) {
+                    detail.setRevationID(reservationID);
+                    cartDB.addReservationDetail(detail);
+                }
+
                 if (success) {
+                    cartDB.removeCheckedItems(customer.getUser().getUserID(), checkItem);
                     session.removeAttribute("checkItem");
                     session.removeAttribute("totalPrice");
                     response.sendRedirect(request.getContextPath() + "/customer/shoppingCart");
@@ -155,5 +176,9 @@ session.setAttribute("checkItem", checkItem);
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    public static void main(String[] args) {
+        // Main method to handle console interaction (if needed)
     }
 }

@@ -9,7 +9,7 @@ public class ReservationDetail {
     private int revationID;
     private Service service; // Associated service
     private int amount;
-    private int numberOfPerson;
+
 
     public ReservationDetail() {
     }
@@ -19,7 +19,7 @@ public class ReservationDetail {
         this.revationID = revationID;
         this.service = service;
         this.amount = amount;
-        this.numberOfPerson = numberOfPerson;
+      
     }
 
     public int getDetailID() {
@@ -54,13 +54,7 @@ public class ReservationDetail {
         this.amount = amount;
     }
 
-    public int getNumberOfPerson() {
-        return numberOfPerson;
-    }
-
-    public void setNumberOfPerson(int numberOfPerson) {
-        this.numberOfPerson = numberOfPerson;
-    }
+  
 public float getPrice() {
   return service != null ? service.getServicePrice() * service.getSalePrice() * amount : 0;
 

@@ -107,7 +107,7 @@ public class ReservationDBContext {
                 detail.setService(service);
 
                 detail.setAmount(rs.getInt("Amount"));
-                detail.setNumberOfPerson(rs.getInt("NumberOfPerson"));
+               
                 details.add(detail);
             }
         }
@@ -553,40 +553,59 @@ public Customer getCustomerByID(int ID) {
         return carts;
 
     }
-    public List<Cart> getCart1(String search, int userID, int categoryID, int page, int pageSize) {
-        List<Cart> carts = new ArrayList<>();
-        String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
-                + "FROM carts c "
-                + "JOIN services s ON c.serviceID = s.serviceID "
-                + "JOIN users u ON c.userID = u.userID "
-                + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) AND (c.userID = ?) "
-                + "AND (? = 0 OR s.categoryID = ?) AND  c.CheckService='1'  "
-                + "LIMIT ?, ?";
+public List<Cart> getCart1(String search, int userID, int categoryID, int page, int pageSize) {
+    List<Cart> carts = new ArrayList<>();
+    String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName, s.ServiceID, s.servicePrice, s.salePrice "
+               + "FROM carts c "
+               + "JOIN services s ON c.serviceID = s.serviceID "
+               + "JOIN users u ON c.userID = u.userID "
+               + "WHERE (COALESCE(?, '') = '' OR s.serviceName LIKE ?) AND (c.userID = ?) "
+               + "AND (? = 0 OR s.categoryID = ?) AND c.CheckService='1' "
+               + "LIMIT ?, ?";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, search.isEmpty() ? "" : search);
-            stmt.setString(2, search.isEmpty() ? "%" : "%" + search + "%");
-            stmt.setInt(3, userID);
-            stmt.setInt(4, categoryID);
-            stmt.setInt(5, categoryID);
-            stmt.setInt(6, (page - 1) * pageSize);
-            stmt.setInt(7, pageSize);
+    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Set the parameters for the PreparedStatement
+        stmt.setString(1, search == null || search.isEmpty() ? "" : search); // search parameter for service name
+        stmt.setString(2, search == null || search.isEmpty() ? "%" : "%" + search + "%"); // LIKE condition for search
+        stmt.setInt(3, userID); // userID filter
+        stmt.setInt(4, categoryID); // category filter (for filtering by category)
+        stmt.setInt(5, categoryID); // category filter
+        stmt.setInt(6, (page - 1) * pageSize); // offset for pagination
+        stmt.setInt(7, pageSize); // limit for pagination
 
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                int categoryID1 = rs.getObject("categoryID") != null ? rs.getInt("categoryID") : -1;
-                ServiceCategory category = new ServiceCategory(categoryID1, "", "");
-                User user = new User(rs.getInt("userID"), rs.getString("authorName"), true, "", "", "", "", "", "");
-                Service service = new Service(rs.getInt("serviceID"), rs.getString("serviceName"), "", category, rs.getInt("servicePrice"), rs.getInt("salePrice"), "", true, user);
-                Cart cart = new Cart(rs.getInt("ID"), rs.getBoolean("checkService"), rs.getInt("amount"), service, user);
-                carts.add(cart);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            // Extract data from ResultSet
+            int categoryID1 = rs.getObject("categoryID") != null ? rs.getInt("categoryID") : -1;
+            ServiceCategory category = new ServiceCategory(categoryID1, "", ""); // Assuming category data is simplified
+            
+            // Create a User object
+            User user = new User(rs.getInt("UserID"), rs.getString("authorName"), true, "", "", "", "", "", "");
+
+            // Create a Service object
+            Service service = new Service(
+                rs.getInt("ServiceID"),
+                rs.getString("serviceName"),
+                "", // Assuming some field is empty
+                category,
+                rs.getInt("servicePrice"),
+                rs.getInt("salePrice"),
+                "", // Assuming some field is empty
+                true, // Assuming the service is active
+                user // Link to the user who is associated with the service
+            );
+
+            // Create a Cart object and add it to the list
+            Cart cart = new Cart(rs.getInt("ID"), rs.getBoolean("checkService"), rs.getInt("amount"), service, user);
+            carts.add(cart);
         }
-        return carts;
-
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return carts;
+}
+
+
     public List<Cart> getCart2(String search, int userID, int categoryID, int page, int pageSize) {
         List<Cart> carts = new ArrayList<>();
         String sql = "SELECT c.*, s.categoryID, u.name AS authorName, s.serviceName,s.servicePrice,s.salePrice "
