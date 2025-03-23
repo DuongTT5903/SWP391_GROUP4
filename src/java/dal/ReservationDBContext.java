@@ -34,8 +34,9 @@ import model.User;
 public class ReservationDBContext {
     public int getCartCount(int userID) {
     int count = 0;
-    String sql = "SELECT COUNT(*) FROM Cart WHERE userID = ?";
-    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+    String sql = "SELECT COUNT(*) FROM Carts WHERE userID = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, userID);
         ResultSet rs = ps.executeQuery();
         if (rs.next()) {

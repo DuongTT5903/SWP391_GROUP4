@@ -161,24 +161,24 @@
                     </tbody>
                 </table>
             </c:if>
-            <p>Tổng Thanh Toán: ${total} VNĐ</p>
+            <p>Tổng Thanh Toán: ${total}00 VNĐ</p>
                <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <!-- Nút Trang Trước -->
                     <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage - 1}&search=${param.search}&category=${param.category}"><<</a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/customer/shoppingCart?page=${currentPage - 1}&search=${param.search}&category=${param.category}"><<</a>
                     </li>
 
                     <!-- Hiển thị các số trang -->
                     <c:forEach var="i" begin="1" end="${totalPages}">
                         <li class="page-item ${i == currentPage ? 'active' : ''}">
-                            <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
+                            <a class="page-link" href="${pageContext.request.contextPath}/customer/shoppingCart?page=${i}&search=${param.search}&category=${param.category}">${i}</a>
                         </li>
                     </c:forEach>
 
                     <!-- Nút Trang Sau -->
                     <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="${pageContext.request.contextPath}/serviceList?page=${currentPage + 1}&search=${param.search}&category=${param.category}">>></a>
+                        <a class="page-link" href="${pageContext.request.contextPath}/customer/shoppingCart?page=${currentPage + 1}&search=${param.search}&category=${param.category}">>></a>
                     </li>
                 </ul>
             </nav>
