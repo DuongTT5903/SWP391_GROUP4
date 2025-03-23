@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
-
 package controller;
 
 import dal.FeedbackDBContext;
@@ -19,66 +14,46 @@ import model.Feedback;
 import model.Service;
 import model.User;
 
-/**
- *
- * @author yugio
- */
 public class FeedbackController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // Xử lý cả GET và POST nếu cần
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+            /* Một trang hiển thị đơn giản nếu cần debug */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
             out.println("<title>Servlet Feedback</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet Feedback at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet Feedback at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    // Xử lý GET: Lấy thông tin của service nếu có, sau đó chuyển sang trang feedback.jsp
     @Override
-     protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Lấy serviceID từ tham số (nếu có)
         String serviceIDParam = request.getParameter("serviceID");
         if (serviceIDParam != null) {
             try {
                 int serviceID = Integer.parseInt(serviceIDParam);
-                // Lấy thông tin service để hiển thị tên dịch vụ cho người dùng
                 ServiceDBContext sdb = new ServiceDBContext();
                 Service service = sdb.getServiceByID(serviceID);
                 request.setAttribute("service", service);
             } catch (NumberFormatException e) {
-                // serviceID không hợp lệ => bỏ qua hoặc báo lỗi
+                // Nếu serviceID không hợp lệ, có thể thêm thông báo lỗi hoặc bỏ qua.
             }
         }
-        // Forward sang feedback.jsp
         request.getRequestDispatcher("/view/feedback.jsp").forward(request, response);
     }
 
-    // Xử lý khi người dùng submit form feedback
+    // Xử lý POST: Khi người dùng submit form feedback
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -89,47 +64,66 @@ public class FeedbackController extends HttpServlet {
         String ratedParam = request.getParameter("rated");
         String imgLink = request.getParameter("imgLink");
 
-        // Lấy user từ session
+        // Lấy thông tin user từ session (phải đảm bảo user đã đăng nhập)
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        int serviceID = 0;
-        int rated = 0;
+        // Kiểm tra các tham số bắt buộc
+        if (serviceIDParam == null || serviceIDParam.trim().isEmpty()
+                || ratedParam == null || ratedParam.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/error.jsp?error=Missing+parameters");
+            return;
+        }
+        int serviceID;
+        int rated;
         try {
             serviceID = Integer.parseInt(serviceIDParam);
-            rated = Integer.parseInt(ratedParam);
         } catch (NumberFormatException e) {
-            // Xử lý nếu parse lỗi
+            // Nếu serviceID không hợp lệ
+            response.sendRedirect(request.getContextPath() + "/error.jsp?error=Invalid+serviceID");
+            return;
         }
 
-        // Tạo đối tượng Feedback
+        try {
+            rated = Integer.parseInt(ratedParam);
+            // Kiểm tra giá trị rated có nằm trong khoảng 1-5 không
+            if (rated < 1 || rated > 5) {
+                response.sendRedirect(request.getContextPath() + "/error.jsp?error=Rating+must+be+between+1+and+5");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            // Nếu rated không hợp lệ
+            response.sendRedirect(request.getContextPath() + "/error.jsp?error=Invalid+rating");
+            return;
+        }
+
+        // Tạo đối tượng Feedback và thiết lập thông tin
         Feedback feedback = new Feedback();
         feedback.setFeedbackDetail(detail);
-        feedback.setCustomerID(user.getUserID()); // hoặc CustomerID tuỳ logic
+        feedback.setCustomerID(user.getUserID()); // Lấy mã người dùng từ session
         feedback.setRated(rated);
         feedback.setImgLink(imgLink);
-        Service s = new Service();
-        s.setServiceID(serviceID);
-        feedback.setServices(s);
+
+        // Tạo đối tượng Service chỉ với serviceID (các thông tin khác không cần thiết khi add feedback)
+        Service service = new Service();
+        service.setServiceID(serviceID);
+        feedback.setServices(service);
+
+        // Thiết lập ngày tạo là ngày hiện tại và trạng thái là true (đã duyệt hoặc hiển thị)
         feedback.setCreationDate(new Date());
         feedback.setStatus(true);
 
-        // Gọi DBContext để lưu
+        // Sử dụng FeedbackDBContext để thêm feedback vào database
         FeedbackDBContext fdb = new FeedbackDBContext();
         fdb.addFeedback(feedback);
 
-        // Chuyển hướng sau khi gửi feedback
-        // Có thể về trang chi tiết dịch vụ / trang cảm ơn
+        // Sau khi thêm thành công, chuyển hướng về trang chủ hoặc trang chi tiết dịch vụ.
+        // Ví dụ: chuyển về trang homepage.
         response.sendRedirect(request.getContextPath() + "/homepage");
     }
 
-    /**
-     * Returns a short description of the servlet.
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "FeedbackController cho phép người dùng thêm phản hồi mới.";
+    }
 }
