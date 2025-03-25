@@ -15,9 +15,27 @@ public class Reservation {
     private int status;
     private int paymentMethod;
     private float totalPrice;
+    private int acceptStatus;
+    private Date BookingDate;
     private List<ReservationDetail> details; // Danh sách chi tiết đặt chỗ
 
     public Reservation() {
+    }
+
+    public void setAcceptStatus(int acceptStatus) {
+        this.acceptStatus = acceptStatus;
+    }
+
+    public void setBookingDate(Date BookingDate) {
+        this.BookingDate = BookingDate;
+    }
+
+    public int getAcceptStatus() {
+        return acceptStatus;
+    }
+
+    public Date getBookingDate() {
+        return BookingDate;
     }
 
     public Reservation(int reservationID, String customerName, String email, String address, String phone, Date creationDate, int userID, int status, int paymentMethod, float totalPrice) {
