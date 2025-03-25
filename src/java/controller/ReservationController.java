@@ -27,7 +27,7 @@ public class ReservationController extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
         List<Cart> checkItem = (List<Cart>) session.getAttribute("checkItem");
-        
+
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -96,11 +96,9 @@ public class ReservationController extends HttpServlet {
 
             Service service = c.getService();
             int amount = c.getAmount();
-        
 
             detail.setService(service);
             detail.setAmount(amount);
-            
 
             reservationDetails.add(detail);
         }
@@ -156,7 +154,12 @@ public class ReservationController extends HttpServlet {
                     cartDB.removeCheckedItems(customer.getUser().getUserID(), checkItem);
                     session.removeAttribute("checkItem");
                     session.removeAttribute("totalPrice");
-                    response.sendRedirect(request.getContextPath() + "/customer/shoppingCart");
+                   
+                    session.setAttribute("reservationID", reservationID);
+                    session.setAttribute("totalPrice", totalPrice);
+
+                    // Chuyển hướng đến trang thanh toán
+                    response.sendRedirect(request.getContextPath() + "/payment");
                     return;
                 } else {
                     errors.put("checkout", "Thanh toán thất bại, vui lòng thử lại.");

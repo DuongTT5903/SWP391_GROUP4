@@ -148,6 +148,14 @@
         <servlet-name>MedicalExaminationController</servlet-name>
         <servlet-class>controller.MedicalExaminationController</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ajaxServlet</servlet-name>
+        <servlet-class>VNPAY.ajaxServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VNPayReturnController</servlet-name>
+        <servlet-class>controller.VNPayReturnController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>HomepageController</servlet-name>
         <url-pattern>/homepage</url-pattern>
@@ -315,7 +323,8 @@
     <servlet-mapping>
         <servlet-name>AdminSettingList</servlet-name>
         <url-pattern>/admin/settingList</url-pattern>
-    </servlet-mapping><servlet-mapping>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>AdminSettingList</servlet-name>
         <url-pattern>/admin/editRole</url-pattern>
     </servlet-mapping>
@@ -343,5 +352,12 @@
         <servlet-name>MedicalExaminationController</servlet-name>
         <url-pattern>/staff/examination/add</url-pattern>
     </servlet-mapping>
-    
+    <servlet-mapping>
+        <servlet-name>ajaxServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VNPayReturnController</servlet-name>
+        <url-pattern>/vnpay_return</url-pattern>
+    </servlet-mapping>
 </web-app>

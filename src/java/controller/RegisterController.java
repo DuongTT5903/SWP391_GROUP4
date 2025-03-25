@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import dal.UserDBContext;
+import model.Customer;
 import model.User;
 
 public class RegisterController extends HttpServlet {
@@ -34,6 +35,7 @@ public class RegisterController extends HttpServlet {
         String fullname = request.getParameter("fullname");
         String phone = request.getParameter("phone");
         String pass = request.getParameter("pass");
+        String address=request.getParameter("address");
 
         UserDBContext account = new UserDBContext();
 
@@ -77,7 +79,7 @@ public class RegisterController extends HttpServlet {
                 boolean genderBoolean = "1".equals(request.getParameter("gender"));
 
                 // Lưu thông tin người dùng với mật khẩu đã mã hóa
-                User newUser = new User(fullname, genderBoolean, email, user, hashedPassword, phone);
+                User newUser = new User(fullname, genderBoolean, email, user, hashedPassword, phone,address);
                 session.setAttribute("registeredUser", newUser);
 
                 response.sendRedirect(request.getContextPath() + "/verify");

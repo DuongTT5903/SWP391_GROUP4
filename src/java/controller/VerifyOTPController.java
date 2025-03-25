@@ -27,7 +27,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         HttpSession session = request.getSession();
         String generatedOTP = (String) session.getAttribute("otp");
         User registeredUser = (User) session.getAttribute("registeredUser");
-
+int roleID=4;
         if (enteredOTP != null && generatedOTP != null && enteredOTP.equals(generatedOTP)) {
             // Kiểm tra xem registeredUser có null không để tránh lỗi NullPointerException
             if (registeredUser != null) {
@@ -40,7 +40,10 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                     registeredUser.getEmail(),
                     registeredUser.getUsername(),
                     registeredUser.getPassword(),
-                    registeredUser.getPhone()   
+                    registeredUser.getPhone() ,
+                     roleID,
+                    registeredUser.getAddress()
+                        
                 );
 
                 // Xóa thông tin session sau khi đăng ký thành công

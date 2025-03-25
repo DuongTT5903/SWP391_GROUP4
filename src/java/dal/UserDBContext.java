@@ -143,23 +143,65 @@ public class UserDBContext {
      * @param pass
      * @param phone
      */
-    public void signup(String name, boolean gender, String email, String user, String pass, String phone) {
-        try {
-            Connection conn = new DBContext().getConnection();
-            String sql = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID) VALUES (?, ?, ?, ?, ?, ?, 4)";
+  public void signup(String name, boolean gender, String email, String user, String pass, String phone, int roleID, String address) {
+    Connection conn = null;
+    PreparedStatement psUser = null;
+    PreparedStatement psCustomer = null;
+    ResultSet rs = null;
 
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setBoolean(2, gender); // Chuyển đổi trực tiếp sang boolean
-            ps.setString(3, email);
-            ps.setString(4, user);
-            ps.setString(5, pass);
-            ps.setString(6, phone);
-            ps.executeUpdate();
-        } catch (Exception ex) {
-            ex.printStackTrace(System.out);
+    try {
+        conn = new DBContext().getConnection();
+        conn.setAutoCommit(false); // Bắt đầu transaction
+
+        // Câu lệnh chèn vào bảng Users
+        String sqlUser = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        psUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
+        psUser.setString(1, name);
+        psUser.setBoolean(2, gender);
+        psUser.setString(3, email);
+        psUser.setString(4, user);
+        psUser.setString(5, pass);
+        psUser.setString(6, phone);
+        psUser.setInt(7, roleID);
+        psUser.executeUpdate();
+
+        // Lấy UserID vừa chèn
+        rs = psUser.getGeneratedKeys();
+        int userID = 0;
+        if (rs.next()) {
+            userID = rs.getInt(1);
+        }
+
+        // Chỉ chèn vào bảng Customer nếu RoleID = 4 (Khách hàng)
+        if (roleID == 4) {
+            String sqlCustomer = "INSERT INTO Customer (UserID, Address) VALUES (?, ?)";
+            psCustomer = conn.prepareStatement(sqlCustomer);
+            psCustomer.setInt(1, userID);
+            psCustomer.setString(2, address);
+            psCustomer.executeUpdate();
+        }
+
+        conn.commit(); // Xác nhận transaction
+    } catch (Exception ex) {
+        if (conn != null) {
+            try {
+                conn.rollback(); // Hoàn tác nếu có lỗi
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        ex.printStackTrace(System.out);
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (psUser != null) psUser.close();
+            if (psCustomer != null) psCustomer.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
+}
 
     private static Connection connection = DBContext.getConnection();
 

@@ -12,6 +12,20 @@ import model.ReservationDetail;
 import model.Service;
 
 public class CartDBContext extends DBContext {
+    public boolean updateReservationStatus(int reservationID, int status) {
+    String sql = "UPDATE Reservations SET status = ? WHERE reservationID = ?";
+    try (Connection connection = getConnection();
+         PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, status);
+        statement.setInt(2, reservationID);
+        
+        int rowsAffected = statement.executeUpdate();
+        return rowsAffected > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 public boolean removeCheckedItems(int userID, List<Cart> checkItem) {
     // Step 1: Build the IN clause dynamically based on the size of checkItem
     StringBuilder inClause = new StringBuilder();

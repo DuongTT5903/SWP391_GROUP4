@@ -20,7 +20,18 @@ public class User {
     private String role;
     private String imageURL;
     private UserStatus status;
+    private Customer customer;
+     private String  address;
 
+
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
     // Default constructor
     /**
      *
@@ -70,16 +81,24 @@ public User(String name, boolean gender, String email, String username, String p
     this.imageURL = imageURL;
  
 }
-public User(String name, boolean gender, String email, String username, String password, String phone) {
+public User(String name, boolean gender, String email, String username, String password, String phone,String address) {
     this.name = name;
     this.gender = gender;
     this.email = email;
     this.username = username;
     this.password = password;
     this.phone = phone;
-
+  this.address = address;
  
 }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
     // Parameterized constructor
     /**
      *

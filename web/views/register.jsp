@@ -43,6 +43,10 @@
                                         <label class="mb-2 text-muted" for="user">Tên tài khoản</label>
                                         <input id="user" type="text" class="form-control" name="user" required>
                                     </div>
+                                     <div class="mb-3">
+                                        <label class="mb-2 text-muted" for="user">địa chỉ</label>
+                                        <input id="user" type="text" class="form-control" name="address" required>
+                                    </div>
                                     <div class="mb-3">
                                         <label class="mb-2 text-muted" for="pass">Mật khẩu</label>
                                         <input id="pass" type="password" class="form-control" name="pass" required>
