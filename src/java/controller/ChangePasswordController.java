@@ -91,6 +91,11 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         request.getRequestDispatcher("views/changepassword.jsp").forward(request, response);
         return;
     }
+    if (oldpass.contains(" ")|| newpass.contains(" ")) {
+                request.setAttribute("mess", "Tài khoản hoặc Mật khẩu không được chứa dấu cách");
+                request.getRequestDispatcher("views/changepassword.jsp").forward(request, response);
+        return;
+            }
 
     // Mã hóa mật khẩu mới trước khi lưu vào database
     String hashedNewPassword = hashPassword(newpass);

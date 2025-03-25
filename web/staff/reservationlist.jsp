@@ -25,8 +25,8 @@
                 <label for="status" class="form-label">Status:</label>
                 <select class="form-select" name="status" id="status">
                     <option value="">All</option>
-                    <option value="1" <%= "1".equals(request.getParameter("status")) ? "selected" : ""%>>Active</option>
-                    <option value="0" <%= "0".equals(request.getParameter("status")) ? "selected" : ""%>>Inactive</option>
+                    <option value="1" <%= "1".equals(request.getParameter("status")) ? "selected" : ""%>>Đã thanh toán</option>
+                    <option value="0" <%= "0".equals(request.getParameter("status")) ? "selected" : ""%>>Chưa thanh toán</option>
                 </select>
             </div>
 
@@ -71,10 +71,10 @@
                         <td><%= reservation.getEmail() %></td>
                         <td><%= reservation.getPhone() %></td>
                         <td><%= reservation.getCreationDate() %></td>
-                        <td>$<%= reservation.getTotalPrice() %></td>
+                        <td><%= reservation.getTotalPrice()*1000 %></td>
                         <td>
                             <span class="badge <%= reservation.getStatus() == 1 ? "bg-success" : "bg-secondary" %>">
-                                <%= reservation.getStatus() == 1 ? "Active" : "Inactive" %>
+                                <%= reservation.getStatus() == 1 ? "Đã thanh toán" : "Chưa thanh toán" %>
                             </span>
                         </td>
                         <!-- Thêm liên kết đến trang chi tiết -->
@@ -140,6 +140,11 @@
                 </ul>
             </nav>
         </div>
+                <div class="d-flex justify-content-center mt-3">
+                            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-outline-light px-4 py-2 fw-bold rounded-pill">
+                                ⬅ Back to Home
+                            </a>
+                        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>

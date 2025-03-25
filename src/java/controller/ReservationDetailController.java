@@ -1,46 +1,35 @@
 package controller;
 
 import dal.ReservationDBContext;
+import model.Reservation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
-import model.Reservation;
 import model.ReservationDetail;
 
 @WebServlet(name = "ReservationDetailController", urlPatterns = {"/staff/reservationdetail"})
 public class ReservationDetailController extends HttpServlet {
-    private final ReservationDBContext reservationDB = new ReservationDBContext();
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int reservationID = Integer.parseInt(request.getParameter("reservationID"));
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String reservationIDParam = request.getParameter("reservationID");
+        // Lấy thông tin đặt chỗ từ ReservationDBContext
+        ReservationDBContext dbContext = new ReservationDBContext();
+        Reservation reservation = dbContext.getReservationById(reservationID);
+        List<ReservationDetail> reservationDetails = dbContext.getReservationDetails(reservationID);
 
-        if (reservationIDParam == null || reservationIDParam.trim().isEmpty()) {
-            request.setAttribute("error", "ReservationID cannot be empty!");
-        } else {
-            try {
-                int reservationID = Integer.parseInt(reservationIDParam);
-                Reservation reservation = reservationDB.getReservationById(reservationID);
+        // Lấy vai trò của người dùng hiện tại từ session
+        HttpSession session = request.getSession();
+        String role = (String) session.getAttribute("role"); // Giả sử role được lưu trong session
 
-                if (reservation == null) {
-                    request.setAttribute("error", "Reservation not found!");
-                } else {
-                    // Lấy danh sách chi tiết đặt chỗ từ cơ sở dữ liệu
-                    List<ReservationDetail> details = reservationDB.getReservationDetails(reservationID);
-                    reservation.setDetails(details); // Gán danh sách chi tiết vào đối tượng Reservation
-
-                    request.setAttribute("reservation", reservation);
-                }
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Invalid ReservationID!");
-            }
-        }
-
+        // Đặt thông tin vào request để truyền sang JSP
+        request.setAttribute("reservation", reservation);
+        request.setAttribute("reservationDetails", reservationDetails);
+        request.setAttribute("userRole", role); // Truyền vai trò của người dùng sang JSP
         request.getRequestDispatcher("/staff/reservationdetail.jsp").forward(request, response);
     }
 }

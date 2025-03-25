@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Cart;
+import model.Children;
 import model.Customer;
 import model.Reservation;
 import model.ReservationDetail;
@@ -32,6 +33,87 @@ import model.User;
  * @author admin
  */
 public class ReservationDBContext {
+  public List<ReservationDetail> getReservationDetails(int reservationID) {
+    List<ReservationDetail> details = new ArrayList<>();
+    String query = "SELECT rd.*, s.ServiceName, s.ImageURL, s.ServicePrice, s.SalePrice, " +
+                   "sc.CategoryID, sc.CategoryName " + // Lấy thông tin từ bảng ServiceCategory
+                   "FROM ReservationDetails rd " +
+                   "JOIN Services s ON rd.ServiceID = s.ServiceID " +
+                   "JOIN ServiceCategories sc ON s.CategoryID = sc.CategoryID " + // Join với bảng ServiceCategory
+                   "WHERE rd.ReservationID = ?";
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement ps = conn.prepareStatement(query)) {
+        ps.setInt(1, reservationID);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            ReservationDetail detail = new ReservationDetail();
+            detail.setDetailID(rs.getInt("DetailID"));
+            detail.setRevationID(rs.getInt("ReservationID"));
+            detail.setAmount(rs.getInt("Amount"));
+
+            // Lấy thông tin dịch vụ từ bảng Services
+            Service service = new Service();
+            service.setServiceID(rs.getInt("ServiceID"));
+            service.setServiceName(rs.getString("ServiceName"));
+            service.setImageURL(rs.getString("ImageURL"));
+            service.setServicePrice(rs.getFloat("ServicePrice"));
+            service.setSalePrice(rs.getFloat("SalePrice"));
+
+            // Lấy thông tin danh mục dịch vụ từ bảng ServiceCategories
+            ServiceCategory category = new ServiceCategory();
+            category.setCategoryID(rs.getInt("CategoryID"));
+            category.setCategoryName(rs.getString("CategoryName"));
+
+            service.setCategory(category); // Gán đối tượng ServiceCategory vào Service
+            detail.setService(service); // Gán đối tượng Service vào ReservationDetail
+            details.add(detail);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return details;
+}
+
+     public boolean updateReservationStatus(int reservationId, String status) {
+        String sql = "UPDATE Reservations SET status = ? WHERE reservationId = ?";
+        try (Connection conn = DBContext.getConnection(); // Kết nối đến cơ sở dữ liệu
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Thiết lập các tham số cho câu lệnh SQL
+            stmt.setString(1, status);
+            stmt.setInt(2, reservationId);
+
+            // Thực thi câu lệnh UPDATE
+            int rowsAffected = stmt.executeUpdate();
+
+            // Trả về true nếu có ít nhất một hàng được cập nhật
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Xử lý lỗi (có thể ghi log hoặc ném ngoại lệ tùy thuộc vào yêu cầu)
+            return false;
+        }
+    }
+     public boolean assignReservationToStaff(int reservationId, int assignedStaffId) {
+        String sql = "UPDATE Reservations SET assignedStaffId = ? WHERE reservationId = ?";
+        try (Connection conn = DBContext.getConnection(); // Kết nối đến cơ sở dữ liệu
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Thiết lập các tham số cho câu lệnh SQL
+            stmt.setInt(1, assignedStaffId);
+            stmt.setInt(2, reservationId);
+
+            // Thực thi câu lệnh UPDATE
+            int rowsAffected = stmt.executeUpdate();
+
+            // Trả về true nếu có ít nhất một hàng được cập nhật
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Xử lý lỗi (có thể ghi log hoặc ném ngoại lệ tùy thuộc vào yêu cầu)
+            return false;
+        }
+    }
     public int getCartCount(int userID) {
     int count = 0;
     String sql = "SELECT COUNT(*) FROM Carts WHERE userID = ?";
@@ -81,43 +163,6 @@ public class ReservationDBContext {
     }
 
     return reservation;
-}
-    public List<ReservationDetail> getReservationDetails(int reservationID) {
-    List<ReservationDetail> details = new ArrayList<>();
-    String sql = "SELECT rd.DetailID, rd.ServiceID, s.ServiceName, s.Category, s.Thumbnail, rd.Amount, rd.NumberOfPerson "
-               + "FROM ReservationDetails rd "
-               + "JOIN Services s ON rd.ServiceID = s.ServiceID "
-               + "WHERE rd.ReservationID = ?";
-
-    try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-        pstmt.setInt(1, reservationID);
-
-        try (ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                ReservationDetail detail = new ReservationDetail();
-                detail.setDetailID(rs.getInt("DetailID"));
-                detail.setRevationID(reservationID);
-
-                // Tạo đối tượng Service
-                Service service = new Service();
-                service.setServiceID(rs.getInt("ServiceID"));
-                service.setServiceName(rs.getString("ServiceName"));
-               
-                detail.setService(service);
-
-                detail.setAmount(rs.getInt("Amount"));
-               
-                details.add(detail);
-            }
-        }
-
-    } catch (SQLException e) {
-        System.err.println("Error fetching reservation details: " + e.getMessage());
-    }
-
-    return details;
 }
     public List<Reservation> getReservations(Integer status, String fromDate, String toDate, Integer staffId,
                                          String searchQuery, String sortBy, int page, int pageSize) {

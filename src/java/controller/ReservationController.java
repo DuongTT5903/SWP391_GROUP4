@@ -145,11 +145,7 @@ public class ReservationController extends HttpServlet {
                         reservationID, totalPriceStr, name, phone, email, address
                 );
 
-                for (ReservationDetail detail : reservationDetails) {
-                    detail.setRevationID(reservationID);
-                    cartDB.addReservationDetail(detail);
-                }
-
+                
                 if (success) {
                     cartDB.removeCheckedItems(customer.getUser().getUserID(), checkItem);
                     session.removeAttribute("checkItem");
