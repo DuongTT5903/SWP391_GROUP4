@@ -43,6 +43,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 (fromDate != null && !fromDate.isEmpty()) ? fromDate : null, // Bỏ qua nếu fromDate rỗng
                 (toDate != null && !toDate.isEmpty()) ? toDate : null, // Bỏ qua nếu toDate rỗng
                 null, // staffId (nếu có)
+                null,
                 (search != null && !search.isEmpty()) ? search : null, // Bỏ qua nếu search rỗng
                 sortBy,
                 page,
@@ -54,7 +55,8 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 (status != null && !status.isEmpty()) ? Integer.parseInt(status) : null,
                 (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
                 (toDate != null && !toDate.isEmpty()) ? toDate : null,
-                null, // staffId (nếu có)
+                null,
+                null,// staffId (nếu có)
                 (search != null && !search.isEmpty()) ? search : null
         );
         int totalPages = (int) Math.ceil((double) totalReservations / pageSize);

@@ -148,6 +148,7 @@ public class ReservationDBContext {
                 reservation.setPhone(rs.getString("phone"));
                 reservation.setAddress(rs.getString("address"));
                 reservation.setCreationDate(rs.getDate("creationDate"));
+                reservation.setBookingDate(rs.getDate("bookingDate"));
                 reservation.setStatus(rs.getInt("status"));
                 reservation.setTotalPrice(rs.getFloat("totalPrice"));
               
@@ -164,7 +165,8 @@ public class ReservationDBContext {
 
     return reservation;
 }
-    public List<Reservation> getReservations(Integer status, String fromDate, String toDate, Integer staffId,
+  
+      public List<Reservation> getReservations(Integer status, String fromDate, String toDate, Integer staffId,Integer userId,
                                          String searchQuery, String sortBy, int page, int pageSize) {
     List<Reservation> reservations = new ArrayList<>();
     String sql = "SELECT * FROM Reservations WHERE 1=1";
@@ -181,6 +183,9 @@ public class ReservationDBContext {
     }
     if (staffId != null) {
         sql += " AND staffID = ?";
+    }
+     if (userId != null) {
+        sql += " AND userID = ?";
     }
     if (searchQuery != null && !searchQuery.isEmpty()) {
         sql += " AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)";
@@ -212,6 +217,9 @@ public class ReservationDBContext {
         if (staffId != null) {
             pstmt.setInt(paramIndex++, staffId);
         }
+         if (userId != null) {
+            pstmt.setInt(paramIndex++, userId);
+        }
         if (searchQuery != null && !searchQuery.isEmpty()) {
             String searchPattern = "%" + searchQuery + "%";
             pstmt.setString(paramIndex++, searchPattern);
@@ -233,13 +241,9 @@ public class ReservationDBContext {
                 reservation.setPhone(rs.getString("phone"));
                 reservation.setAddress(rs.getString("address"));
                 reservation.setCreationDate(rs.getDate("creationDate"));
+                reservation.setBookingDate(rs.getDate("bookingDate"));
                 reservation.setStatus(rs.getInt("status"));
                 reservation.setTotalPrice(rs.getFloat("totalPrice"));
-
-                // Bỏ phần chi tiết (ReservationDetail)
-                // List<ReservationDetail> details = getReservationDetails(reservation.getReservationID());
-                // reservation.setDetails(details);
-
                 reservations.add(reservation);
             }
         }
@@ -253,8 +257,8 @@ public class ReservationDBContext {
 
     return reservations;
 }
-    
-public int countReservations(Integer status, String fromDate, String toDate, Integer staffId, String searchQuery) {
+
+public int countReservations(Integer status, String fromDate, String toDate, Integer staffId,Integer userId, String searchQuery) {
     String sql = "SELECT COUNT(*) AS total FROM Reservations WHERE 1=1";
 
     // Thêm điều kiện lọc vào câu lệnh SQL
@@ -269,6 +273,9 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
     }
     if (staffId != null) {
         sql += " AND staffID = ?";
+    }
+    if (userId != null) {
+        sql += " AND userID = ?";
     }
     if (searchQuery != null && !searchQuery.isEmpty()) {
         sql += " AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)";
@@ -292,6 +299,9 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
         if (staffId != null) {
             pstmt.setInt(paramIndex++, staffId);
         }
+        if (userId != null) {
+            pstmt.setInt(paramIndex++, userId);
+        }
         if (searchQuery != null && !searchQuery.isEmpty()) {
             String searchPattern = "%" + searchQuery + "%";
             pstmt.setString(paramIndex++, searchPattern);
@@ -312,7 +322,6 @@ public int countReservations(Integer status, String fromDate, String toDate, Int
 
     return 0; // Trả về 0 nếu có lỗi
 }
-
     public int ReservationID() {
         String sql = "SELECT COUNT(*)"
                 + "FROM Reservations;";

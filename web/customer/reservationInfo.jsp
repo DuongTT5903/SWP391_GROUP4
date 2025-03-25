@@ -4,6 +4,11 @@
 <%@ page import="model.Service" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@page import="model.Reservation, model.ReservationDetail, java.util.List" %>
+<%
+    Reservation reservation = (Reservation) request.getAttribute("reservation");
+    List<ReservationDetail> reservationDetails = (List<ReservationDetail>) request.getAttribute("reservationDetails");
+    String userRole = (String) request.getAttribute("userRole"); // Lấy vai trò của người dùng
+%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -49,59 +54,73 @@
     <body>
         <div class="container">
             <jsp:include page="./headerCustomer.jsp" />
-            <div class="reservation-detail">
-                <h2 class="text-center mb-4">Reservation Information</h2>
+            <h1 class="mb-4 text-center">Reservation Information</h1>
+            <div class="card mb-4">
+                <div class="card-header">Basic Reservation Information</div>
+                <div class="card-body">                
+                    <p><strong>Customer Name:</strong> <%= reservation.getCustomerName()%></p>
+                    <p><strong>Email:</strong> <%= reservation.getEmail()%></p>
+                    <p><strong>Phone:</strong> <%= reservation.getPhone()%></p>
+                    <p><strong>Address:</strong> <%= reservation.getAddress()%></p>
+                    <p><strong>Creation Date:</strong> <%= reservation.getCreationDate()%></p>
+                    <p><strong>Booking Date:</strong> <%= reservation.getBookingDate()%></p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge <%= reservation.getStatus() == 1 ? "bg-success" : "bg-secondary"%>">
+                            <%= reservation.getStatus() == 1 ? "Payment done" : "Not payment"%>
+                        </span>
+                    </p>
+                    <p><strong>Accept Status:</strong> 
+                        <span class="badge <%= reservation.getAcceptStatus() == 1 ? "bg-success" : "bg-secondary"%>">
+                            <%= reservation.getAcceptStatus() == 1 ? "Payment done" : "Not payment"%>
+                        </span>
+                    </p>                  
+                </div>
+            </div>
 
-                <!-- Hiển thị thông báo lỗi nếu có -->
-                <% if (request.getAttribute("error") != null) { %>
-                <p class="error text-center">${error}</p>
-                <% } %>
-
-                <!-- Hiển thị chi tiết đặt chỗ nếu có -->
-                <% Reservation reservation = (Reservation) request.getAttribute("reservation"); %>
-                <% if (reservation != null) {%>
-                <p><strong>Reservation ID:</strong> <%= reservation.getReservationID()%></p>
-                <p><strong>Customer Name:</strong> <%= reservation.getCustomerName()%></p>
-                <p><strong>Email:</strong> <%= reservation.getEmail()%></p>
-                <p><strong>Phone:</strong> <%= reservation.getPhone()%></p>
-                <p><strong>Creation Date:</strong> <%= reservation.getCreationDate()%></p>
-                <p><strong>Total Price:</strong> $<%= reservation.getTotalPrice()%></p>
-                <p><strong>Status:</strong> 
-                    <span class="badge <%= reservation.getStatus() == 1 ? "bg-success" : "bg-secondary"%>">
-                        <%= reservation.getStatus() == 1 ? "Active" : "Inactive"%>
-                    </span>
-                </p>
-
-                <!-- Hiển thị danh sách chi tiết đặt chỗ (nếu có) -->
-                <% List<ReservationDetail> details = reservation.getDetails(); %>
-                <% if (details != null && !details.isEmpty()) { %>
-                <h4 class="mt-4">Reservation Details</h4>
-                <table class="table table-bordered table-hover text-center">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Service</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (ReservationDetail detail : details) {%>
-                        <tr>
-                            <td><%= detail.getService().getServiceName()%></td>
-                            <td><%= detail.getAmount()%></td>
-                        </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-                <% } else { %>
-                <p class="text-center">No details found for this reservation.</p>
-                <% } %>
-                <% } else { %>
-                <p class="text-center">No reservation found.</p>
-                <% }%>
-
-                <!-- Nút quay lại danh sách đặt chỗ -->
-                <div class="text-center mt-4">
-                    <a href="${pageContext.request.contextPath}/customer/myReservation" class="btn btn-primary">Back to Reservation History</a>
+            <!-- Danh sách dịch vụ đã đặt -->
+            <div class="card mb-4">
+                <div class="card-header">Reserved Services</div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Unit Price</th>
+                                <th>Sale Price</th>
+                                <th>Number of Persons</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                double totalAmount = 0; // Khởi tạo biến tổng
+                                for (ReservationDetail detail : reservationDetails) {
+                                    double servicePrice = detail.getService().getServicePrice();
+                                    double salePrice = detail.getService().getSalePrice();
+                                    int amount = detail.getAmount();
+                                    double totalCost = servicePrice * amount - (servicePrice * amount * salePrice / 100);
+                                    totalAmount += totalCost; // Cộng dồn vào tổng
+%>
+                            <tr>
+                                <td><img src="<%= detail.getService().getImageURL()%>" alt="Thumbnail" width="50"></td>
+                                <td><%= detail.getService().getServiceName()%></td>
+                                <td><%= detail.getService().getCategory().getCategoryName()%></td>
+                                <td><%= servicePrice * 1000%> VNĐ</td>
+                                <td><%= salePrice%>%</td>
+                                <td><%= amount%></td>
+                                <td><%= totalCost * 1000%> VNĐ</td>
+                            </tr>
+                            <% }%>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-end"><strong>Total:</strong></td>
+                                <td><%= totalAmount * 1000%></td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 

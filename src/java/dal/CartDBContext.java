@@ -1,5 +1,6 @@
 package dal;
 
+import static dal.DBContext.getConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,103 +13,91 @@ import model.ReservationDetail;
 import model.Service;
 
 public class CartDBContext extends DBContext {
+
     public boolean updateReservationStatus(int reservationID, int status) {
-    String sql = "UPDATE Reservations SET status = ? WHERE reservationID = ?";
-    try (Connection connection = getConnection();
-         PreparedStatement statement = connection.prepareStatement(sql)) {
-        statement.setInt(1, status);
-        statement.setInt(2, reservationID);
-        
-        int rowsAffected = statement.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
-public boolean removeCheckedItems(int userID, List<Cart> checkItem) {
-    // Step 1: Build the IN clause dynamically based on the size of checkItem
-    StringBuilder inClause = new StringBuilder();
-    for (int i = 0; i < checkItem.size(); i++) {
-        if (i > 0) {
-            inClause.append(", ");
-        }
-        inClause.append("?");
-    }
-    
-    // Step 2: Prepare the SQL query with the dynamic IN clause
-    String query = "DELETE FROM Carts WHERE userID = ? AND serviceID IN (" + inClause.toString() + ")";
-    
-    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-        // Set the userID parameter
-        stmt.setInt(1, userID);
+        String sql = "UPDATE Reservations SET status = ? WHERE reservationID = ?";
+        try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, status);
+            statement.setInt(2, reservationID);
 
-        // Step 3: Set the serviceIDs dynamically into the PreparedStatement
+            int rowsAffected = statement.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean removeCheckedItems(int userID, List<Cart> checkItem) {
+        // Step 1: Build the IN clause dynamically based on the size of checkItem
+        StringBuilder inClause = new StringBuilder();
         for (int i = 0; i < checkItem.size(); i++) {
-            stmt.setInt(i + 2, checkItem.get(i).getService().getServiceID());  // Setting service IDs starting from index 2
+            if (i > 0) {
+                inClause.append(", ");
+            }
+            inClause.append("?");
         }
 
-        // Step 4: Execute the update and check the result
-        int rowsAffected = stmt.executeUpdate();
-        return rowsAffected > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+        // Step 2: Prepare the SQL query with the dynamic IN clause
+        String query = "DELETE FROM Carts WHERE userID = ? AND serviceID IN (" + inClause.toString() + ")";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the userID parameter
+            stmt.setInt(1, userID);
+
+            // Step 3: Set the serviceIDs dynamically into the PreparedStatement
+            for (int i = 0; i < checkItem.size(); i++) {
+                stmt.setInt(i + 2, checkItem.get(i).getService().getServiceID());  // Setting service IDs starting from index 2
+            }
+
+            // Step 4: Execute the update and check the result
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
-
-
-
 
     // Thêm đặt chỗ mới
-public int addReservation(Reservation reservation) {
-    String sql = "INSERT INTO Reservations (CustomerName, Email, Address, Phone, CreationDate, UserID, Status, PaymentMethod, TotalPrice) " +
-                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public int addReservation(Reservation reservation) {
+        String sql = "INSERT INTO Reservations (CustomerName, Email, Address, Phone, CreationDate, UserID, Status, PaymentMethod, TotalPrice, BookingDate) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        stmt.setString(1, reservation.getCustomerName());
-        stmt.setString(2, reservation.getEmail());
-        stmt.setString(3, reservation.getAddress());
-        stmt.setString(4, reservation.getPhone());
-        stmt.setDate(5, new java.sql.Date(System.currentTimeMillis())); // Chuyển thành `java.sql.Date`
-
-        if (reservation.getUserID() == 0) {
-            stmt.setNull(6, Types.INTEGER);
-        } else {
-            stmt.setInt(6, reservation.getUserID());
-        }
-
-        stmt.setInt(7, 0);  // Mặc định chưa thanh toán
-        stmt.setInt(8, reservation.getPaymentMethod());
-
-    stmt.setDouble(9, reservation.getTotalPrice());
-
-
-
-        stmt.executeUpdate();
-
-        try (ResultSet rs = stmt.getGeneratedKeys()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+            stmt.setString(1, reservation.getCustomerName());
+            stmt.setString(2, reservation.getEmail());
+            stmt.setString(3, reservation.getAddress());
+            stmt.setString(4, reservation.getPhone());
+            stmt.setDate(5, new java.sql.Date(System.currentTimeMillis())); // Chuyển thành `java.sql.Date`
+            if (reservation.getUserID() == 0) {
+                stmt.setNull(6, Types.INTEGER);
+            } else {
+                stmt.setInt(6, reservation.getUserID());
             }
+            stmt.setInt(7, 0);  // Mặc định chưa thanh toán
+            stmt.setInt(8, reservation.getPaymentMethod());
+            stmt.setDouble(9, reservation.getTotalPrice());
+            stmt.setDate(10, new java.sql.Date(reservation.getBookingDate().getTime()));
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(CartDBContext.class.getName()).log(Level.SEVERE, "Error adding reservation", ex);
         }
-    } catch (SQLException ex) {
-        Logger.getLogger(CartDBContext.class.getName()).log(Level.SEVERE, "Error adding reservation", ex);
+        return -1;
     }
-    return -1;
-}
-
-
-
 
     // Lấy ID đơn đặt chỗ mới nhất của người dùng
     public int getLatestReservationID(int userID) {
         String sql = "SELECT ReservationID FROM Reservations WHERE UserID = ? ORDER BY CreationDate DESC LIMIT 1";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, userID);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -124,12 +113,11 @@ public int addReservation(Reservation reservation) {
 
     // Kiểm tra xem có dịch vụ nào hết hạn không
     public boolean hasExpiredServices(int reservationID) {
-        String sql = "SELECT COUNT(*) FROM ReservationDetails rd " +
-                     "JOIN Services s ON rd.ServiceID = s.ServiceID " +
-                     "WHERE rd.ReservationID = ? AND s.ExpiryDate < NOW()";
+        String sql = "SELECT COUNT(*) FROM ReservationDetails rd "
+                + "JOIN Services s ON rd.ServiceID = s.ServiceID "
+                + "WHERE rd.ReservationID = ? AND s.ExpiryDate < NOW()";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, reservationID);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -148,8 +136,7 @@ public int addReservation(Reservation reservation) {
 
         String sql = "UPDATE Reservations SET CustomerName=?, Email=?, Address=?, Phone=?,  TotalPrice=?, Status=0 WHERE ReservationID=?";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, name);
             stmt.setString(2, email);
@@ -165,49 +152,42 @@ public int addReservation(Reservation reservation) {
         }
         return false;
     }
-public boolean addReservationDetail(ReservationDetail detail) {
-    try (Connection conn = getConnection()) {
-        String sql = "INSERT INTO ReservationDetails (reservationID, serviceID, amount) VALUES (?, ?, ?)";
-        
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, detail.getRevationID());
-            stmt.setInt(2, detail.getService().getServiceID());
-            stmt.setInt(3, detail.getAmount());
-           
-            
-            int rowsAffected = stmt.executeUpdate();
-            // If at least one row was affected, return true
-            return rowsAffected > 0;
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;  // Return false if there was an exception
-    }
-}
 
+    public boolean addReservationDetail(ReservationDetail detail) {
+        try (Connection conn = getConnection()) {
+            String sql = "INSERT INTO ReservationDetails (reservationID, serviceID, amount) VALUES (?, ?, ?)";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, detail.getRevationID());
+                stmt.setInt(2, detail.getService().getServiceID());
+                stmt.setInt(3, detail.getAmount());
+
+                int rowsAffected = stmt.executeUpdate();
+                // If at least one row was affected, return true
+                return rowsAffected > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;  // Return false if there was an exception
+        }
+    }
 
     // Phương thức giả lập kết nối cơ sở dữ liệu (cần thay thế bằng phương thức thực tế của bạn)
-
-
-
-
-
-
     public static void main(String[] args) {
         // Create mock Cart data
         List<Cart> checkItem = new ArrayList<>();
-        
+
         // Mock Cart items
         Service service1 = new Service(1, "Service 1", "", null, 100, 10, "", true, null);
         Service service2 = new Service(2, "Service 2", "", null, 200, 20, "", true, null);
-        
+
         // Mock Cart objects
         Cart cart1 = new Cart(1, true, 2, service1, null); // 2 items of Service 1
         Cart cart2 = new Cart(2, true, 1, service2, null); // 1 item of Service 2
-        
+
         checkItem.add(cart1);
         checkItem.add(cart2);
-        
+
         // Print checkItem contents before removal
         System.out.println("Before removal:");
         for (Cart cart : checkItem) {
@@ -216,7 +196,7 @@ public boolean addReservationDetail(ReservationDetail detail) {
 
         // Simulate a userID for testing
         int userID = 4;  // Assuming user ID is 4
-        
+
         // Call the method to remove checked items
         CartDBContext cartDB = new CartDBContext();
         boolean result = cartDB.removeCheckedItems(userID, checkItem);
@@ -234,8 +214,6 @@ public boolean addReservationDetail(ReservationDetail detail) {
             System.out.println("Service ID: " + cart.getService().getServiceID() + ", Amount: " + cart.getAmount());
         }
     }
-
-
 
     private void closeConnection(Connection conn, PreparedStatement ps) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

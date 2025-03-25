@@ -11,8 +11,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import model.User;
 
 /**
  *
@@ -47,6 +49,8 @@ public class MyReservationController extends HttpServlet {
             throws ServletException, IOException {
         try {
             // Lấy các tham số từ request
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
             String search = request.getParameter("search");
             String status = request.getParameter("status");
             String fromDate = request.getParameter("fromDate");
@@ -70,7 +74,8 @@ public class MyReservationController extends HttpServlet {
                     status != null ? Integer.parseInt(status) : null,
                     fromDate,
                     toDate,
-                    null, // staffId (nếu có)
+                    null,
+                    user.getUserID(),// staffId (nếu có)
                     search,
                     sortBy,
                     page,
@@ -82,7 +87,8 @@ public class MyReservationController extends HttpServlet {
                     status != null ? Integer.parseInt(status) : null,
                     fromDate,
                     toDate,
-                    null, // staffId (nếu có)
+                    null,
+                    user.getUserID(),// staffId (nếu có)
                     search
             );
             int totalPages = (int) Math.ceil((double) totalReservations / pageSize);

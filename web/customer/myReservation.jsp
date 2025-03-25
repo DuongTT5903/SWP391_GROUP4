@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Service" %>
@@ -53,7 +52,7 @@
             <h1 class="mb-4 text-center">Reservation History</h1>
 
             <!-- Filter and Search Form -->
-            <form action="reservationlist" method="GET" class="row g-3 mb-4">
+            <form action="myReservation" method="GET" class="row g-3 mb-4">
                 <!-- Search by Customer Name or Email -->
                 <div class="col-md-3">
                     <label for="search" class="form-label">Search by Customer Name or Email:</label>
@@ -93,29 +92,38 @@
             <table class="table table-bordered table-hover text-center">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Customer Name</th>
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Creation Date</th>
+                        <th>Booking Date</th>
                         <th>Total Price</th>
                         <th>Status</th>
+                        <th>Accept Status</th>
                         <th>Action</th> <!-- Thêm cột Action -->
                     </tr>
                 </thead>
                 <tbody>
                     <% if (reservations != null && !reservations.isEmpty()) { %>
+                    <% int i=1 ;%>
                     <% for (Reservation reservation : reservations) {%>
                     <tr>
-                        <td><%= reservation.getReservationID()%></td>
+                        <td><%= i++ %></td>                     
                         <td><%= reservation.getCustomerName()%></td>
                         <td><%= reservation.getEmail()%></td>
                         <td><%= reservation.getPhone()%></td>
                         <td><%= reservation.getCreationDate()%></td>
-                        <td>$<%= reservation.getTotalPrice()%></td>
+                        <td><%= reservation.getBookingDate()%></td>
+                        <td><%= reservation.getTotalPrice()%>00 VNĐ</td>
                         <td>
                             <span class="badge <%= reservation.getStatus() == 1 ? "bg-success" : "bg-secondary"%>">
                                 <%= reservation.getStatus() == 1 ? "Active" : "Inactive"%>
+                            </span>
+                        </td>
+                         <td>
+                            <span class="badge <%= reservation.getAcceptStatus() == 1 ? "bg-success" : "bg-secondary"%>">
+                                <%= reservation.getAcceptStatus() == 1 ? "Accept" : "Not Accepted"%>
                             </span>
                         </td>
                         <!-- Thêm liên kết đến trang chi tiết -->

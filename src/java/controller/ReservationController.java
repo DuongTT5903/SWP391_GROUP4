@@ -14,7 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,11 +114,20 @@ public class ReservationController extends HttpServlet {
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
         int paymentMethod = parseInteger(request.getParameter("payment"), -1);
-
+        String bookingDateStr = request.getParameter("bookingDate");
+        Date bookingDate = null;
+        if (bookingDateStr != null && !bookingDateStr.trim().isEmpty()) {
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                bookingDate = formatter.parse(bookingDateStr);
+            } catch (ParseException e) {
+                errors.put("bookingDate", "Ngày đặt lịch không hợp lệ.");
+            }
+        }       
         if (paymentMethod == -1) {
             errors.put("payment", "Phương thức thanh toán không hợp lệ.");
         }
-
+        reservation.setBookingDate(bookingDate);
         reservation.setCustomerName(name);
         reservation.setEmail(email);
         reservation.setAddress(address);
@@ -145,12 +157,10 @@ public class ReservationController extends HttpServlet {
                         reservationID, totalPriceStr, name, phone, email, address
                 );
 
-                
                 if (success) {
                     cartDB.removeCheckedItems(customer.getUser().getUserID(), checkItem);
                     session.removeAttribute("checkItem");
                     session.removeAttribute("totalPrice");
-                   
                     session.setAttribute("reservationID", reservationID);
                     session.setAttribute("totalPrice", totalPrice);
 

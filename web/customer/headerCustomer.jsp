@@ -93,21 +93,13 @@
                                 <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
                                 </c:otherwise>
                             </c:choose>
-                        <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/blogList">Blogs</a></li>                       
                             <c:choose>
                                 <c:when test="${sessionScope.roleID == '4'}">
-                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/reservation">Reservations</a></li>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">My Reservations</a></li>
                                 </c:when>
                                 <c:otherwise>
-                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
-                                </c:otherwise>
-                            </c:choose>
-                            <c:choose>
-                                <c:when test="${sessionScope.roleID == '4'}">
-                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">Reservations History</a></li>
-                                </c:when>
-                                <c:otherwise>
-                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations History</a></li>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login"> My Reservations</a></li>
                                 </c:otherwise>
                             </c:choose>
                     </ul>

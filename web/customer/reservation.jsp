@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Service" %>
@@ -73,7 +72,7 @@
                 <p class="text-danger fw-bold">${cartMessage}</p>
             </c:if>
 
-          <c:if test="${not empty cartItems}">
+            <c:if test="${not empty cartItems}">
                 <table class="table table-bordered">
                     <thead class="bg-secondary">
                         <tr>
@@ -124,83 +123,56 @@
             <form action="reservation" method="POST" class="mt-4">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label for="email" class="form-label">Name:</label>
-                        <input type="name" name="name" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" value="${sessionScope.user.name}" >
-                        <div class="invalid-feedback">
-                            ${errors.email}
-                        </div>
+                        <label for="name" class="form-label">Name:</label>
+                        <input type="text" id="name" name="name" class="form-control ${not empty errors.name ? 'is-invalid' : ''}" 
+                               value="${sessionScope.user.name}" required>
+                        <div class="invalid-feedback">${errors.name}</div>
                     </div>
+
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email:</label>
-                        <input type="email" name="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" value="${sessionScope.user.email}" >
-                        <div class="invalid-feedback">
-                            ${errors.email}
-                        </div>
+                        <input type="email" id="email" name="email" class="form-control ${not empty errors.email ? 'is-invalid' : ''}" 
+                               value="${sessionScope.user.email}" required>
+                        <div class="invalid-feedback">${errors.email}</div>
                     </div>
+
                     <div class="col-md-6">
                         <label for="phone" class="form-label">Số điện thoại:</label>
-                        <input type="tel" name="phone" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}" value="${sessionScope.user.phone}" >
-                        <div class="invalid-feedback">
-                            ${errors.phone}
-                        </div>
+                        <input type="tel" id="phone" name="phone" class="form-control ${not empty errors.phone ? 'is-invalid' : ''}" 
+                               value="${sessionScope.user.phone}" required pattern="[0-9]{10,11}">
+                        <div class="invalid-feedback">${errors.phone}</div>
                     </div>
+
                     <div class="col-md-6">
                         <label for="address" class="form-label">Địa chỉ:</label>
-                        <input type="text" name="address" class="form-control ${not empty errors.address ? 'is-invalid' : ''}" value="${customer.address}">
-                        <div class="invalid-feedback">
-                            ${errors.address}
-                        </div>
-                    </div>               
-                    <div class="col-md-12">
-                        <label class="form-label">Phương thức thanh toán:</label>
+                        <input type="text" id="address" name="address" class="form-control ${not empty errors.address ? 'is-invalid' : ''}" 
+                               value="${customer.address}" required minlength="5">
+                        <div class="invalid-feedback">${errors.address}</div>
+                    </div> 
+
+                    <div class="col-md-6">
+                        <label for="bookingDate" class="form-label">Ngày đặt lịch:</label>
+                        <input type="date" id="bookingDate" name="bookingDate" class="form-control ${not empty errors.bookingDate ? 'is-invalid' : ''}" required>
+                        <div class="invalid-feedback">${errors.bookingDate}</div>
+                    </div>    
+
+                    <div class="col-md-12 text-center">
+                        <label class="form-label">Phương thức thanh toán</label>
                         <div class="btn-group w-100">
-                            <input type="radio" class="btn-check" id="creditCard" name="payment" value="0" onclick="toggleCardDetails(true)" >
-                            <label class="btn btn-outline-primary" for="creditCard">Thẻ tín dụng</label>
-
-                            <input type="radio" class="btn-check" id="bankApp" name="payment" value="1" onclick="toggleCardDetails(false)" >
-                            <label class="btn btn-outline-secondary" for="bankApp">VP Payment</label>
-                        </div>
-                        <div class="text-danger">${errors.payment}</div>
-                    </div>
-                </div>
-                <div class="col-md-12 mt-3" id="cardDetails" style="display: none;">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="cardName" class="form-label">Tên chủ thẻ:</label>
-                            <input type="text" name="cardName" class="form-control ${not empty errors.cardName ? 'is-invalid' : ''}" >
-                            <div class="invalid-feedback">${errors.cardName}</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="cardNumber" class="form-label">Số thẻ:</label>
-                            <input type="text" name="cardNumber" class="form-control ${not empty errors.cardNumber ? 'is-invalid' : ''}" >
-                            <div class="invalid-feedback">${errors.cardNumber}</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="CVV" class="form-label">CVV:</label>
-                            <input type="text" name="CVV" class="form-control ${not empty errors.CVV ? 'is-invalid' : ''}">
-                            <div class="invalid-feedback">${errors.CVV}</div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="expirationDate" class="form-label">Ngày hết hạn:</label>
-                            <input type="date" name="expirationDate" class="form-control ${not empty errors.expirationDate ? 'is-invalid' : ''}">
-                            <div class="invalid-feedback">${errors.expirationDate}</div>
+                            <input type="radio" class="btn-check" id="bankApp" name="payment" value="1" checked >
+                            <label class="btn btn-outline-secondary" for="bankApp">VNPay</label>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-12 text-center mt-4">
-                    <button type="submit" class="btn btn-success">Đặt lịch</button>
-                </div>                   
-            </form>        
+
+                    <div class="col-md-12 text-center mt-4">
+                        <button type="submit" class="btn btn-success">Đặt lịch</button>
+                    </div>                   
+                </div>             
+            </form>
+
             <jsp:include page="./footerCustomer.jsp" />
         </div>
-        <script>
-            function toggleCardDetails(show) {
-                document.getElementById("cardDetails").style.display = show ? "block" : "none";
-            }
-        </script>
+
     </body>
 </html>

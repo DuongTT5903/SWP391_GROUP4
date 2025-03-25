@@ -107,71 +107,63 @@
     </script>
     <body>
         <div class="container">
-            <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
-                <div class="container-fluid">
-                    <c:choose>
-                        <c:when test="${sessionScope.roleID == '4'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>       
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '2'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '3'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:when test="${sessionScope.roleID == '1'}">
-                            <h3 class="w3-wide public"> 
-                                <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
-                                <br>
-                            </h3>
-                        </c:when>
-                        <c:otherwise>
-                            <h3 class="w3-wide public"> 
-                                <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
-                            </h3>
-                        </c:otherwise>
-                    </c:choose> 
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
-                                    </c:when>
-                                    <c:otherwise>
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
-                                    </c:otherwise>
-                                </c:choose>
-                            <li class="nav-item"><a class="nav-link " href="#">Blog</a></li>
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/reservation">Reservations</a></li>
-                                    </c:when>
-                                    <c:otherwise>
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations</a></li>
-                                    </c:otherwise>
-                                </c:choose>
-                                <c:choose>
-                                    <c:when test="${sessionScope.roleID == '4'}">
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">Reservations History</a></li>
-                                    </c:when>
-                                    <c:otherwise>
-                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Reservations History</a></li>
-                                    </c:otherwise>
-                                </c:choose>
-                        </ul>
-                    </div>
+             <nav class="navbar navbar-expand-lg bg-secondary" style="height: 55px;">
+            <div class="container-fluid">
+                <c:choose>
+                    <c:when test="${sessionScope.roleID == '4'}">
+                        <h3 class="w3-wide public"> 
+                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                            <br>
+                        </h3>       
+                    </c:when>
+                    <c:when test="${sessionScope.roleID == '2'}">
+                        <h3 class="w3-wide public"> 
+                            <b><a href="${pageContext.request.contextPath}/userProfile" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                            <br>
+                        </h3>
+                    </c:when>
+                    <c:when test="${sessionScope.roleID == '3'}">
+                        <h3 class="w3-wide public"> 
+                            <b><a href="/staff" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                            <br>
+                        </h3>
+                    </c:when>
+                    <c:when test="${sessionScope.roleID == '1'}">
+                        <h3 class="w3-wide public"> 
+                            <b><a href="/admin" style="text-decoration: none">${sessionScope.user.username}</a></b>
+                            <br>
+                        </h3>
+                    </c:when>
+                    <c:otherwise>
+                        <h3 class="w3-wide public"> 
+                            <b><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">LOGIN</a></b>
+                        </h3>
+                    </c:otherwise>
+                </c:choose> 
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
+                            <c:choose>
+                                <c:when test="${sessionScope.roleID == '4'}">
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
+                                </c:otherwise>
+                            </c:choose>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/blogList">Blogs</a></li>                       
+                            <c:choose>
+                                <c:when test="${sessionScope.roleID == '4'}">
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">My Reservations</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login"> My Reservations</a></li>
+                                </c:otherwise>
+                            </c:choose>
+                    </ul>
                 </div>
-            </nav>
+            </div>
+        </nav>
 
             <h2 class="text-center">Service List</h2>
             <!-- Hộp tìm kiếm -->
