@@ -35,12 +35,13 @@
             margin-bottom: 10px;
         }
     </style>
+     <jsp:include page="./AdminHeader.jsp" />
 </head>
 <body>
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Quản lý Roles</h2>
-            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary">Quay lại</a>
+          
         </div>
 
         <c:if test="${not empty error}">

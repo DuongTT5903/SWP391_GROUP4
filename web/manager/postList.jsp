@@ -8,7 +8,7 @@
         <title>Manage Posts</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
-    <body class="container py-4">
+    <body >
         <jsp:include page="./headermanager.jsp" />
         <h1 class="mb-4 text-center">Post List</h1>
 

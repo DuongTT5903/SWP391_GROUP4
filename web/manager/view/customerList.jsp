@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Danh sách người dùng</title>
@@ -40,6 +41,10 @@
             #myTable tr {
                 border-bottom: 1px solid #ddd;
             }
+            header {
+                margin: 0;
+                padding: 0;
+            }
 
             #myTable tr.header, #myTable tr:hover {
                 background-color: #f1f1f1;
@@ -65,14 +70,14 @@
         </style>
     </head>
     <jsp:include page="/manager/headermanager.jsp" />
-    <body style="padding: 50px;">
+    <body>
 
 
 
         <div class="d-flex justify-content-between">
 
             <h2>Danh sách người dùng</h2>
-            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary" style="margin-bottom:10px">Quay lại</a>
+           
 
         </div>
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm kiếm tên người dùng.." title="Nhập tên người dùng">

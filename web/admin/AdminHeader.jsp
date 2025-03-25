@@ -16,6 +16,11 @@
             background-color: #343a40;
             padding: 10px 20px;
         }
+        body {
+    margin: 0;
+    padding: 0;
+}
+
         .navbar-brand {
             color: white !important;
             font-size: 20px;
@@ -51,19 +56,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="postList"><i class="fas fa-list"></i> Post List</a>
+                    <a class="nav-link" href="dashboard"><i class="fas fa-list"></i> Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="customerList"><i class="fas fa-users"></i> User List</a>
+                    <a class="nav-link" href="userList"><i class="fas fa-users"></i> User List</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="listservice"><i class="fas fa-tags"></i> Service List</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="feedbackdetail"><i class="fas fa-list"></i>Feedbacklist</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="sliderList"><i class="fas fa-list"></i>Slider List</a>
+               <li class="nav-item">
+                    <a class="nav-link" href="settingList"><i class="fas fa-users"></i> Setting List</a>
                 </li>
             </ul>
 

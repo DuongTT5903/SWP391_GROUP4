@@ -81,8 +81,10 @@
             height: 300px !important;
         }
     </style>
+     <jsp:include page="./AdminHeader.jsp" />
 </head>
 <body>
+    
     <h2>Thống kê Đặt chỗ, Đánh giá & Xu hướng</h2>
 
     <div class="dashboard-container">

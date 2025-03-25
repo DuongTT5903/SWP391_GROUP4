@@ -40,11 +40,11 @@
             <form action="${pageContext.request.contextPath}/manager/customerDetail" method="POST">
                 <input type="hidden" name="userID" value="${user.userID}">
                 <div class="mb-3">
-                    <label for="name" class="form-label">Tên</label>
+                    <label for="name" class="form-label">name</label>
                     <input type="text" class="form-control" id="name" name="name" value="${user.name}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="gender" class="form-label">Giới tính</label>
+                    <label for="gender" class="form-label">gender</label>
                     <select class="form-control" id="gender" name="gender">
                         <option value="true" ${user.gender ? 'selected' : ''}>Nam</option>
                         <option value="false" ${!user.gender ? 'selected' : ''}>Nữ</option>
@@ -55,28 +55,28 @@
                     <input type="email" class="form-control" id="email" name="email" value="${user.email}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="username" class="form-label">Tên tài khoản</label>
+                    <label for="username" class="form-label">user name</label>
                     <input type="text" class="form-control" id="username" name="username" value="${user.username}" required>
                 </div>
                <div class="mb-3">
-                    <label for="password" class="form-label">Mật khẩu</label>
+                    <label for="password" class="form-label">password</label>
                     <input type="password" class="form-control" id="password" name="password">
                     <small class="text-muted">Để trống nếu không muốn đổi mật khẩu.</small>
                 </div>
                 <div class="mb-3">
-                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <label for="phone" class="form-label">phone</label>
                     <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="role" class="form-label">Vai trò</label>
+                    <label for="role" class="form-label">role</label>
                     <select class="form-control" id="role" name="role">
                      
                         <option value="Customer" ${user.role == 'Customer' ? 'selected' : ''}>Customer</option>
                     </select>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <a href="${pageContext.request.contextPath}/admin/userList" class="btn btn-secondary">Quay lại</a>
-                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    <a href="${pageContext.request.contextPath}/manager/customerList" class="btn btn-secondary">back list</a>
+                    <button type="submit" class="btn btn-primary">update</button>
                 </div>
             </form>
         </div>

@@ -2,7 +2,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
+     <jsp:include page="./AdminHeader.jsp" />
     <head>
+        
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Danh sách người dùng</title>
@@ -62,15 +64,20 @@
                 z-index: 100;
                 border-bottom: 2px solid #ddd;
             }
+            body {
+    margin: 0;
+    padding: 0;
+}
+
         </style>
     </head>
 
-    <body style="padding: 50px;">
+    <body >
 
 
         <div class="d-flex justify-content-between">
             <h2>Danh sách người dùng</h2>
-            <a href="${pageContext.request.contextPath}/homepage" class="btn btn-secondary" style="margin-bottom:10px">Quay lại</a>
+          
 
         </div>
         <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Tìm kiếm tên người dùng.." title="Nhập tên người dùng">
