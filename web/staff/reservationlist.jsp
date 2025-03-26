@@ -5,187 +5,53 @@
 <!DOCTYPE html>
 <html>
     <head>
-      
-        <title>Medical Reservation List</title>
+           <jsp:include page="./staffHeader.jsp" />
+        <title>Reservation List</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 0;
-                padding: 20px;
-                background-color: #f5f7fa;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: white;
-                padding: 25px;
-                border-radius: 8px;
-                box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            }
-            h1 {
-                color: #2c3e50;
-                margin-bottom: 25px;
-                padding-bottom: 10px;
-                border-bottom: 2px solid #3498db;
-            }
-            .filter-container {
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 8px;
-                margin-bottom: 25px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            .filter-form {
+            .action-btns {
                 display: flex;
-                flex-wrap: wrap;
-                align-items: flex-end;
-                gap: 20px;
-            }
-            .filter-group {
-                flex: 1;
-                min-width: 220px;
-            }
-            .filter-group label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 600;
-                color: #2c3e50;
-            }
-            .filter-control {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                font-size: 14px;
-                height: 40px;
-                box-sizing: border-box;
-            }
-            .filter-actions {
-                display: flex;
-                align-items: center;
-                height: 40px;
-                margin-bottom: 5px;
-            }
-            .btn {
-                padding: 10px 20px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 14px;
-                height: 40px;
-                display: inline-flex;
-                align-items: center;
+                gap: 5px;
                 justify-content: center;
             }
-            .btn-primary {
-                background-color: #3498db;
+            .btn-change-status {
+                background-color: #6f42c1;
                 color: white;
                 border: none;
-                transition: background-color 0.3s;
             }
-            .btn-primary:hover {
-                background-color: #2980b9;
+            .btn-change-status:hover {
+                background-color: #5a32a3;
+                color: white;
             }
-            .btn-edit {
-                background-color: #f39c12;
+            .btn-accept-payment {
+                background-color: #28a745;
                 color: white;
                 border: none;
-                transition: background-color 0.3s;
             }
-            .btn-edit:hover {
-                background-color: #e67e22;
+            .btn-accept-payment:hover {
+                background-color: #218838;
+                color: white;
             }
-            .btn-save {
-                background-color: #2ecc71;
+            .btn-cancel-payment {
+                background-color: #dc3545;
                 color: white;
                 border: none;
-                transition: background-color 0.3s;
-                display: none;
             }
-            .btn-save:hover {
-                background-color: #27ae60;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            th, td {
-                padding: 15px;
-                text-align: left;
-                border-bottom: 1px solid #ecf0f1;
-            }
-            th {
-                background-color: #2c3e50;
+            .btn-cancel-payment:hover {
+                background-color: #c82333;
                 color: white;
-                font-weight: 600;
             }
-            tr:nth-child(even) {
-                background-color: #f8f9fa;
+            .badge-pending {
+                background-color: #ffc107;
+                color: #212529;
             }
-            tr:hover {
-                background-color: #f1f7fd;
-            }
-            .action-link {
-                color: #3498db;
-                text-decoration: none;
-                font-weight: 500;
-                transition: color 0.3s;
-                margin-right: 10px;
-            }
-            .action-link:hover {
-                color: #21618c;
-                text-decoration: underline;
-            }
-            .no-data {
-                text-align: center;
-                padding: 20px;
-                color: #7f8c8d;
-                font-style: italic;
-            }
-            .prescription-text {
-                display: inline-block;
-                max-width: 300px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .prescription-edit {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                resize: vertical;
-                min-height: 60px;
-                display: none;
-            }
-            .action-buttons {
-                display: flex;
-                gap: 10px;
-            }
-            @media (max-width: 768px) {
-                .filter-form {
-                    flex-direction: column;
-                }
-                .filter-group {
-                    width: 100%;
-                }
-                .filter-actions {
-                    width: 100%;
-                }
-                .btn {
-                    width: 100%;
-                }
-                .action-buttons {
-                    flex-direction: column;
-                }
+            .badge-paid {
+                background-color: #28a745;
+                color: white;
             }
         </style>
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </head>
     <body >
-          <jsp:include page="./staffHeader.jsp" />
         <h1 class="mb-4 text-center">Reservation List</h1>
 
         <!-- Filter and Search Form -->
