@@ -1,4 +1,3 @@
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="model.User"%>
 <%@page session="true"%>
@@ -17,10 +16,9 @@
             padding: 10px 20px;
         }
         body {
-    margin: 0;
-    padding: 0;
-}
-
+            margin: 0;
+            padding: 0;
+        }
         .navbar-brand {
             color: white !important;
             font-size: 20px;
@@ -32,9 +30,13 @@
         .nav-link:hover {
             color: #f8f9fa !important;
         }
+        .dropdown {
+            position: relative; /* Đảm bảo dropdown hiển thị đúng */
+        }
         .dropdown-menu {
             right: 0;
             left: auto;
+            z-index: 1050; /* Đảm bảo hiển thị trên các phần khác */
         }
         .avatar {
             width: 40px;
@@ -42,47 +44,61 @@
             border-radius: 50%;
             object-fit: cover;
         }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info span {
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark">
-  
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="reservationlist"><i class="fas fa-list"></i> Reservations List</a>
-                </li>
-              
-               <li class="nav-item">
-                    <a class="nav-link" href="examination/list"><i class="fas fa-users"></i> Medical examination</a>
-                </li>
-            </ul>
-
-            <!-- User Dropdown -->
-            <%
-                User user = (User) session.getAttribute("user");
-                if (user != null) {
-            %>
-            <div class="dropdown">
-                <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
-                    <img src="<%= user.getImageURL() %>" alt="Avatar" class="avatar">
-                    <span class="ms-2"><%= user.getName() %></span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="${pageContext.request.contextPath}/staff/reservationlist">
+                    <i class="fas fa-list"></i> Reservations List
                 </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="${pageContext.request.contextPath}/userProfile"><i class="fas fa-user"></i> Hồ sơ</a></li>
-                    
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
-                </ul>
-            </div>
-            <% } %>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="${pageContext.request.contextPath}/staff/examination/list">
+                    <i class="fas fa-users"></i> Medical Examination
+                </a>
+            </li>
+        </ul>
+
+        <!-- User Dropdown -->
+        <%
+            User user = (User) session.getAttribute("user");
+            if (user != null) {
+        %>
+        <div class="dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
+                <div class="user-info">
+                    <img src="<%= user.getImageURL() %>" alt="Avatar" class="avatar">
+                    <span><%= user.getName() %></span>
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/userProfile">
+                    <i class="fas fa-user"></i> Hồ sơ
+                </a></li>
+                
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a></li>
+            </ul>
         </div>
+        <% } %>
     </div>
 </nav>
 
