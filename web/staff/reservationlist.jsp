@@ -51,7 +51,7 @@
             }
         </style>
     </head>
-    <body class="container py-4">
+    <body >
         <h1 class="mb-4 text-center">Reservation List</h1>
 
         <!-- Filter and Search Form -->

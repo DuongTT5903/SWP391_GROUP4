@@ -52,7 +52,7 @@ public class ajaxServlet extends HttpServlet {
         
         // Khai báo danh sách tham số theo yêu cầu - sử dụng TreeMap để tự động sắp xếp theo bảng chữ cái
         Map<String, String> vnp_Params = new TreeMap<>();
-        vnp_Params.put("vnp_Amount", String.valueOf((long) (amountDouble * 100)));
+        vnp_Params.put("vnp_Amount", String.valueOf((long) (amountDouble * 10)));
         
         if (bankCode != null && !bankCode.isEmpty()) {
             vnp_Params.put("vnp_BankCode", bankCode);
