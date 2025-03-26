@@ -17,7 +17,7 @@
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-        
+
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -139,11 +139,9 @@
                             <br>
                             <a href="${pageContext.request.contextPath}/logout">Logout</a>
                         </h3>
-                        <a href="customerDashboard.jsp">Go to Dashboard</a>
-                        <a href="${pageContext.request.contextPath}/feedback?serviceID=1">Go to Feedback test with serviceID=1</a>
-                        <a href="${pageContext.request.contextPath}/samplefeedback">Go to Feedback test with serviceID sample</a>
+
                         <!-- <//%= p.getId() %> -->
-                        
+
 
                     </c:when>
                     <c:when test="${sessionScope.roleID == '2'}">
@@ -283,9 +281,7 @@
                     }
                 </style>
 
-                <i class="tamthoi">
-                    <a href="${pageContext.request.contextPath}/shoppingCart">Your Cart</a>
-                </i>
+
 
 
 
@@ -546,58 +542,37 @@
 
             <!-- Product Grid -->
             <div class="w3-row w3-grayscale">
-                <c:forEach var="service" items="${services}">
-                    <div class="w3-col l3 s6 service-container">
-                        <div class="service-card" style="a {
-                                 text-decoration: none;
-                                 color: inherit;
-                             }">
-                            <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}">
-                                <img src="${service.imageURL}" alt="${service.serviceName}" class="service-image">
-                                <style>
-                                    .service-info {
-                                        padding: 10px 0;
-                                    }
-                                    .service-info p {
-                                        margin: 0;
-                                        text-decoration: none; /* Remove any underline */
-                                    }
-                                    .service-title {
-                                        font-size: 18px;
-                                        font-weight: 600;
-                                        color: #333;
-                                    }
-                                    .service-price {
-                                        font-size: 16px;
-                                        color: #e91e63;
-                                        margin-top: 5px;
-                                    }
-                                    a {
-                                        text-decoration: none;
-                                        color: inherit;
-                                    }
-                                </style>
-                                <div class="service-info">
-                                    <p class="service-title" style="text-decoration: none;">${service.serviceName}</p>
-                                    <p class="service-price" style="text-decoration: none;"><b>${service.servicePrice}00 VND</b></p>
-                                    <p class="service-title" style="text-decoration: none;">${service.serviceDetail}</p>
-                                </div>
-                            </a>
-                            <c:choose>
-                                <c:when test="${sessionScope.roleID == '4'}">
-                                    <form action="AddCart" method="post">
-                                        <input type="hidden" name="serviceID" value="${service.serviceID}">  
-                                        <button type="submit" class="add-to-cart">Add to Cart</button>
-                                    </form>
-                                </c:when>
-                                <c:otherwise>
-                                    <button class="add-to-cart"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none">Add to Cart</a></button>
-                                </c:otherwise>
-                            </c:choose>
+                <c:forEach var="service" items="${services}" varStatus="status">
+                    <c:if test="${status.index < 4}">
+                        <div class="w3-col l3 s6 service-container">
+                            <div class="service-card">
+                                <a href="${pageContext.request.contextPath}/service?serviceID=${service.serviceID}" style="text-decoration: none; color: inherit;">
+                                    <img src="${service.imageURL}" alt="${service.serviceName}" class="service-image">
+                                    <div class="service-info">
+                                        <p class="service-title">${service.serviceName}</p>
+                                        <p class="service-price"><b>${service.servicePrice}00 VND</b></p>
+                                        <p class="service-title">${service.serviceDetail}</p>
+                                    </div>
+                                </a>
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                        <form action="AddCart" method="post">
+                                            <input type="hidden" name="serviceID" value="${service.serviceID}">  
+                                            <button type="submit" class="add-to-cart">Add to Cart</button>
+                                        </form>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button class="add-to-cart">
+                                            <a href="${pageContext.request.contextPath}/login" style="text-decoration: none; color: inherit;">Add to Cart</a>
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
-                    </div>
+                    </c:if>
                 </c:forEach>
             </div>
+
             <br>
 
             <%

@@ -2,7 +2,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +9,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
           integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
-
 <body style="background-color: #f4f4f4; font-family: Arial, sans-serif; margin: 0; padding: 20px;">
-
-
     <section style="margin-top: 50px; text-align: center;">
         <div>
             <img src="https://cdn2.cellphones.com.vn/insecure/rs:fill:150:0/q:90/plain/https://cellphones.com.vn/media/wysiwyg/Review-empty.png" 
                  alt="Transaction Status" 
                  style="width: 120px; height: 120px; margin-bottom: 20px;">
         </div>
-
         <!-- Giao dịch thành công -->
         <c:if test="${transResult}">
             <div>
@@ -33,7 +43,6 @@
                 <strong style="color: red; font-size: 24px;">0383459560</strong>
             </div>
         </c:if>
-
         <!-- Giao dịch thất bại -->
         <c:if test="${transResult == false}">
             <div>
@@ -45,7 +54,6 @@
                 <strong style="color: red; font-size: 24px;">0383456xxx</strong>
             </div>
         </c:if>
-
         <!-- Đang xử lý giao dịch -->
         <c:if test="${transResult == null}">
             <div>
@@ -56,7 +64,14 @@
                 <strong style="color: red; font-size: 24px;">0383456xxx</strong>
             </div>
         </c:if>
-    </section>
+        
+        <!-- Nút quay về trang chủ -->
+        <div>
+         <a href="${pageContext.request.contextPath}/homepage" class="back-btn">
+    <i class="fas fa-home"></i> Về Trang Chủ
+</a>
 
+        </div>
+    </section>
 </body>
 </html>

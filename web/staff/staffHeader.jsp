@@ -30,26 +30,11 @@
         .nav-link:hover {
             color: #f8f9fa !important;
         }
-        .dropdown {
-            position: relative; /* Đảm bảo dropdown hiển thị đúng */
-        }
-        .dropdown-menu {
-            right: 0;
-            left: auto;
-            z-index: 1050; /* Đảm bảo hiển thị trên các phần khác */
-        }
         .avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-        .user-info span {
-            margin-left: 8px;
         }
     </style>
 </head>
@@ -75,28 +60,16 @@
             </li>
         </ul>
 
-        <!-- User Dropdown -->
+        <!-- Hiển thị nút Logout nhỏ hơn -->
         <%
             User user = (User) session.getAttribute("user");
             if (user != null) {
         %>
-        <div class="dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center text-white" href="#" role="button" data-bs-toggle="dropdown">
-                <div class="user-info">
-                    <img src="<%= user.getImageURL() %>" alt="Avatar" class="avatar">
-                    <span><%= user.getName() %></span>
-                </div>
+        <div class="d-flex align-items-center">
+            <span class="text-white me-2"><%= user.getName() %></span>
+            <a href="${pageContext.request.contextPath}/logout" class="btn btn-danger btn-sm">
+                <i class="fas fa-sign-out-alt"></i>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="${pageContext.request.contextPath}/userProfile">
-                    <i class="fas fa-user"></i> Hồ sơ
-                </a></li>
-                
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                </a></li>
-            </ul>
         </div>
         <% } %>
     </div>
