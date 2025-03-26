@@ -28,7 +28,8 @@ public class BaseRequiredFilter implements Filter {
             "/blogList",
             "/reset",
             "/verify",
-            "/request"
+            "/request",
+            "/viewDetailProduct"
     // Trang chủ
     // Trang chủ
     // Giới thiệu

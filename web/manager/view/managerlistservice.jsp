@@ -85,8 +85,14 @@
                                                 <td>${service.category.categoryName}</td>
                                                 <td class="service-price">${service.servicePrice}</td>
                                                 <td>${service.salePrice}</td>
+
+                                                <!-- Hiển thị nhiều hình ảnh -->
                                                 <td>
-                                                    <img src="${service.imageURL}" alt="Service Image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
+                                                    <c:forEach var="img" items="${listImg}">
+                                                        <c:if test="${img.serviceID == service.serviceID}">
+                                                            <img src="${img.imageURL}" alt="Service Image" class="img-fluid" style="max-width: 50px; max-height: 50px; margin: 2px;">
+                                                        </c:if>
+                                                    </c:forEach>
                                                 </td>
                                                 <td>
                                                     <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
@@ -100,9 +106,10 @@
                                                 </td>
                                                 <td>
                                                     <div class="action-buttons">
+                                                        <!-- Sửa nút Edit để điều hướng đến trang chỉnh sửa -->
                                                         <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
                                                             <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                                            <input type="hidden" name="service" value="viewDetail">
+                                                            <input type="hidden" name="service" value="viewDetail"> <!-- Giữ nguyên để khớp với servlet -->
                                                             <button type="submit" class="btn btn-sm btn-info">Edit</button>
                                                         </form>
                                                         <form action="${pageContext.request.contextPath}/manager/listservice" method="get" class="mb-0">
@@ -186,4 +193,5 @@
                 return confirm("Are you sure you want to delete this service?");
             }
         </script>
-   
+    </body>
+</html>
