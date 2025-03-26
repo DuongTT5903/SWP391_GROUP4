@@ -1,6 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,26 +8,10 @@
         <title>Edit Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <style>
-            .required::after {
-                content: " *";
-                color: red;
-            }
-            .error-message {
-                color: red;
-                font-size: 14px;
-                display: none;
-            }
-            .detail-item {
-                border: 1px solid #ddd;
-                padding: 10px;
-                margin-bottom: 10px;
-                position: relative;
-            }
-            .remove-btn {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-            }
+            .required::after { content: " *"; color: red; }
+            .error-message { color: red; font-size: 14px; display: none; }
+            .image-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; position: relative; }
+            .remove-btn { position: absolute; top: 10px; right: 10px; }
         </style>
     </head>
     
@@ -39,14 +22,12 @@
                 <div class="col-md-8">
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white">
-                            <h2 class="mb-0">Edit</h2>
+                            <h2 class="mb-0">Edit Service</h2>
                         </div>
                         <div class="card-body">
-                            <form action="${pageContext.request.contextPath}/manager/listservice" method="get" onsubmit="return validateForm()">
+                            <form action="${pageContext.request.contextPath}/manager/listservice" method="post" onsubmit="return validateForm()">
                                 <input type="hidden" name="service" value="savechange">
                                 <input type="hidden" name="serviceID" value="${service.serviceID}">
-                                <!-- Ẩn trường serviceDetail để gửi chuỗi kết hợp -->
-                                <input type="hidden" id="serviceDetail" name="serviceDetail">
 
                                 <div class="mb-3">
                                     <label for="serviceName" class="form-label required">Service Name</label>
@@ -54,54 +35,30 @@
                                            value="${service.serviceName}" required>
                                 </div>
 
-                                <!-- Phần chi tiết với nhiều mục -->
                                 <div class="mb-3">
-                                    <label class="form-label required">Service Details</label>
-                                    <div id="detailItems">
-                                        <!-- Kiểm tra service và serviceDetail -->
-                                        <c:choose>
-                                            <c:when test="${not empty service and not empty service.serviceDetail and fn:contains(service.serviceDetail, '||')}">
-                                                <c:set var="detailItems" value="${fn:split(service.serviceDetail, '||')}" />
-                                                <c:forEach var="item" items="${detailItems}" varStatus="loop">
-                                                    <c:if test="${not empty item and fn:contains(item, '|')}">
-                                                        <c:set var="parts" value="${fn:split(item, '|')}" />
-                                                        <c:if test="${fn:length(parts) >= 2}">
-                                                            <div class="detail-item">
-                                                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeDetailItem(this)">X</button>
-                                                                <div class="mb-2">
-                                                                    <label class="form-label">Detail Text</label>
-                                                                    <textarea class="form-control detail-text" name="detailText_${loop.index}" rows="2" required>${parts[0]}</textarea>
-                                                                </div>
-                                                                <div class="mb-2">
-                                                                    <label class="form-label">Detail Image URL</label>
-                                                                    <input type="text" class="form-control detail-image" name="detailImage_${loop.index}" 
-                                                                           value="${parts[1]}">
-                                                                    <c:if test="${not empty parts[1]}">
-                                                                        <img src="${parts[1]}" alt="Detail Image" class="img-fluid mt-2" style="max-height: 100px;">
-                                                                    </c:if>
-                                                                </div>
-                                                            </div>
-                                                        </c:if>
-                                                    </c:if>
-                                                </c:forEach>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <!-- Nếu không có dữ liệu hợp lệ, hiển thị mục mặc định -->
-                                                <div class="detail-item">
-                                                    <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeDetailItem(this)">X</button>
-                                                    <div class="mb-2">
-                                                        <label class="form-label">Detail Text</label>
-                                                        <textarea class="form-control detail-text" name="detailText_0" rows="2" required>${service.serviceDetail}</textarea>
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <label class="form-label">Detail Image URL</label>
-                                                        <input type="text" class="form-control detail-image" name="detailImage_0">
-                                                    </div>
-                                                </div>
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <label for="detailText" class="form-label required">Service Detail</label>
+                                    <textarea class="form-control" id="detailText" name="detailText" rows="3" required>${service.serviceDetail}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label required">Detail Images</label>
+                                    <div id="imageItems">
+                                        <c:forEach var="img" items="${detailImages}" varStatus="loop">
+                                            <div class="image-item">
+                                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeImageItem(this)">X</button>
+                                                <input type="text" class="form-control" name="detailImage_${loop.index}" 
+                                                       value="${img.imageURL}" required>
+                                                <img src="${img.imageURL}" alt="Detail Image" class="img-fluid mt-2" style="max-height: 100px;">
+                                            </div>
+                                        </c:forEach>
+                                        <c:if test="${empty detailImages}">
+                                            <div class="image-item">
+                                                <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeImageItem(this)">X</button>
+                                                <input type="text" class="form-control" name="detailImage_0" placeholder="Enter image URL" required>
+                                            </div>
+                                        </c:if>
                                     </div>
-                                    <button type="button" class="btn btn-success btn-sm mt-2" onclick="addDetailItem()">Add New Detail</button>
+                                    <button type="button" class="btn btn-success btn-sm mt-2" onclick="addImageItem()">Add New Image</button>
                                 </div>
 
                                 <div class="mb-3">
@@ -131,7 +88,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="imageURL" class="form-label required">Image URL</label>
+                                    <label for="imageURL" class="form-label required">Main Image URL</label>
                                     <input type="text" class="form-control" id="imageURL" name="imageURL" 
                                            value="${service.imageURL}" required>
                                     <img src="${service.imageURL}" alt="Service Image" class="img-fluid mt-2" 
@@ -152,84 +109,88 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            let detailIndex = document.querySelectorAll(".detail-item").length;
+            let imageIndex = ${empty detailImages ? 1 : fn:length(detailImages)};
 
-            function addDetailItem() {
-                let container = document.getElementById("detailItems");
+            function addImageItem() {
+                let container = document.getElementById("imageItems");
                 let newItem = document.createElement("div");
-                newItem.className = "detail-item";
+                newItem.className = "image-item";
                 newItem.innerHTML = `
-                    <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeDetailItem(this)">X</button>
-                    <div class="mb-2">
-                        <label class="form-label">Detail Text</label>
-                        <textarea class="form-control detail-text" name="detailText_${detailIndex}" rows="2" required></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Detail Image URL</label>
-                        <input type="text" class="form-control detail-image" name="detailImage_${detailIndex}">
-                    </div>
+                    <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeImageItem(this)">X</button>
+                    <input type="text" class="form-control" name="detailImage_${imageIndex}" placeholder="Enter image URL" required>
                 `;
                 container.appendChild(newItem);
-                detailIndex++;
+                imageIndex++;
             }
 
-            function removeDetailItem(button) {
-                button.parentElement.remove();
+            function removeImageItem(button) {
+                let imageItems = document.querySelectorAll(".image-item");
+                if (imageItems.length > 1) {
+                    button.parentElement.remove();
+                } else {
+                    alert("At least one image is required!");
+                }
             }
 
             function validateForm() {
                 let isValid = true;
-
                 let serviceName = document.getElementById("serviceName").value.trim();
+                let detailText = document.getElementById("detailText").value.trim();
                 let servicePrice = parseFloat(document.getElementById("servicePrice").value);
                 let salePrice = document.getElementById("salePrice").value ? parseFloat(document.getElementById("salePrice").value) : null;
+                let imageURL = document.getElementById("imageURL").value.trim();
 
-                // Reset thông báo lỗi
                 document.getElementById("priceError").style.display = "none";
                 document.getElementById("salePriceError").style.display = "none";
 
-                // Kiểm tra Service Name
                 if (serviceName === "") {
-                    alert("Service Name không được để trống hoặc chỉ chứa dấu cách!");
+                    alert("Service Name cannot be empty or contain only spaces!");
                     isValid = false;
                 }
-
-                // Kiểm tra tất cả Detail Text
-                let detailTexts = document.querySelectorAll(".detail-text");
-                detailTexts.forEach(textarea => {
-                    if (textarea.value.trim() === "") {
-                        alert("Detail Text không được để trống hoặc chỉ chứa dấu cách!");
-                        isValid = false;
-                    }
-                });
-
-                // Validate servicePrice
+                if (detailText === "") {
+                    alert("Service Detail cannot be empty or contain only spaces!");
+                    isValid = false;
+                }
                 if (isNaN(servicePrice) || servicePrice <= 0) {
                     document.getElementById("priceError").style.display = "block";
                     isValid = false;
                 }
+                if (salePrice !== null && (salePrice < 0 || salePrice >= servicePrice)) {
+                    document.getElementById("salePriceError").style.display = "block";
+                    isValid = false;
+                }
+                if (imageURL === "") {
+                    alert("Main Image URL cannot be empty!");
+                    isValid = false;
+                } else if (!isValidURL(imageURL)) {
+                    alert("Main Image URL is invalid. Please enter a valid URL!");
+                    isValid = false;
+                }
 
-                // Validate salePrice
-                if (salePrice !== null) {
-                    if (salePrice < 0 || salePrice >= servicePrice) {
-                        document.getElementById("salePriceError").style.display = "block";
+                let imageInputs = document.querySelectorAll("[name^='detailImage_']");
+                for (let input of imageInputs) {
+                    let value = input.value.trim();
+                    if (value === "") {
+                        alert("Detail Image URL cannot be empty!");
+                        isValid = false;
+                    } else if (!isValidURL(value)) {
+                        alert("Detail Image URL is invalid. Please enter a valid URL!");
                         isValid = false;
                     }
                 }
 
-                // Kết hợp các mục chi tiết thành chuỗi serviceDetail
-                if (isValid) {
-                    let detailItems = document.querySelectorAll(".detail-item");
-                    let serviceDetailValue = "";
-                    detailItems.forEach((item, index) => {
-                        let detailText = item.querySelector(".detail-text").value.trim();
-                        let detailImage = item.querySelector(".detail-image").value.trim();
-                        serviceDetailValue += detailText + "|" + (detailImage || "") + (index < detailItems.length - 1 ? "||" : "");
-                    });
-                    document.getElementById("serviceDetail").value = serviceDetailValue;
-                }
-
                 return isValid;
+            }
+
+            function isValidURL(str) {
+                let pattern = new RegExp('^(https?:\\/\\/)?' +
+                    '((([a-zA-Z0-9$_.+!*\'(),-]+:\\S*)?@)?' +
+                    '(([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})|' +
+                    '((\\d{1,3}\\.){3}\\d{1,3}))' +
+                    '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+]*)*' +
+                    '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' +
+                    '(\\#[-a-zA-Z0-9_]*)?$', 'i');
+                return pattern.test(str);
             }
         </script>
     </body>
