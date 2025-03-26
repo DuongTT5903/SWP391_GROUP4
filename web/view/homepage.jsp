@@ -186,9 +186,10 @@
                 <a href="${pageContext.request.contextPath}/serviceList" class="w3-bar-item w3-button">Services</a>
                 <c:choose>
                     <c:when test="${sessionScope.roleID == '4'}">
-                        <a href="${pageContext.request.contextPath}/reservation" class="w3-bar-item w3-button">Reservations</a>
+                        <a href="${pageContext.request.contextPath}/customer/myReservation" class="w3-bar-item w3-button">My Reservations</a>
                     </c:when>
-                    <c:otherwise>                       
+                    <c:otherwise> 
+                        <a href="${pageContext.request.contextPath}/login" class="w3-bar-item w3-button">My Reservations</a>
                     </c:otherwise>
                 </c:choose>
                 <c:if test="${sessionScope.roleID == '2'}">

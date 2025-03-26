@@ -196,7 +196,7 @@ public class ReservationDBContext {
         sql.append(" AND creationDate <= ?");
     }
     if (staffId != null) {
-        sql.append(" AND staffID = ?");
+        sql.append(" AND userID = ?");
     }
     if (searchQuery != null && !searchQuery.isEmpty()) {
         sql.append(" AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)");
@@ -270,6 +270,7 @@ public class ReservationDBContext {
     reservation.setEmail(rs.getString("email"));
     reservation.setPhone(rs.getString("phone"));
     reservation.setCreationDate(rs.getDate("creationDate"));
+    reservation.setBookingDate(rs.getDate("bookingDate"));
     reservation.setStatus(rs.getInt("status"));
     reservation.setAcceptStatus(rs.getInt("acceptStatus"));
     reservation.setTotalPrice(rs.getFloat("totalPrice"));
@@ -303,7 +304,7 @@ public int countReservations(Integer status, Integer acceptStatus, String fromDa
         sql.append(" AND creationDate <= ?");
     }
     if (staffId != null) {
-        sql.append(" AND staffID = ?");
+        sql.append(" AND userID = ?");
     }
     if (searchQuery != null && !searchQuery.isEmpty()) {
         sql.append(" AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)");

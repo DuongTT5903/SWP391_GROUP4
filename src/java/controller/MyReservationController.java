@@ -7,8 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
+import model.User;
 
 @WebServlet(name = "MyReservationController", urlPatterns = {"/customer/myReservation"})
 public class MyReservationController extends HttpServlet {
@@ -30,6 +32,8 @@ public class MyReservationController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+             HttpSession session = request.getSession();
+             User user = (User) session.getAttribute("user");
             // Lấy các tham số từ request
             String search = request.getParameter("search");
             String status = request.getParameter("status");
@@ -56,7 +60,7 @@ public class MyReservationController extends HttpServlet {
                     (acceptStatus != null && !acceptStatus.isEmpty()) ? Integer.parseInt(acceptStatus) : null,
                     (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
                     (toDate != null && !toDate.isEmpty()) ? toDate : null,
-                    null, // staffId
+                    user.getUserID(), // staffId
                     (search != null && !search.isEmpty()) ? search : null,
                     (sortBy != null && !sortBy.isEmpty()) ? sortBy : null,
                     page,
@@ -69,7 +73,7 @@ public class MyReservationController extends HttpServlet {
                     (acceptStatus != null && !acceptStatus.isEmpty()) ? Integer.parseInt(acceptStatus) : null,
                     (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
                     (toDate != null && !toDate.isEmpty()) ? toDate : null,
-                    null, // staffId
+                     user.getUserID(), // staffId
                     (search != null && !search.isEmpty()) ? search : null
             );
             
