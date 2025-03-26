@@ -9,6 +9,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        
         <title>Reservation Detail</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     </head>
@@ -50,32 +51,32 @@
                         </tr>
                     </thead>
                     <tbody>
-    <% 
-        double totalAmount = 0; // Khởi tạo biến tổng
-        for (ReservationDetail detail : reservationDetails) { 
-            double servicePrice = detail.getService().getServicePrice();
-            double salePrice = detail.getService().getSalePrice();
-            int amount = detail.getAmount();
-            double totalCost = servicePrice * amount - (servicePrice * amount * salePrice / 100);
-            totalAmount += totalCost; // Cộng dồn vào tổng
-    %>
-    <tr>
-        <td><img src="<%= detail.getService().getImageURL() %>" alt="Thumbnail" width="50"></td>
-        <td><%= detail.getService().getServiceName() %></td>
-        <td><%= detail.getService().getCategory().getCategoryName() %></td>
-        <td><%= servicePrice*1000 %></td>
-        <td>%<%= salePrice %></td>
-        <td><%= amount %></td>
-        <td><%= totalCost*1000 %></td>
-    </tr>
-    <% } %>
-</tbody>
-<tfoot>
-    <tr>
-        <td colspan="6" class="text-end"><strong>Total:</strong></td>
-        <td><%= totalAmount*1000 %></td>
-    </tr>
-</tfoot>
+                        <% 
+                            double totalAmount = 0; // Khởi tạo biến tổng
+                            for (ReservationDetail detail : reservationDetails) { 
+                                double servicePrice = detail.getService().getServicePrice();
+                                double salePrice = detail.getService().getSalePrice();
+                                int amount = detail.getAmount();
+                                double totalCost = servicePrice * amount - (servicePrice * amount * salePrice / 100);
+                                totalAmount += totalCost; // Cộng dồn vào tổng
+                        %>
+                        <tr>
+                            <td><img src="<%= detail.getService().getImageURL() %>" alt="Thumbnail" width="50"></td>
+                            <td><%= detail.getService().getServiceName() %></td>
+                            <td><%= detail.getService().getCategory().getCategoryName() %></td>
+                            <td><%= servicePrice*1000 %></td>
+                            <td>%<%= salePrice %></td>
+                            <td><%= amount %></td>
+                            <td><%= totalCost*1000 %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="text-end"><strong>Total:</strong></td>
+                            <td><%= totalAmount*1000 %></td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>

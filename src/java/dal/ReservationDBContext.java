@@ -33,6 +33,55 @@ import model.User;
  * @author admin
  */
 public class ReservationDBContext {
+     public boolean updateAcceptStatus(int reservationId, int newAcceptStatus) {
+    String sql = "UPDATE Reservations SET acceptStatus = ? WHERE reservationID = ?";
+    
+    try (Connection conn = DBContext.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setInt(1, newAcceptStatus);
+        stmt.setInt(2, reservationId);
+        
+        int rowsAffected = stmt.executeUpdate();
+        return rowsAffected > 0;
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+        System.err.println("Error updating accept status for reservation ID: " + reservationId);
+        return false;
+    }
+}
+ public boolean updateReservationStatus(int reservationId, String newStatus) {
+    String sql = "UPDATE Reservations SET status = ? WHERE reservationID = ?";
+    
+    System.out.println("DEBUG - Executing SQL: " + sql 
+        + " with reservationId=" + reservationId + ", status=" + newStatus); // Debug SQL
+    
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        // Chuyển đổi status nếu cần (tùy vào cách lưu trong database)
+        // Nếu database lưu số (0/1):
+        int statusValue = "1".equals(newStatus) ? 1 : 0;
+        pstmt.setInt(1, statusValue);
+        
+        // Hoặc nếu database lưu chuỗi:
+        // pstmt.setString(1, newStatus);
+        
+        pstmt.setInt(2, reservationId);
+        
+        int affectedRows = pstmt.executeUpdate();
+        System.out.println("DEBUG - Affected rows: " + affectedRows); // Debug kết quả
+        
+        return affectedRows > 0;
+        
+    } catch (SQLException e) {
+        System.err.println("ERROR - SQL Exception: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}
+
   public List<ReservationDetail> getReservationDetails(int reservationID) {
     List<ReservationDetail> details = new ArrayList<>();
     String query = "SELECT rd.*, s.ServiceName, s.ImageURL, s.ServicePrice, s.SalePrice, " +
@@ -74,46 +123,7 @@ public class ReservationDBContext {
     return details;
 }
 
-     public boolean updateReservationStatus(int reservationId, String status) {
-        String sql = "UPDATE Reservations SET status = ? WHERE reservationId = ?";
-        try (Connection conn = DBContext.getConnection(); // Kết nối đến cơ sở dữ liệu
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Thiết lập các tham số cho câu lệnh SQL
-            stmt.setString(1, status);
-            stmt.setInt(2, reservationId);
-
-            // Thực thi câu lệnh UPDATE
-            int rowsAffected = stmt.executeUpdate();
-
-            // Trả về true nếu có ít nhất một hàng được cập nhật
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Xử lý lỗi (có thể ghi log hoặc ném ngoại lệ tùy thuộc vào yêu cầu)
-            return false;
-        }
-    }
-     public boolean assignReservationToStaff(int reservationId, int assignedStaffId) {
-        String sql = "UPDATE Reservations SET assignedStaffId = ? WHERE reservationId = ?";
-        try (Connection conn = DBContext.getConnection(); // Kết nối đến cơ sở dữ liệu
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Thiết lập các tham số cho câu lệnh SQL
-            stmt.setInt(1, assignedStaffId);
-            stmt.setInt(2, reservationId);
-
-            // Thực thi câu lệnh UPDATE
-            int rowsAffected = stmt.executeUpdate();
-
-            // Trả về true nếu có ít nhất một hàng được cập nhật
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Xử lý lỗi (có thể ghi log hoặc ném ngoại lệ tùy thuộc vào yêu cầu)
-            return false;
-        }
-    }
+   
     public int getCartCount(int userID) {
     int count = 0;
     String sql = "SELECT COUNT(*) FROM Carts WHERE userID = ?";
@@ -166,47 +176,59 @@ public class ReservationDBContext {
     return reservation;
 }
   
-      public List<Reservation> getReservations(Integer status, String fromDate, String toDate, Integer staffId,Integer userId,
-                                         String searchQuery, String sortBy, int page, int pageSize) {
+       public List<Reservation> getReservations(Integer status, Integer acceptStatus, String fromDate, 
+    String toDate, Integer staffId, String searchQuery, String sortBy, int page, int pageSize) {
+    
     List<Reservation> reservations = new ArrayList<>();
-    String sql = "SELECT * FROM Reservations WHERE 1=1";
+    StringBuilder sql = new StringBuilder("SELECT * FROM Reservations WHERE 1=1");
 
-    // Thêm điều kiện lọc vào câu lệnh SQL
+    // Thêm điều kiện lọc
     if (status != null) {
-        sql += " AND status = ?";
+        sql.append(" AND status = ?");
+    }
+    if (acceptStatus != null) {
+        sql.append(" AND acceptStatus = ?");
     }
     if (fromDate != null && !fromDate.isEmpty()) {
-        sql += " AND creationDate >= ?";
+        sql.append(" AND creationDate >= ?");
     }
     if (toDate != null && !toDate.isEmpty()) {
-        sql += " AND creationDate <= ?";
+        sql.append(" AND creationDate <= ?");
     }
     if (staffId != null) {
-        sql += " AND staffID = ?";
-    }
-     if (userId != null) {
-        sql += " AND userID = ?";
+        sql.append(" AND staffID = ?");
     }
     if (searchQuery != null && !searchQuery.isEmpty()) {
-        sql += " AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)";
+        sql.append(" AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)");
     }
 
-    // Thêm sắp xếp (nếu có)
+    // Sửa phần sắp xếp - Mặc định ASC (tăng dần)
+    sql.append(" ORDER BY ");
     if (sortBy != null && !sortBy.isEmpty()) {
-        sql += " ORDER BY " + sortBy;
+        // Kiểm tra xem sortBy đã chứa DESC/ASC chưa
+        if (!sortBy.toUpperCase().contains(" DESC") && !sortBy.toUpperCase().contains(" ASC")) {
+            sql.append(sortBy).append(" ASC"); // Mặc định thêm ASC nếu không chỉ định
+        } else {
+            sql.append(sortBy);
+        }
+    } else {
+        sql.append("reservationID ASC"); // Mặc định sắp xếp tăng dần theo ID
     }
 
-    // Thêm phân trang
-    sql += " LIMIT ? OFFSET ?";
+    // Phân trang - Sửa lại để đảm bảo hiệu suất
+    sql.append(" LIMIT ? OFFSET ?");
 
     try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+         PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+        
         int paramIndex = 1;
-
-        // Thiết lập các tham số cho câu lệnh SQL
+        
+        // Thiết lập các tham số theo đúng thứ tự
         if (status != null) {
             pstmt.setInt(paramIndex++, status);
+        }
+        if (acceptStatus != null) {
+            pstmt.setInt(paramIndex++, acceptStatus);
         }
         if (fromDate != null && !fromDate.isEmpty()) {
             pstmt.setString(paramIndex++, fromDate);
@@ -217,8 +239,95 @@ public class ReservationDBContext {
         if (staffId != null) {
             pstmt.setInt(paramIndex++, staffId);
         }
-         if (userId != null) {
-            pstmt.setInt(paramIndex++, userId);
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            String searchPattern = "%" + searchQuery + "%";
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+            pstmt.setString(paramIndex++, searchPattern);
+        }
+        
+        // Thiết lập phân trang
+        pstmt.setInt(paramIndex++, pageSize);
+        pstmt.setInt(paramIndex++, (page - 1) * pageSize);
+
+        // Thực thi truy vấn
+        try (ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Reservation reservation = mapReservationFromResultSet(rs);
+                reservations.add(reservation);
+            }
+        }
+    } catch (SQLException e) {
+        handleSQLException("Error getting reservations", e);
+    }
+    
+    return reservations;
+}
+       private Reservation mapReservationFromResultSet(ResultSet rs) throws SQLException {
+    Reservation reservation = new Reservation();
+    reservation.setReservationID(rs.getInt("reservationID"));
+    reservation.setCustomerName(rs.getString("customerName"));
+    reservation.setEmail(rs.getString("email"));
+    reservation.setPhone(rs.getString("phone"));
+    reservation.setCreationDate(rs.getDate("creationDate"));
+    reservation.setStatus(rs.getInt("status"));
+    reservation.setAcceptStatus(rs.getInt("acceptStatus"));
+    reservation.setTotalPrice(rs.getFloat("totalPrice"));
+    return reservation;
+}
+
+// Phương thức xử lý lỗi SQL
+private void handleSQLException(String message, SQLException e) {
+    System.err.println(message + ": " + e.getMessage());
+    e.printStackTrace();
+    // Có thể thêm log vào file hoặc hệ thống log tập trung ở đây
+}
+    
+public int countReservations(Integer status, Integer acceptStatus, String fromDate, 
+    String toDate, Integer staffId, String searchQuery) {
+    
+    int count = 0;
+    StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Reservations WHERE 1=1");
+
+    // Thêm điều kiện lọc
+    if (status != null) {
+        sql.append(" AND status = ?");
+    }
+    if (acceptStatus != null) {
+        sql.append(" AND acceptStatus = ?");
+    }
+    if (fromDate != null && !fromDate.isEmpty()) {
+        sql.append(" AND creationDate >= ?");
+    }
+    if (toDate != null && !toDate.isEmpty()) {
+        sql.append(" AND creationDate <= ?");
+    }
+    if (staffId != null) {
+        sql.append(" AND staffID = ?");
+    }
+    if (searchQuery != null && !searchQuery.isEmpty()) {
+        sql.append(" AND (customerName LIKE ? OR email LIKE ? OR phone LIKE ?)");
+    }
+
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+        
+        int paramIndex = 1;
+        
+        if (status != null) {
+            pstmt.setInt(paramIndex++, status);
+        }
+        if (acceptStatus != null) {
+            pstmt.setInt(paramIndex++, acceptStatus);
+        }
+        if (fromDate != null && !fromDate.isEmpty()) {
+            pstmt.setString(paramIndex++, fromDate);
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            pstmt.setString(paramIndex++, toDate);
+        }
+        if (staffId != null) {
+            pstmt.setInt(paramIndex++, staffId);
         }
         if (searchQuery != null && !searchQuery.isEmpty()) {
             String searchPattern = "%" + searchQuery + "%";
@@ -227,36 +336,22 @@ public class ReservationDBContext {
             pstmt.setString(paramIndex++, searchPattern);
         }
 
-        // Thiết lập phân trang
-        pstmt.setInt(paramIndex++, pageSize);
-        pstmt.setInt(paramIndex++, (page - 1) * pageSize);
-
-        // Thực thi câu lệnh SQL và lấy kết quả
         try (ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                Reservation reservation = new Reservation();
-                reservation.setReservationID(rs.getInt("reservationID"));
-                reservation.setCustomerName(rs.getString("customerName"));
-                reservation.setEmail(rs.getString("email"));
-                reservation.setPhone(rs.getString("phone"));
-                reservation.setAddress(rs.getString("address"));
-                reservation.setCreationDate(rs.getDate("creationDate"));
-                reservation.setBookingDate(rs.getDate("bookingDate"));
-                reservation.setStatus(rs.getInt("status"));
-                reservation.setTotalPrice(rs.getFloat("totalPrice"));
-                reservations.add(reservation);
+            if (rs.next()) {
+                count = rs.getInt(1);
             }
         }
-
     } catch (SQLException e) {
-        System.err.println("Error fetching reservations: " + e.getMessage());
+        System.err.println("Error counting reservations: " + e.getMessage());
+        e.printStackTrace();
     }
-
-    // Debug: In ra số lượng bản ghi được lấy
-    System.out.println("Total reservations fetched: " + reservations.size());
-
-    return reservations;
+    
+    return count;
 }
+
+
+
+
 
 public int countReservations(Integer status, String fromDate, String toDate, Integer staffId,Integer userId, String searchQuery) {
     String sql = "SELECT COUNT(*) AS total FROM Reservations WHERE 1=1";

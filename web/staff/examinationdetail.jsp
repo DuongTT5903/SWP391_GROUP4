@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+ 
     <title>Examination Detail</title>
     <style>
         body {

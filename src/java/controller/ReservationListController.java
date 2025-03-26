@@ -12,103 +12,131 @@ import java.util.List;
 
 @WebServlet(name = "ReservationListController", urlPatterns = {"/staff/reservationlist"})
 public class ReservationListController extends HttpServlet {
-
+    private static final long serialVersionUID = 1L;
     private ReservationDBContext reservationDAO = new ReservationDBContext();
 
-    @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    try {
-        // Lấy các tham số từ request
-        String search = request.getParameter("search");
-        String status = request.getParameter("status");
-        String fromDate = request.getParameter("fromDate");
-        String toDate = request.getParameter("toDate");
-        String sortBy = request.getParameter("sortBy");
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        String action = request.getParameter("action");
 
-        // Phân trang
-        int page = 1;
-        int pageSize = 10;
         try {
+            // Lấy các tham số từ request
+            String search = request.getParameter("search");
+            String status = request.getParameter("status");
+            String acceptStatus = request.getParameter("acceptStatus");
+            String fromDate = request.getParameter("fromDate");
+            String toDate = request.getParameter("toDate");
+            
+            // Phân trang
+            int page = 1;
+            int pageSize = 10;
             if (request.getParameter("page") != null) {
-                page = Integer.parseInt(request.getParameter("page"));
+                try {
+                    page = Integer.parseInt(request.getParameter("page"));
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
             }
-        } catch (NumberFormatException e) {
-            page = 1; // Mặc định về trang 1 nếu có lỗi
+
+            // Xử lý thay đổi trạng thái (POST request)
+            if ("POST".equalsIgnoreCase(request.getMethod())) {
+                String reservationIdParam = request.getParameter("reservationId");
+                String newStatus = request.getParameter("newStatus");
+                String newAcceptStatus = request.getParameter("newAcceptStatus");
+                
+                if (reservationIdParam != null) {
+                    try {
+                        int reservationId = Integer.parseInt(reservationIdParam);
+                        boolean updateSuccess = false;
+                        
+                        if (newStatus != null) {
+                            // Update reservation status (Active/Inactive)
+                            System.out.println("DEBUG - Updating reservation status ID: " + reservationId 
+                                + " to status: " + newStatus);
+                            updateSuccess = reservationDAO.updateReservationStatus(reservationId, newStatus);
+                        } 
+                        else if (newAcceptStatus != null) {
+                            // Update payment status (AcceptStatus)
+                            System.out.println("DEBUG - Updating payment status ID: " + reservationId 
+                                + " to acceptStatus: " + newAcceptStatus);
+                            updateSuccess = reservationDAO.updateAcceptStatus(reservationId, Integer.parseInt(newAcceptStatus));
+                        }
+                        
+                        System.out.println("DEBUG - Update result: " + updateSuccess);
+                        
+                        // Redirect với các tham số filter
+                        StringBuilder redirectUrl = new StringBuilder(request.getContextPath() + "/staff/reservationlist?page=" + page);
+                        if (search != null) redirectUrl.append("&search=").append(search);
+                        if (status != null) redirectUrl.append("&status=").append(status);
+                        if (acceptStatus != null) redirectUrl.append("&acceptStatus=").append(acceptStatus);
+                        if (fromDate != null) redirectUrl.append("&fromDate=").append(fromDate);
+                        if (toDate != null) redirectUrl.append("&toDate=").append(toDate);
+                        
+                        response.sendRedirect(redirectUrl.toString());
+                        return;
+                        
+                    } catch (NumberFormatException e) {
+                        System.err.println("ERROR - Invalid reservation ID format: " + reservationIdParam);
+                        request.setAttribute("errorMessage", "Invalid reservation ID format");
+                    }
+                }
+            }
+
+            // Lấy danh sách đặt chỗ từ DAO với acceptStatus
+            List<Reservation> reservations = reservationDAO.getReservations(
+                    (status != null && !status.isEmpty()) ? Integer.parseInt(status) : null,
+                    (acceptStatus != null && !acceptStatus.isEmpty()) ? Integer.parseInt(acceptStatus) : null,
+                    (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
+                    (toDate != null && !toDate.isEmpty()) ? toDate : null,
+                    null, // staffId
+                    (search != null && !search.isEmpty()) ? search : null,
+                    null, // sortBy
+                    page,
+                    pageSize
+            );
+
+            // Đếm tổng số đặt chỗ để phân trang
+            int totalReservations = reservationDAO.countReservations(
+                    (status != null && !status.isEmpty()) ? Integer.parseInt(status) : null,
+                    (acceptStatus != null && !acceptStatus.isEmpty()) ? Integer.parseInt(acceptStatus) : null,
+                    (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
+                    (toDate != null && !toDate.isEmpty()) ? toDate : null,
+                    null, // staffId
+                    (search != null && !search.isEmpty()) ? search : null
+            );
+            int totalPages = (int) Math.ceil((double) totalReservations / pageSize);
+
+            // Đặt dữ liệu vào request attribute
+            request.setAttribute("reservations", reservations);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("search", search);
+            request.setAttribute("status", status);
+            request.setAttribute("acceptStatus", acceptStatus);
+            request.setAttribute("fromDate", fromDate);
+            request.setAttribute("toDate", toDate);
+
+            // Chuyển tiếp đến JSP
+            request.getRequestDispatcher("/staff/reservationlist.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
+            request.getRequestDispatcher("/staff/reservationlist.jsp").forward(request, response);
         }
-
-        // Lấy danh sách đặt chỗ từ DAO
-        List<Reservation> reservations = reservationDAO.getReservations(
-                (status != null && !status.isEmpty()) ? Integer.parseInt(status) : null, // Bỏ qua nếu status rỗng
-                (fromDate != null && !fromDate.isEmpty()) ? fromDate : null, // Bỏ qua nếu fromDate rỗng
-                (toDate != null && !toDate.isEmpty()) ? toDate : null, // Bỏ qua nếu toDate rỗng
-                null, // staffId (nếu có)
-                null,
-                (search != null && !search.isEmpty()) ? search : null, // Bỏ qua nếu search rỗng
-                sortBy,
-                page,
-                pageSize
-        );
-
-        // Đếm tổng số đặt chỗ để phân trang
-        int totalReservations = reservationDAO.countReservations(
-                (status != null && !status.isEmpty()) ? Integer.parseInt(status) : null,
-                (fromDate != null && !fromDate.isEmpty()) ? fromDate : null,
-                (toDate != null && !toDate.isEmpty()) ? toDate : null,
-                null,
-                null,// staffId (nếu có)
-                (search != null && !search.isEmpty()) ? search : null
-        );
-        int totalPages = (int) Math.ceil((double) totalReservations / pageSize);
-
-        // Đặt dữ liệu vào request attribute
-        request.setAttribute("reservations", reservations);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("search", search);
-        request.setAttribute("status", status);
-        request.setAttribute("fromDate", fromDate);
-        request.setAttribute("toDate", toDate);
-        request.setAttribute("sortBy", sortBy);
-
-        // Chuyển tiếp đến JSP
-        request.getRequestDispatcher("/staff/reservationlist.jsp").forward(request, response);
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
-        request.getRequestDispatcher("/staff/reservationlist.jsp").forward(request, response);
     }
-}
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            // Xử lý các thao tác POST (nếu có)
-            String action = request.getParameter("action");
-            String reservationIdParam = request.getParameter("reservationId");
-            String currentPage = request.getParameter("page");
-
-            if (action != null && reservationIdParam != null && !reservationIdParam.isEmpty()) {
-                int reservationId = Integer.parseInt(reservationIdParam);
-                if ("approve".equalsIgnoreCase(action)) {
-                    reservationDAO.updateReservationStatus(reservationId, "Approved");
-                } else if ("reject".equalsIgnoreCase(action)) {
-                    reservationDAO.updateReservationStatus(reservationId, "Rejected");
-                }
-                // Chuyển hướng lại để tránh lặp lại thao tác khi refresh trang
-                response.sendRedirect(request.getContextPath() + "/staff/reservationlist?page=" + (currentPage != null ? currentPage : "1"));
-                return;
-            }
-
-            // Nếu không có action, chuyển hướng về trang danh sách
-            response.sendRedirect(request.getContextPath() + "/staff/reservationlist");
-        } catch (Exception e) {
-            e.printStackTrace();
-            // Hiển thị thông báo lỗi trên trang hiện tại
-            request.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
-            request.getRequestDispatcher("/staff/reservationlist.jsp").forward(request, response);
-        }
+        processRequest(request, response);
     }
 
     @Override

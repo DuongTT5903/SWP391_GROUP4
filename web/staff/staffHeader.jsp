@@ -60,7 +60,7 @@
                 </li>
               
                <li class="nav-item">
-                    <a class="nav-link" href="settingList"><i class="fas fa-users"></i> Medical examination</a>
+                    <a class="nav-link" href="examination/list"><i class="fas fa-users"></i> Medical examination</a>
                 </li>
             </ul>
 

@@ -350,7 +350,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MedicalExaminationController</servlet-name>
-        <url-pattern>/staff/examination/add</url-pattern>
+        <url-pattern>/staff/examination/edit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ajaxServlet</servlet-name>
