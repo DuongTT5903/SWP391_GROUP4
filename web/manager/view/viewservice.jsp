@@ -1,6 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,11 +8,7 @@
         <title>View Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <style>
-            .detail-item {
-                border: 1px solid #ddd;
-                padding: 10px;
-                margin-bottom: 10px;
-            }
+            .detail-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
         </style>
     </head>
     
@@ -37,46 +32,23 @@
                                 <p>${service.serviceName}</p>
                             </div>
 
-                            <!-- Phần chi tiết -->
                             <div class="mb-3">
-                                <label class="form-label"><strong>Service Details:</strong></label>
+                                <label class="form-label"><strong>Service Detail:</strong></label>
+                                <p>${service.serviceDetail}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Detail Images:</strong></label>
                                 <c:choose>
-                                    <c:when test="${not empty service and not empty service.serviceDetail and fn:contains(service.serviceDetail, '||')}">
-                                        <c:set var="detailItems" value="${fn:split(service.serviceDetail, '||')}" />
-                                        <c:forEach var="item" items="${detailItems}" varStatus="loop">
-                                            <c:if test="${not empty item and fn:contains(item, '|')}">
-                                                <c:set var="parts" value="${fn:split(item, '|')}" />
-                                                <c:if test="${fn:length(parts) >= 2}">
-                                                    <div class="detail-item">
-                                                        <div class="mb-2">
-                                                            <label class="form-label">Detail Text:</label>
-                                                            <p>${parts[0]}</p>
-                                                        </div>
-                                                        <div class="mb-2">
-                                                            <label class="form-label">Detail Image:</label>
-                                                            <c:if test="${not empty parts[1]}">
-                                                                <img src="${parts[1]}" alt="Detail Image" class="img-fluid" style="max-height: 100px;">
-                                                            </c:if>
-                                                            <c:if test="${empty parts[1]}">
-                                                                <p>No image available</p>
-                                                            </c:if>
-                                                        </div>
-                                                    </div>
-                                                </c:if>
-                                            </c:if>
+                                    <c:when test="${not empty detailImages}">
+                                        <c:forEach var="img" items="${detailImages}">
+                                            <div class="detail-item">
+                                                <img src="${img.imageURL}" alt="Detail Image" class="img-fluid" style="max-height: 100px;">
+                                            </div>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <div class="detail-item">
-                                            <div class="mb-2">
-                                                <label class="form-label">Detail Text:</label>
-                                                <p>${service.serviceDetail}</p>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label">Detail Image:</label>
-                                                <p>No image available</p>
-                                            </div>
-                                        </div>
+                                        <p>No detail images available</p>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
@@ -97,10 +69,9 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label"><strong>Image URL:</strong></label>
+                                <label class="form-label"><strong>Main Image:</strong></label>
                                 <p>${service.imageURL}</p>
-                                <img src="${service.imageURL}" alt="Service Image" class="img-fluid mt-2" 
-                                     style="max-height: 200px;">
+                                <img src="${service.imageURL}" alt="Service Image" class="img-fluid mt-2" style="max-height: 200px;">
                             </div>
 
                             <div class="mb-3">

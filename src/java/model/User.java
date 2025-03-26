@@ -57,6 +57,7 @@ public class User {
         this.name = name;
         this.role = role;
     }
+    
 
     public User(int userID, String name, boolean gender, String email, String username, String password, String phone, String role, String imageURL, UserStatus status) {
         this.userID = userID;

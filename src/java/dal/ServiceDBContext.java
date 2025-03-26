@@ -17,6 +17,7 @@ import model.Service;
 import model.ServiceCategory;
 import dal.UserDBContext;
 import java.util.Arrays;
+import model.ImgDetail;
 import model.User;
 
 /**
@@ -24,6 +25,47 @@ import model.User;
  * @author admin
  */
 public class ServiceDBContext {
+    public List<ImgDetail> getDetailImages(int serviceID) {
+        List<ImgDetail> images = new ArrayList<>();
+        String sql = "SELECT ImgID, ImageURL FROM ImgDetail WHERE ServiceID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, serviceID);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ImgDetail img = new ImgDetail(rs.getInt("ImgID"), serviceID, rs.getString("ImageURL"));
+                images.add(img);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error fetching detail images", ex);
+        }
+        return images;
+    }
+    // Thêm phương thức thêm ảnh chi tiết
+    public void addDetailImage(int serviceID, String imageURL) {
+        String sql = "INSERT INTO ImgDetail (ServiceID, ImageURL) VALUES (?, ?)";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, serviceID);
+            stmt.setString(2, imageURL);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding detail image", ex);
+        }
+    }
+
+    // Thêm phương thức xóa tất cả ảnh chi tiết của một dịch vụ
+    public void deleteDetailImages(int serviceID) {
+        String sql = "DELETE FROM ImgDetail WHERE ServiceID = ?";
+        try (Connection conn = DBContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, serviceID);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error deleting detail images", ex);
+        }
+    }
+    
 
     private static Connection connection = DBContext.getConnection();
 
@@ -31,27 +73,6 @@ public class ServiceDBContext {
      *
      * @return
      */
-    public List<Service> getActiveMedicalServices() {
-    List<Service> services = new ArrayList<>();
-    String sql = "SELECT s.* FROM Services s WHERE s.Status = 1";
-    
-    try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql);
-         ResultSet rs = stmt.executeQuery()) {
-        
-        while (rs.next()) {
-            Service service = new Service();
-            service.setServiceID(rs.getInt("ServiceID"));
-            service.setServiceName(rs.getString("ServiceName"));
-            // Set các thuộc tính khác nếu cần
-            services.add(service);
-        }
-    } catch (SQLException e) {
-        System.err.println("Lỗi truy vấn dịch vụ: " + e.getMessage());
-    }
-    return services;
-}
-
     public List<ServiceCategory> getServiceCategories() {
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -225,6 +246,37 @@ public class ServiceDBContext {
     }
     return services;
 }
+   
+   public List<ImgDetail> listImgByServiceId(int id) {
+        List<ImgDetail> imgList = new ArrayList<>();
+        UserDBContext userDB = new UserDBContext();
+
+        String sql = "SELECT * FROM imgdetail WHERE ServiceID = ?";
+
+        try (Connection conn = DBContext.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id); // Thiết lập tham số ServiceID
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ImgDetail imgDetail = new ImgDetail(
+                    rs.getInt("imgID"),        // Lấy imgID từ ResultSet
+                    rs.getInt("ServiceID"),    // Lấy ServiceID từ ResultSet
+                    rs.getString("imageURL")   // Lấy imageURL từ ResultSet
+                );
+                imgList.add(imgDetail);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
+        }
+        return imgList;
+    }
+   
+   
+   
+   
+   
 // Hàm đếm tổng số dịch vụ để hỗ trợ phân trang
 public int getTotalServicesForSearch(String search, int categoryID) {
     int total = 0;
@@ -333,7 +385,8 @@ public int getTotalServicesForSearch(String search, int categoryID) {
                 String imageURL = rs.getString("ImageURL");
                 boolean status = rs.getBoolean("status");
                 int authorID = rs.getInt("AuthorID");
-                Service service = new Service(serviceID, serviceName, serviceDetail, getServiceCategoryByID(categoryID), servicePrice, salePrice, imageURL, status, u.getUserByID(authorID));
+                Service service = new Service(serviceID, serviceName, serviceDetail, getServiceCategoryByID(categoryID),
+                        servicePrice, salePrice, imageURL, status, u.getUserByID(authorID));
                 services.add(service);
             }
         } catch (SQLException ex) {
@@ -364,32 +417,49 @@ public int getTotalServicesForSearch(String search, int categoryID) {
      * @param imageURL
      * @param authorID
      */
-    public void addService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int authorID) {
+    // Cập nhật phương thức addService để hỗ trợ thêm ảnh
+    public void addService(Service service, List<String> detailImages) {
+        Connection conn = null;
         PreparedStatement stm = null;
         try {
-            String sql = "INSERT INTO services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, imageURL, status, authorID)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, 1, ?);";
-            stm = connection.prepareStatement(sql);
-            stm.setString(1, serviceName);
-            stm.setString(2, serviceDetail);
-            stm.setInt(3, categoryID);
-            stm.setFloat(4, servicePrice);
-            stm.setFloat(5, salePrice);
-            stm.setString(6, imageURL);
-            stm.setInt(7, authorID);
+            conn = DBContext.getConnection();
+            conn.setAutoCommit(false);
 
-            // ✅ Use executeUpdate() instead
-            int rowsInserted = stm.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("Service added successfully!");
+            String sql = "INSERT INTO Services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, ImageURL, status, authorID) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            stm = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            stm.setString(1, service.getServiceName());
+            stm.setString(2, service.getServiceDetail());
+            stm.setInt(3, service.getCategory().getCategoryID());
+            stm.setFloat(4, service.getServicePrice());
+            stm.setFloat(5, service.getSalePrice());
+            stm.setString(6, service.getImageURL());
+            stm.setBoolean(7, service.isStatus());
+            stm.setInt(8, 2);
+            stm.executeUpdate();
+
+            ResultSet rs = stm.getGeneratedKeys();
+            int serviceID = 0;
+            if (rs.next()) {
+                serviceID = rs.getInt(1);
             }
+
+            for (String imageURL : detailImages) {
+                addDetailImage(serviceID, imageURL);
+            }
+
+            conn.commit();
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding service", ex);
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException e) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Rollback failed", e);
+            }
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding service with images", ex);
         } finally {
             try {
-                if (stm != null) {
-                    stm.close();
-                }
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
             } catch (SQLException ex) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
             }
@@ -406,37 +476,48 @@ public int getTotalServicesForSearch(String search, int categoryID) {
      * @param imageURL
      * @param serviceID
      */
-    public void updateService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int serviceID) {
-    PreparedStatement stm = null;
-    try {
-        String sql = "UPDATE services SET ServiceName = ?, ServiceDetail = ?, CategoryID = ?, ServicePrice = ?, SalePrice = ?, ImageURL = ? WHERE ServiceID = ?";
-        stm = DBContext.getConnection().prepareStatement(sql);
-        stm.setString(1, serviceName);
-        stm.setString(2, serviceDetail);
-        stm.setInt(3, categoryID);
-        stm.setFloat(4, servicePrice);
-        stm.setFloat(5, salePrice);
-        stm.setString(6, imageURL);
-        stm.setInt(7, serviceID);
-
-        int rowsUpdated = stm.executeUpdate();
-        if (rowsUpdated > 0) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.INFO, "Service ID {0} updated successfully.", serviceID);
-        } else {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.WARNING, "No rows updated for Service ID {0}.", serviceID);
-        }
-    } catch (SQLException ex) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error updating service", ex);
-    } finally {
+    public void updateService(String serviceName, String serviceDetail, int categoryID, float servicePrice, float salePrice, String imageURL, int serviceID, List<String> detailImages) {
+        Connection conn = null;
+        PreparedStatement stm = null;
         try {
-            if (stm != null) {
-                stm.close();
+            conn = DBContext.getConnection();
+            conn.setAutoCommit(false);
+
+            String sql = "UPDATE Services SET ServiceName = ?, ServiceDetail = ?, CategoryID = ?, ServicePrice = ?, SalePrice = ?, ImageURL = ? WHERE ServiceID = ?";
+            stm = conn.prepareStatement(sql);
+            stm.setString(1, serviceName);
+            stm.setString(2, serviceDetail);
+            stm.setInt(3, categoryID);
+            stm.setFloat(4, servicePrice);
+            stm.setFloat(5, salePrice);
+            stm.setString(6, imageURL);
+            stm.setInt(7, serviceID);
+            stm.executeUpdate();
+
+            deleteDetailImages(serviceID);
+            for (String imgURL : detailImages) {
+                addDetailImage(serviceID, imgURL);
             }
+
+            conn.commit();
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException e) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Rollback failed", e);
+            }
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error updating service with images", ex);
+        } finally {
+            try {
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+            }
         }
     }
-}
+
+
 
     /**
      *
