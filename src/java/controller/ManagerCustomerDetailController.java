@@ -84,7 +84,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         StringBuilder content = new StringBuilder("<h1>Xin chào " + name + ",</h1>");
         content.append("<p>Thông tin tài khoản của bạn đã được cập nhật:</p>");
         content.append("<ul>");
-
+        
         if (!oldUser.getName().equals(name)) {
             content.append("<li><strong>Họ tên:</strong> ").append(oldUser.getName()).append(" → ").append(name).append("</li>");
         }
