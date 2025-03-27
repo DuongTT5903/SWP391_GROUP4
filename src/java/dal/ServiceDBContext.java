@@ -230,10 +230,10 @@ public class ServiceDBContext {
     }
 
     public List<Service> searchServices1(String search, int categoryID, int page, int pageSize) {
-        List<Service> services = new ArrayList<>();
-        UserDBContext userDB = new UserDBContext();
+    List<Service> services = new ArrayList<>();
+    UserDBContext userDB = new UserDBContext();
 
-        String sql = """
+    String sql = """
         SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, s.CategoryID, s.ServicePrice, s.SalePrice, 
                s.ImageURL, s.status, s.authorID, sc.CategoryName, sc.CategoryDetail 
         FROM services s 
@@ -241,62 +241,62 @@ public class ServiceDBContext {
         WHERE 
          (? IS NULL OR s.ServiceName LIKE ? OR s.ServiceDetail LIKE ?)
         AND (? = 0 OR s.CategoryID = ?)
-        ORDER BY s.ServiceID DESC
+        ORDER BY s.ServiceID ASC
         LIMIT ? OFFSET ?""";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Thiết lập tham số tìm kiếm
-            if (search == null || search.trim().isEmpty()) {
-                stmt.setNull(1, java.sql.Types.VARCHAR);
-                stmt.setNull(2, java.sql.Types.VARCHAR);
-                stmt.setNull(3, java.sql.Types.VARCHAR);
-            } else {
-                String searchPattern = "%" + search.trim() + "%";
-                stmt.setString(1, search);
-                stmt.setString(2, searchPattern);
-                stmt.setString(3, searchPattern);
-            }
-
-            // Thiết lập tham số cho categoryID
-            if (categoryID == 0) {
-                stmt.setInt(4, 0);
-                stmt.setInt(5, 0);
-            } else {
-                stmt.setInt(4, categoryID);
-                stmt.setInt(5, categoryID);
-            }
-
-            // Thiết lập phân trang
-            stmt.setInt(6, pageSize); // LIMIT
-            stmt.setInt(7, (page - 1) * pageSize); // OFFSET
-
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                ServiceCategory category = new ServiceCategory(
-                        rs.getInt("CategoryID"),
-                        rs.getString("CategoryName"),
-                        rs.getString("CategoryDetail")
-                );
-
-                Service service = new Service(
-                        rs.getInt("ServiceID"),
-                        rs.getString("ServiceName"),
-                        rs.getString("ServiceDetail"),
-                        category,
-                        rs.getFloat("ServicePrice"),
-                        rs.getFloat("SalePrice"),
-                        rs.getString("ImageURL"),
-                        rs.getBoolean("status"),
-                        userDB.getUserByID(rs.getInt("authorID"))
-                );
-                services.add(service);
-            }
-        } catch (SQLException e) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
+        // Thiết lập tham số tìm kiếm
+        if (search == null || search.trim().isEmpty()) {
+            stmt.setNull(1, java.sql.Types.VARCHAR);
+            stmt.setNull(2, java.sql.Types.VARCHAR);
+            stmt.setNull(3, java.sql.Types.VARCHAR);
+        } else {
+            String searchPattern = "%" + search.trim() + "%";
+            stmt.setString(1, search);
+            stmt.setString(2, searchPattern);
+            stmt.setString(3, searchPattern);
         }
-        return services;
+
+        // Thiết lập tham số cho categoryID
+        if (categoryID == 0) {
+            stmt.setInt(4, 0);
+            stmt.setInt(5, 0);
+        } else {
+            stmt.setInt(4, categoryID);
+            stmt.setInt(5, categoryID);
+        }
+
+        // Thiết lập phân trang
+        stmt.setInt(6, pageSize); // LIMIT
+        stmt.setInt(7, (page - 1) * pageSize); // OFFSET
+
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            ServiceCategory category = new ServiceCategory(
+                    rs.getInt("CategoryID"),
+                    rs.getString("CategoryName"),
+                    rs.getString("CategoryDetail")
+            );
+
+            Service service = new Service(
+                    rs.getInt("ServiceID"),
+                    rs.getString("ServiceName"),
+                    rs.getString("ServiceDetail"),
+                    category,
+                    rs.getFloat("ServicePrice"),
+                    rs.getFloat("SalePrice"),
+                    rs.getString("ImageURL"),
+                    rs.getBoolean("status"),
+                    userDB.getUserByID(rs.getInt("authorID"))
+            );
+            services.add(service);
+        }
+    } catch (SQLException e) {
+        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
     }
+    return services;
+}
 
     public List<ImgDetail> listImgByServiceId(int id) {
         List<ImgDetail> imgList = new ArrayList<>();
