@@ -683,29 +683,66 @@ public class UserDBContext {
     }
 
     public User getUserByEmail(String email) {
-        String sql = "SELECT * FROM Users WHERE email = ?";
+    String sql = "SELECT u.UserID, u.Name, u.Gender, u.Email, u.Username, u.Password, u.Phone, u.RoleID, u.ImageURL, us.Status "
+            + "FROM Users u "
+            + "LEFT JOIN UserStatus us ON u.UserID = us.UserID "
+            + "WHERE u.Email = ?";
 
-        try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, email);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    User user = new User(); // Khởi tạo đối tượng User        
-                    user.setUserID(rs.getInt("UserID"));
-                    user.setName(rs.getString("Name"));
-                    user.setGender(rs.getBoolean("Gender"));
-                    user.setEmail(rs.getString("Email"));
-                    user.setUsername(rs.getString("Username"));
-                    user.setPassword(rs.getString("Password"));
-                    user.setPhone(rs.getString("Phone"));
-                    return user;
-                }
+    try (Connection conn = new DBContext().getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, email);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                User user = new User();
+                user.setUserID(rs.getInt("UserID"));
+                user.setName(rs.getString("Name"));
+                user.setGender(rs.getBoolean("Gender"));
+                user.setEmail(rs.getString("Email"));
+                user.setUsername(rs.getString("Username"));
+                user.setPassword(rs.getString("Password"));
+                user.setPhone(rs.getString("Phone"));
+                user.setRole(rs.getString("RoleID"));
+                user.setImageURL(rs.getString("ImageURL"));
+                UserStatus status = new UserStatus(rs.getInt("UserID"), rs.getBoolean("Status"));
+                user.setStatus(status);
+                return user;
             }
-        } catch (SQLException e) {
-            e.printStackTrace(); // In lỗi ra console để dễ debug
         }
-        return null;
+    } catch (SQLException e) {
+        Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error fetching user by email", e);
     }
+    return null;
+}
+    /**
+ * Thêm người dùng mới vào bảng Users khi đăng nhập bằng Google
+ * @param user Người dùng cần thêm
+ */
+public void insertUser(User user) {
+    String sql = "INSERT INTO Users (Name, Gender, Email, Username, Password, Phone, RoleID, ImageURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    try (Connection conn = DBContext.getConnection(); PreparedStatement stm = conn.prepareStatement(sql)) {
+        stm.setString(1, user.getName());
+        stm.setBoolean(2, user.isGender()); // Mặc định là false nếu không có thông tin
+        stm.setString(3, user.getEmail());
+        stm.setString(4, user.getUsername());
+        stm.setString(5, user.getPassword() != null ? user.getPassword() : ""); // Password rỗng cho Google login
+        stm.setString(6, user.getPhone() != null ? user.getPhone() : ""); // Phone rỗng nếu không có
+        stm.setString(7, user.getRole() != null ? user.getRole() : "4"); // RoleID mặc định là 4 (user)
+        stm.setString(8, user.getImageURL() != null ? user.getImageURL() : ""); // ImageURL rỗng nếu không có
+        stm.executeUpdate();
+
+        // Sau khi thêm user, cập nhật trạng thái trong bảng UserStatus
+        String userIdSql = "SELECT UserID FROM Users WHERE Email = ?";
+        try (PreparedStatement userIdStmt = conn.prepareStatement(userIdSql)) {
+            userIdStmt.setString(1, user.getEmail());
+            ResultSet rs = userIdStmt.executeQuery();
+            if (rs.next()) {
+                int userId = rs.getInt("UserID");
+                updateUserStatus(userId, true); // Kích hoạt tài khoản ngay sau khi tạo
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(UserDBContext.class.getName()).log(Level.SEVERE, "Error inserting new user", ex);
+    }
+}
 
     public User getUserById1(int userId) {
         Connection connection = null;
