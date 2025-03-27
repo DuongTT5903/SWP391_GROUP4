@@ -8,7 +8,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>HealthCare - Máy đo huyết áp Omron HEM-8712</title>
+
 
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
@@ -81,93 +81,20 @@
     </head>
     <body class="min-h-screen bg-gray-50">
         <!-- Header -->
-        <header class="bg-primary text-white">
-            <div class="container mx-auto px-4 py-3">
-                <div class="flex items-center justify-between">
-                    <a href="/" class="flex items-center gap-2">
-                        <div class="relative w-10 h-10">
-                            <div class="absolute inset-0 bg-white rounded-full flex items-center justify-center">
-                                <span class="text-primary text-xl font-bold">HC</span>
-                            </div>
-                        </div>
-                        <span class="text-xl font-bold">HealthCare</span>
-                    </a>
-
-                    <div class="flex-1 max-w-xl mx-4">
-                        <div class="relative">
-                            <input 
-                                type="text" 
-                                placeholder="Tìm sản phẩm, dịch vụ y tế..." 
-                                class="w-full pl-4 pr-10 py-2 rounded-full border-0 bg-white/90 text-gray-800"
-                                />
-                            <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                        <a href="/account" class="flex items-center gap-1 text-sm">
-                            <i class="fas fa-user h-5 w-5"></i>
-                            <span>Đăng nhập</span>
-                        </a>
-
-                        <a href="/cart" class="flex items-center gap-1 text-sm">
-                            <div class="relative">
-                                <i class="fas fa-shopping-cart h-5 w-5"></i>
-                                <span class="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 bg-red-500 text-white text-xs rounded-full">2</span>
-                            </div>
-                            <span>Giỏ hàng</span>
-                        </a>
-
-                        <div class="flex items-center gap-1 text-sm">
-                            <i class="fas fa-map-marker-alt h-5 w-5"></i>
-                            <span>Hà Nội</span>
-                            <i class="fas fa-chevron-down h-4 w-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <jsp:include page="/customer/headerCustomer.jsp" />
 
         <!-- Navigation -->
         <nav class="bg-white shadow">
             <div class="container mx-auto px-4">
-                <div class="flex items-center gap-6 overflow-x-auto py-2 text-sm">
-                    <a href="/thuoc" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Thuốc</span>
-                    </a>
-                    <a href="/thiet-bi" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Thiết bị y tế</span>
-                    </a>
-                    <a href="/vitamin" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Vitamin & TPCN</span>
-                    </a>
-                    <a href="/cham-soc" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Chăm sóc cá nhân</span>
-                    </a>
-                    <a href="/me-be" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Mẹ & Bé</span>
-                    </a>
-                    <a href="/dat-lich" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Đặt lịch khám</span>
-                    </a>
-                    <a href="/tu-van" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Tư vấn sức khỏe</span>
-                    </a>
-                    <a href="/bai-viet" class="flex items-center gap-1 whitespace-nowrap px-2 py-1 hover:text-primary">
-                        <span class="font-medium">Bài viết y khoa</span>
-                    </a>
-                </div>
+
             </div>
         </nav>
 
         <!-- Breadcrumb -->
         <div class="container mx-auto px-4 py-3">
             <div class="flex items-center text-sm text-gray-500">
-                <a href="/" class="hover:text-primary">Trang chủ</a>
+                <a href="/homepage" class="hover:text-primary">Trang chủ</a>
                 <i class="fas fa-chevron-right h-4 w-4 mx-1"></i>
-                <a href="/thiet-bi" class="hover:text-primary">Thiết bị y tế</a>
-                <i class="fas fa-chevron-right h-4 w-4 mx-1"></i>
-                <span class="text-gray-700">Máy đo huyết áp Omron HEM-8712</span>
             </div>
         </div>
 
@@ -176,16 +103,7 @@
         <main class="container mx-auto px-4 py-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Product Images -->
-                <div class="bg-white rounded-lg p-4 shadow-sm">
-                    <div class="relative aspect-square overflow-hidden rounded-lg mb-4">
-                        <img 
-                            src="<c:url value='${service.imageURL}' />" 
-                            alt="img" 
-                            class="object-contain w-full h-full"
-                            id="mainProductImage"
-                            />
-                    </div>
-
+                <div class="bg-white rounded-lg p-4 shadow-sm"> <div class="relative aspect-square overflow-hidden rounded-lg mb-4"> <img src="<c:url value='${service.imageURL}' />" alt="img" class="object-contain w-full h-full" id="mainProductImage" /> </div>
                     <div class="flex gap-2 overflow-x-auto pb-2">
                         <c:forEach var="img" items="${imgList}">
                             <button 
@@ -206,95 +124,58 @@
                 <!-- Product Info -->
                 <div class="space-y-6">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800 mb-2">Máy đo huyết áp Omron HEM-8712</h1>
+                        <h1 class="text-2xl font-bold text-gray-800 mb-2">${service.serviceName}</h1>
                         <div class="flex items-center gap-4 text-sm">
                             <div class="flex items-center">
                                 <span class="text-yellow-500">★★★★★</span>
-                                <span class="text-gray-500 ml-1">4.9</span>
+                                <span class="text-gray-500 ml-1">${totalRated}</span>
                             </div>
                             <a href="#reviews" class="text-primary hover:underline">
-                                Xem 128 đánh giá
+                                Xem ${count} đánh giá
                             </a>
-                            <span class="text-gray-500">Đã bán 5.2k</span>
+                            <span class="text-gray-500">Đã bán ${total}</span>
                         </div>
                     </div>
 
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-baseline gap-2">
-                            <span class="text-3xl font-bold text-red-600">1.250.000₫</span>
-                            <span class="text-lg text-gray-500 line-through">1.590.000₫</span>
+                            <span class="text-3xl font-bold text-red-600">
+                                <fmt:formatNumber value="${service.servicePrice}" pattern="#,###" />.000 VNĐ
+                            </span>
+                            <span class="text-lg text-gray-500 line-through">
+                                <fmt:formatNumber value="${service.servicePrice}" pattern="#,###" />.000 VNĐ
+                            </span>
+
                             <span class="bg-red-600 text-white text-xs px-2 py-0.5 rounded">-21%</span>
                         </div>
 
-                        <div class="mt-4 bg-white p-3 rounded-lg border border-dashed border-primary">
-                            <div class="flex items-center gap-2 text-primary font-medium">
-                                <span class="bg-primary text-white text-xs px-2 py-0.5 rounded">Online giá tốt</span>
-                                Kết thúc sau: 
-                                <span class="bg-gray-100 px-2 py-1 rounded text-gray-800" id="hours">23</span>:
-                                <span class="bg-gray-100 px-2 py-1 rounded text-gray-800" id="minutes">12</span>:
-                                <span class="bg-gray-100 px-2 py-1 rounded text-gray-800" id="seconds">45</span>
-                            </div>
-                        </div>
+
                     </div>
 
-                    <div class="space-y-4">
-                        <h3 class="font-medium text-gray-800">Khuyến mãi</h3>
-                        <ul class="space-y-2 text-sm">
-                            <li class="flex items-start gap-2">
-                                <span class="text-primary font-bold">•</span>
-                                <span>Miễn phí vận chuyển toàn quốc cho đơn hàng từ 500.000₫</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-primary font-bold">•</span>
-                                <span>Tặng phiếu khám sức khỏe trị giá 200.000₫ tại hệ thống bệnh viện đối tác</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-primary font-bold">•</span>
-                                <span>Trả góp 0% lãi suất qua thẻ tín dụng</span>
-                            </li>
-                            <li class="flex items-start gap-2">
-                                <span class="text-primary font-bold">•</span>
-                                <span>Bảo hành chính hãng 24 tháng, đổi mới trong 30 ngày nếu lỗi nhà sản xuất</span>
-                            </li>
-                        </ul>
-                    </div>
+
 
                     <div class="flex gap-4">
-                        <button class="flex-1 h-12 border border-gray-300 rounded-md flex items-center justify-center gap-2 hover:bg-gray-50">
-                            <i class="fas fa-heart mr-2"></i>
-                            Thêm vào yêu thích
-                        </button>
-                        <button class="flex-1 h-12 bg-primary text-white rounded-md hover:bg-primary/90">
-                            Mua ngay
-                        </button>
+
+                        <div class="buttons">
+                            <!-- Add to Cart Form --> 
+                            <c:choose>
+                                <c:when test="${sessionScope.roleID == '4'}">
+                                    <form action="AddCart" method="POST" onsubmit="return showNotification();">
+                                        <input type="hidden" name="serviceID" value="${service.serviceID}">
+                                        <button class="btn btn-success" type="submit">Thêm vào giỏ hàng</button>
+                                    </form>  
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="btn btn-success"><a href="${pageContext.request.contextPath}/login" style="text-decoration: none;color: white">Thêm vào giỏ hàng</a></button><br>
+                                </c:otherwise>
+                            </c:choose>
+
+                            <!-- Feedback Button -->
+
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                <i class="fas fa-heart text-primary"></i>
-                            </div>
-                            <span>Cam kết hàng chính hãng 100%</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                <i class="fas fa-truck text-primary"></i>
-                            </div>
-                            <span>Giao hàng toàn quốc</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                <i class="fas fa-headset text-primary"></i>
-                            </div>
-                            <span>Tư vấn sử dụng 24/7</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-gray-600">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                                <i class="fas fa-shield-alt text-primary"></i>
-                            </div>
-                            <span>Bảo hành chính hãng 24 tháng</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -325,47 +206,11 @@
                         <div class="space-y-6">
                             <div class="flex items-center gap-4">
                                 <div class="text-center">
-                                    <div class="text-5xl font-bold text-yellow-500">4.9</div>
+                                    <div class="text-5xl font-bold text-yellow-500">${totalRated}</div>
                                     <div class="text-yellow-500 text-xl">★★★★★</div>
                                     <div class="text-sm text-gray-500">${count} đánh giá</div>
                                 </div>
-                                <div class="flex-1 space-y-1">
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm w-8">5 ★</div>
-                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="bg-yellow-500 h-full rounded-full" style="width: 90%"></div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">90%</div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm w-8">4 ★</div>
-                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="bg-yellow-500 h-full rounded-full" style="width: 7%"></div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">7%</div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm w-8">3 ★</div>
-                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="bg-yellow-500 h-full rounded-full" style="width: 2%"></div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">2%</div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm w-8">2 ★</div>
-                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="bg-yellow-500 h-full rounded-full" style="width: 1%"></div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">1%</div>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <div class="text-sm w-8">1 ★</div>
-                                        <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                            <div class="bg-yellow-500 h-full rounded-full" style="width: 0%"></div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">0%</div>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <div class="space-y-4">
@@ -376,48 +221,50 @@
                                     <div class="p-4 border rounded-lg">
                                         <div class="flex justify-between mb-2">
                                             <div class="flex items-center gap-2">
-                                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">NT</div>
+                                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                                                    ${feedBack.user.name.substring(0, 1)}
+                                                </div>
                                                 <div>
                                                     <div class="font-medium">${feedBack.user.name}</div>
                                                     <div class="text-yellow-500 text-sm">
                                                         <c:forEach begin="1" end="${feedBack.rated}">★</c:forEach>
                                                         </div>
-
                                                     </div>
                                                 </div>
                                                 <div class="text-sm text-gray-500">${feedBack.creationDate}</div>
                                         </div>
                                         <p class="text-sm text-gray-700">${feedBack.feedbackDetail}</p>
                                     </div>
-
-
                                 </c:forEach>
 
-                                <!-- Hardcoded reviews for demonstration -->
+                                <!-- Form nhập bình luận -->
+                                <div class="mt-4 p-4 border rounded-lg">
+                                    <form action="viewDetailProduct" method="post">
+                                        <input type="hidden" name="id" value="${service.serviceID}" />
 
-                                <div class="p-4 border rounded-lg">
-                                    <div class="flex justify-between mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">NT</div>
-                                            <div>
-                                                <div class="font-medium">Nguyễn Thành</div>
-                                                <div class="text-yellow-500 text-sm">★★★★★</div>
-                                            </div>
-                                        </div>
-                                        <div class="text-sm text-gray-500">12/03/2023</div>
-                                    </div>
-                                    <p class="text-sm text-gray-700">
-                                        Máy đo chính xác, dễ sử dụng. Tôi đã so sánh với kết quả đo tại phòng khám và thấy sai số rất nhỏ. Màn hình lớn, dễ đọc số. Pin dùng được lâu. Rất hài lòng với sản phẩm này.
-                                    </p>
+                                        <label for="rated" class="block text-sm font-medium text-gray-700">Đánh giá:</label>
+                                        <select name="rated" id="rated" class="border p-2 rounded-md w-full">
+                                            <option value="1">★</option>
+                                            <option value="2">★★</option>
+                                            <option value="3">★★★</option>
+                                            <option value="4">★★★★</option>
+                                            <option value="5">★★★★★</option>
+                                        </select>
+
+                                        <label for="feedbackDetail" class="block text-sm font-medium text-gray-700 mt-2">Bình luận:</label>
+                                        <textarea name="feedbackDetail" id="feedbackDetail" class="border p-2 rounded-md w-full" rows="3" placeholder="Nhập bình luận..."></textarea>
+
+                                        <button type="submit" class="mt-3 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                                            Gửi đánh giá
+                                        </button>
+                                    </form>
                                 </div>
 
-                            </div>
 
-                            <button class="w-full py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50">Xem thêm đánh giá</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </main>
 
         <!-- Related Products -->
@@ -594,21 +441,16 @@
         </script>
 
 
-
-
-        <!-- JavaScript để đổi ảnh chính -->
         <script>
             function changeImage(imageUrl, button) {
-                // Thay đổi ảnh chính
+                // Thay đổi ảnh chính 
                 document.getElementById('mainProductImage').src = imageUrl;
-
-                // Loại bỏ viền cũ của tất cả button
+                // Loại bỏ viền cũ của tất cả button 
                 document.querySelectorAll('.flex button').forEach(btn => {
                     btn.classList.remove('border-primary');
                     btn.classList.add('border-gray-200');
                 });
-
-                // Đổi viền của ảnh được chọn
+                // Đổi viền của ảnh được chọn 
                 button.classList.remove('border-gray-200');
                 button.classList.add('border-primary');
             }

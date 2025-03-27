@@ -156,13 +156,14 @@ public class ManagerServiceController extends HttpServlet {
                     String imageURLAdd = request.getParameter("imageURL");
 
                     List<String> detailImagesAdd = new ArrayList<>();
-                    int i = 0;
+                    int i= 0;
                     while (request.getParameter("detailImage_" + i) != null && !request.getParameter("detailImage_" + i).isEmpty()) {
                         detailImagesAdd.add(request.getParameter("detailImage_" + i));
                         i++;
                     }
-
+                    
                     ServiceCategory categoryAdd = db.getServiceCategoryByID(categoryIDAdd);
+                    
                     Service newService = new Service(0, serviceNameAdd, detailTextAdd, categoryAdd,
                             servicePriceAdd, salePriceAdd, imageURLAdd, true);
                     db.addService(newService, detailImagesAdd);

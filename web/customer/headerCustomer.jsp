@@ -82,6 +82,23 @@
                         </h3>
                     </c:otherwise>
                 </c:choose> 
+                <c:choose>
+                    <c:when test="${sessionScope.roleID == '4'}">
+                        <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\customer\shoppingCart">Cart</a></li>
+                        </c:when>
+                        <c:otherwise>
+                        <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
+                        </c:otherwise>
+                    </c:choose>
+                         <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/blogList">Blogs</a></li>                       
+                                <c:choose>
+                                    <c:when test="${sessionScope.roleID == '4'}">
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">My Reservations</a></li>
+                                    </c:when>
+                                    <c:otherwise>
+                                    <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login"> My Reservations</a></li>
+                                    </c:otherwise>
+                                </c:choose>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}\homepage">Homepage</a></li>
@@ -93,7 +110,7 @@
                                 <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/login">Cart</a></li>
                                 </c:otherwise>
                             </c:choose>
-                                <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/blogList">Blogs</a></li>                       
+                        <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/blogList">Blogs</a></li>                       
                             <c:choose>
                                 <c:when test="${sessionScope.roleID == '4'}">
                                 <li class="nav-item"><a class="nav-link " href="${pageContext.request.contextPath}/customer/myReservation">My Reservations</a></li>

@@ -25,11 +25,11 @@ import model.User;
  * @author admin
  */
 public class ServiceDBContext {
+
     public List<ImgDetail> getDetailImages(int serviceID) {
         List<ImgDetail> images = new ArrayList<>();
         String sql = "SELECT ImgID, ImageURL FROM ImgDetail WHERE ServiceID = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, serviceID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -41,31 +41,60 @@ public class ServiceDBContext {
         }
         return images;
     }
+
     // Thêm phương thức thêm ảnh chi tiết
     public void addDetailImage(int serviceID, String imageURL) {
-        String sql = "INSERT INTO ImgDetail (ServiceID, ImageURL) VALUES (?, ?)";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, serviceID);
-            stmt.setString(2, imageURL);
-            stmt.executeUpdate();
+        if (imageURL == null || imageURL.trim().isEmpty()) {
+            System.err.println("Image URL is null or empty, skipping...");
+            return;
+        }
+
+        Connection conn = null;
+        PreparedStatement stm = null;
+
+        try {
+            conn = DBContext.getConnection();
+            if (conn == null) {
+                throw new SQLException("Database connection is null!");
+            }
+
+            String sql = "INSERT INTO ImgDetail (ServiceID, ImageURL) VALUES (?, ?)";
+            stm = conn.prepareStatement(sql);
+            stm.setInt(1, serviceID);
+            stm.setString(2, imageURL);
+
+            int rowsInserted = stm.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Added image for ServiceID " + serviceID + ": " + imageURL);
+            } else {
+                System.err.println("Failed to insert image for ServiceID " + serviceID);
+            }
         } catch (SQLException ex) {
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding detail image", ex);
+            ex.printStackTrace();
+        } finally {
+            try {
+                if (stm != null) {
+                    stm.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException closeEx) {
+                closeEx.printStackTrace();
+            }
         }
     }
 
     // Thêm phương thức xóa tất cả ảnh chi tiết của một dịch vụ
     public void deleteDetailImages(int serviceID) {
         String sql = "DELETE FROM ImgDetail WHERE ServiceID = ?";
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, serviceID);
             stmt.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error deleting detail images", ex);
         }
     }
-    
 
     private static Connection connection = DBContext.getConnection();
 
@@ -108,11 +137,12 @@ public class ServiceDBContext {
 
         return serviceCategories;
     }
-    public List<Service> searchServices(String search, int categoryID, int page, int pageSize) {
-    List<Service> services = new ArrayList<>();
-    UserDBContext userDB = new UserDBContext();
 
-    String sql = """
+    public List<Service> searchServices(String search, int categoryID, int page, int pageSize) {
+        List<Service> services = new ArrayList<>();
+        UserDBContext userDB = new UserDBContext();
+
+        String sql = """
         SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, s.CategoryID, s.ServicePrice, s.SalePrice, 
                s.ImageURL, s.status, s.authorID, sc.CategoryName, sc.CategoryDetail 
         FROM services s 
@@ -123,65 +153,65 @@ public class ServiceDBContext {
         ORDER BY s.ServiceID DESC
         LIMIT ? OFFSET ?""";
 
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        // Thiết lập tham số tìm kiếm
-        if (search == null || search.trim().isEmpty()) {
-            stmt.setNull(1, java.sql.Types.VARCHAR);
-            stmt.setNull(2, java.sql.Types.VARCHAR);
-            stmt.setNull(3, java.sql.Types.VARCHAR);
-        } else {
-            String searchPattern = "%" + search.trim() + "%";
-            stmt.setString(1, search);
-            stmt.setString(2, searchPattern);
-            stmt.setString(3, searchPattern);
+            // Thiết lập tham số tìm kiếm
+            if (search == null || search.trim().isEmpty()) {
+                stmt.setNull(1, java.sql.Types.VARCHAR);
+                stmt.setNull(2, java.sql.Types.VARCHAR);
+                stmt.setNull(3, java.sql.Types.VARCHAR);
+            } else {
+                String searchPattern = "%" + search.trim() + "%";
+                stmt.setString(1, search);
+                stmt.setString(2, searchPattern);
+                stmt.setString(3, searchPattern);
+            }
+
+            // Thiết lập tham số cho categoryID
+            if (categoryID == 0) {
+                stmt.setInt(4, 0);
+                stmt.setInt(5, 0);
+            } else {
+                stmt.setInt(4, categoryID);
+                stmt.setInt(5, categoryID);
+            }
+
+            // Thiết lập phân trang
+            stmt.setInt(6, pageSize); // LIMIT
+            stmt.setInt(7, (page - 1) * pageSize); // OFFSET
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ServiceCategory category = new ServiceCategory(
+                        rs.getInt("CategoryID"),
+                        rs.getString("CategoryName"),
+                        rs.getString("CategoryDetail")
+                );
+
+                Service service = new Service(
+                        rs.getInt("ServiceID"),
+                        rs.getString("ServiceName"),
+                        rs.getString("ServiceDetail"),
+                        category,
+                        rs.getFloat("ServicePrice"),
+                        rs.getFloat("SalePrice"),
+                        rs.getString("ImageURL"),
+                        rs.getBoolean("status"),
+                        userDB.getUserByID(rs.getInt("authorID"))
+                );
+                services.add(service);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
         }
-
-        // Thiết lập tham số cho categoryID
-        if (categoryID == 0) {
-            stmt.setInt(4, 0);
-            stmt.setInt(5, 0);
-        } else {
-            stmt.setInt(4, categoryID);
-            stmt.setInt(5, categoryID);
-        }
-
-        // Thiết lập phân trang
-        stmt.setInt(6, pageSize); // LIMIT
-        stmt.setInt(7, (page - 1) * pageSize); // OFFSET
-
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServiceCategory category = new ServiceCategory(
-                rs.getInt("CategoryID"),
-                rs.getString("CategoryName"),
-                rs.getString("CategoryDetail")
-            );
-
-            Service service = new Service(
-                rs.getInt("ServiceID"),
-                rs.getString("ServiceName"),
-                rs.getString("ServiceDetail"),
-                category,
-                rs.getFloat("ServicePrice"),
-                rs.getFloat("SalePrice"),
-                rs.getString("ImageURL"),
-                rs.getBoolean("status"),
-                userDB.getUserByID(rs.getInt("authorID"))
-            );
-            services.add(service);
-        }
-    } catch (SQLException e) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
+        return services;
     }
-    return services;
-}
-   public List<Service> searchServices1(String search, int categoryID, int page, int pageSize) {
-    List<Service> services = new ArrayList<>();
-    UserDBContext userDB = new UserDBContext();
 
-    String sql = """
+    public List<Service> searchServices1(String search, int categoryID, int page, int pageSize) {
+        List<Service> services = new ArrayList<>();
+        UserDBContext userDB = new UserDBContext();
+
+        String sql = """
         SELECT s.ServiceID, s.ServiceName, s.ServiceDetail, s.CategoryID, s.ServicePrice, s.SalePrice, 
                s.ImageURL, s.status, s.authorID, sc.CategoryName, sc.CategoryDetail 
         FROM services s 
@@ -192,78 +222,76 @@ public class ServiceDBContext {
         ORDER BY s.ServiceID DESC
         LIMIT ? OFFSET ?""";
 
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        // Thiết lập tham số tìm kiếm
-        if (search == null || search.trim().isEmpty()) {
-            stmt.setNull(1, java.sql.Types.VARCHAR);
-            stmt.setNull(2, java.sql.Types.VARCHAR);
-            stmt.setNull(3, java.sql.Types.VARCHAR);
-        } else {
-            String searchPattern = "%" + search.trim() + "%";
-            stmt.setString(1, search);
-            stmt.setString(2, searchPattern);
-            stmt.setString(3, searchPattern);
+            // Thiết lập tham số tìm kiếm
+            if (search == null || search.trim().isEmpty()) {
+                stmt.setNull(1, java.sql.Types.VARCHAR);
+                stmt.setNull(2, java.sql.Types.VARCHAR);
+                stmt.setNull(3, java.sql.Types.VARCHAR);
+            } else {
+                String searchPattern = "%" + search.trim() + "%";
+                stmt.setString(1, search);
+                stmt.setString(2, searchPattern);
+                stmt.setString(3, searchPattern);
+            }
+
+            // Thiết lập tham số cho categoryID
+            if (categoryID == 0) {
+                stmt.setInt(4, 0);
+                stmt.setInt(5, 0);
+            } else {
+                stmt.setInt(4, categoryID);
+                stmt.setInt(5, categoryID);
+            }
+
+            // Thiết lập phân trang
+            stmt.setInt(6, pageSize); // LIMIT
+            stmt.setInt(7, (page - 1) * pageSize); // OFFSET
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                ServiceCategory category = new ServiceCategory(
+                        rs.getInt("CategoryID"),
+                        rs.getString("CategoryName"),
+                        rs.getString("CategoryDetail")
+                );
+
+                Service service = new Service(
+                        rs.getInt("ServiceID"),
+                        rs.getString("ServiceName"),
+                        rs.getString("ServiceDetail"),
+                        category,
+                        rs.getFloat("ServicePrice"),
+                        rs.getFloat("SalePrice"),
+                        rs.getString("ImageURL"),
+                        rs.getBoolean("status"),
+                        userDB.getUserByID(rs.getInt("authorID"))
+                );
+                services.add(service);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
         }
-
-        // Thiết lập tham số cho categoryID
-        if (categoryID == 0) {
-            stmt.setInt(4, 0);
-            stmt.setInt(5, 0);
-        } else {
-            stmt.setInt(4, categoryID);
-            stmt.setInt(5, categoryID);
-        }
-
-        // Thiết lập phân trang
-        stmt.setInt(6, pageSize); // LIMIT
-        stmt.setInt(7, (page - 1) * pageSize); // OFFSET
-
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            ServiceCategory category = new ServiceCategory(
-                rs.getInt("CategoryID"),
-                rs.getString("CategoryName"),
-                rs.getString("CategoryDetail")
-            );
-
-            Service service = new Service(
-                rs.getInt("ServiceID"),
-                rs.getString("ServiceName"),
-                rs.getString("ServiceDetail"),
-                category,
-                rs.getFloat("ServicePrice"),
-                rs.getFloat("SalePrice"),
-                rs.getString("ImageURL"),
-                rs.getBoolean("status"),
-                userDB.getUserByID(rs.getInt("authorID"))
-            );
-            services.add(service);
-        }
-    } catch (SQLException e) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error searching services", e);
+        return services;
     }
-    return services;
-}
-   
-   public List<ImgDetail> listImgByServiceId(int id) {
+
+    public List<ImgDetail> listImgByServiceId(int id) {
         List<ImgDetail> imgList = new ArrayList<>();
         UserDBContext userDB = new UserDBContext();
 
         String sql = "SELECT * FROM imgdetail WHERE ServiceID = ?";
 
-        try (Connection conn = DBContext.getConnection(); 
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id); // Thiết lập tham số ServiceID
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 ImgDetail imgDetail = new ImgDetail(
-                    rs.getInt("imgID"),        // Lấy imgID từ ResultSet
-                    rs.getInt("ServiceID"),    // Lấy ServiceID từ ResultSet
-                    rs.getString("imageURL")   // Lấy imageURL từ ResultSet
+                        rs.getInt("imgID"), // Lấy imgID từ ResultSet
+                        rs.getInt("ServiceID"), // Lấy ServiceID từ ResultSet
+                        rs.getString("imageURL") // Lấy imageURL từ ResultSet
                 );
                 imgList.add(imgDetail);
             }
@@ -272,15 +300,11 @@ public class ServiceDBContext {
         }
         return imgList;
     }
-   
-   
-   
-   
-   
+
 // Hàm đếm tổng số dịch vụ để hỗ trợ phân trang
-public int getTotalServicesForSearch(String search, int categoryID) {
-    int total = 0;
-    String sql = """
+    public int getTotalServicesForSearch(String search, int categoryID) {
+        int total = 0;
+        String sql = """
         SELECT COUNT(*) as total 
         FROM services s 
         INNER JOIN servicecategories sc ON s.CategoryID = sc.CategoryID
@@ -288,37 +312,36 @@ public int getTotalServicesForSearch(String search, int categoryID) {
         AND (? IS NULL OR s.ServiceName LIKE ? OR s.ServiceDetail LIKE ?)
         AND (? = 0 OR s.CategoryID = ?)""";
 
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        if (search == null || search.trim().isEmpty()) {
-            stmt.setNull(1, java.sql.Types.VARCHAR);
-            stmt.setNull(2, java.sql.Types.VARCHAR);
-            stmt.setNull(3, java.sql.Types.VARCHAR);
-        } else {
-            String searchPattern = "%" + search.trim() + "%";
-            stmt.setString(1, search);
-            stmt.setString(2, searchPattern);
-            stmt.setString(3, searchPattern);
-        }
+            if (search == null || search.trim().isEmpty()) {
+                stmt.setNull(1, java.sql.Types.VARCHAR);
+                stmt.setNull(2, java.sql.Types.VARCHAR);
+                stmt.setNull(3, java.sql.Types.VARCHAR);
+            } else {
+                String searchPattern = "%" + search.trim() + "%";
+                stmt.setString(1, search);
+                stmt.setString(2, searchPattern);
+                stmt.setString(3, searchPattern);
+            }
 
-        if (categoryID == 0) {
-            stmt.setInt(4, 0);
-            stmt.setInt(5, 0);
-        } else {
-            stmt.setInt(4, categoryID);
-            stmt.setInt(5, categoryID);
-        }
+            if (categoryID == 0) {
+                stmt.setInt(4, 0);
+                stmt.setInt(5, 0);
+            } else {
+                stmt.setInt(4, categoryID);
+                stmt.setInt(5, categoryID);
+            }
 
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            total = rs.getInt("total");
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error counting services for search", e);
         }
-    } catch (SQLException e) {
-        Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error counting services for search", e);
+        return total;
     }
-    return total;
-}
 
     /**
      *
@@ -419,49 +442,106 @@ public int getTotalServicesForSearch(String search, int categoryID) {
      */
     // Cập nhật phương thức addService để hỗ trợ thêm ảnh
     public void addService(Service service, List<String> detailImages) {
+        if (service == null) {
+            throw new IllegalArgumentException("Service object cannot be null");
+        }
+
         Connection conn = null;
-        PreparedStatement stm = null;
+        PreparedStatement serviceStm = null;
+        PreparedStatement imageStm = null;
+        ResultSet rs = null;
+
         try {
             conn = DBContext.getConnection();
             conn.setAutoCommit(false);
 
-            String sql = "INSERT INTO Services (ServiceName, ServiceDetail, CategoryID, ServicePrice, SalePrice, ImageURL, status, authorID) "
+            // Insert Service
+            String serviceSql = "INSERT INTO Services (ServiceName, ServiceDetail, CategoryID, ServicePrice, ImageURL, status, SalePrice, authorID) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            stm = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            stm.setString(1, service.getServiceName());
-            stm.setString(2, service.getServiceDetail());
-            stm.setInt(3, service.getCategory().getCategoryID());
-            stm.setFloat(4, service.getServicePrice());
-            stm.setFloat(5, service.getSalePrice());
-            stm.setString(6, service.getImageURL());
-            stm.setBoolean(7, service.isStatus());
-            stm.setInt(8, 2);
-            stm.executeUpdate();
+            serviceStm = conn.prepareStatement(serviceSql, PreparedStatement.RETURN_GENERATED_KEYS);
 
-            ResultSet rs = stm.getGeneratedKeys();
-            int serviceID = 0;
-            if (rs.next()) {
-                serviceID = rs.getInt(1);
+            serviceStm.setString(1, service.getServiceName());
+            serviceStm.setString(2, service.getServiceDetail());
+            serviceStm.setInt(3, service.getCategory().getCategoryID());
+            serviceStm.setFloat(4, service.getServicePrice());
+            serviceStm.setString(5, service.getImageURL());
+            serviceStm.setBoolean(6, service.isStatus());
+            serviceStm.setFloat(7, service.getSalePrice());
+            serviceStm.setInt(8, 2); // Hardcoded authorID, consider making this dynamic
+
+            int serviceRowsInserted = serviceStm.executeUpdate();
+            if (serviceRowsInserted == 0) {
+                throw new SQLException("Failed to insert service, no rows affected.");
             }
 
-            for (String imageURL : detailImages) {
-                addDetailImage(serviceID, imageURL);
+            // Get generated ServiceID
+            rs = serviceStm.getGeneratedKeys();
+            int serviceID = -1;
+            if (rs.next()) {
+                serviceID = rs.getInt(1);
+            } else {
+                throw new SQLException("Failed to retrieve generated serviceID.");
+            }
+
+            // Prepare image insertion statement
+            String imageSql = "INSERT INTO ImgDetail (ServiceID, ImageURL) VALUES (?, ?)";
+            imageStm = conn.prepareStatement(imageSql);
+
+            // Insert Detail Images
+            if (detailImages != null) {
+                for (String imageURL : detailImages) {
+                    if (imageURL != null && !imageURL.trim().isEmpty()) {
+                        imageStm.setInt(1, serviceID);
+                        imageStm.setString(2, imageURL);
+                        imageStm.addBatch();
+                    }
+                }
+
+                // Execute batch image insertions
+                int[] batchResults = imageStm.executeBatch();
+
+                // Optional: Log batch insertion results
+                int successfulInserts = 0;
+                for (int result : batchResults) {
+                    if (result > 0) {
+                        successfulInserts++;
+                    }
+                }
+                System.out.println("Inserted " + successfulInserts + " out of " + detailImages.size() + " images");
             }
 
             conn.commit();
+            System.out.println("Service and images added successfully!");
+
         } catch (SQLException ex) {
-            try {
-                if (conn != null) conn.rollback();
-            } catch (SQLException e) {
-                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Rollback failed", e);
+            // Rollback transaction on error
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                    System.err.println("Transaction rolled back: " + ex.getMessage());
+                } catch (SQLException rollbackEx) {
+                    rollbackEx.printStackTrace();
+                }
             }
-            Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error adding service with images", ex);
+            ex.printStackTrace();
         } finally {
+            // Close resources
             try {
-                if (stm != null) stm.close();
-                if (conn != null) conn.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
+                if (rs != null) {
+                    rs.close();
+                }
+                if (serviceStm != null) {
+                    serviceStm.close();
+                }
+                if (imageStm != null) {
+                    imageStm.close();
+                }
+                if (conn != null) {
+                    conn.setAutoCommit(true); // Reset to default
+                    conn.close();
+                }
+            } catch (SQLException closeEx) {
+                closeEx.printStackTrace();
             }
         }
     }
@@ -502,22 +582,26 @@ public int getTotalServicesForSearch(String search, int categoryID) {
             conn.commit();
         } catch (SQLException ex) {
             try {
-                if (conn != null) conn.rollback();
+                if (conn != null) {
+                    conn.rollback();
+                }
             } catch (SQLException e) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Rollback failed", e);
             }
             Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error updating service with images", ex);
         } finally {
             try {
-                if (stm != null) stm.close();
-                if (conn != null) conn.close();
+                if (stm != null) {
+                    stm.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Error closing resources", ex);
             }
         }
     }
-
-
 
     /**
      *
@@ -849,16 +933,16 @@ public int getTotalServicesForSearch(String search, int categoryID) {
             } catch (SQLException ex) {
                 Logger.getLogger(ServiceDBContext.class.getName()).log(Level.SEVERE, "Lỗi khi đóng tài nguyên", ex);
             }
-            
+
         }
-        
+
     }
-public Service getServiceById(int serviceId) {
+
+    public Service getServiceById(int serviceId) {
         Service service = null;
         String sql = "SELECT * FROM Services WHERE ServiceID = ?";
 
-        try (Connection conn = DBContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, serviceId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -876,6 +960,7 @@ public Service getServiceById(int serviceId) {
         }
         return service;
     }
+
     /**
      *
      * @param args

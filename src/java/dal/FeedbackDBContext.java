@@ -23,6 +23,79 @@ public class FeedbackDBContext {
      *
      * @return
      */
+    
+    public double getAverageRatingByServiceID(int serviceID) {
+    double averageRating = 0.0;
+    String sql = "SELECT AVG(Rated) AS average_rating FROM childrencare.feedbacks WHERE ServiceID = ?";
+
+    try (Connection connection = DBContext.getConnection();
+         PreparedStatement stm = connection.prepareStatement(sql)) {
+
+        stm.setInt(1, serviceID);
+        try (ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                averageRating = rs.getDouble("average_rating"); // Lấy giá trị trung bình
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(FeedbackDBContext.class.getName()).log(Level.SEVERE, "Error fetching average rating", ex);
+    }
+    return averageRating;
+}
+
+    public int getTotalAmountByServiceID(int serviceID) {
+    int totalAmount = 0;
+    String sql = "SELECT SUM(Amount) AS total_count FROM childrencare.reservationdetails WHERE serviceID = ?";
+
+    try (Connection connection = DBContext.getConnection();
+         PreparedStatement stm = connection.prepareStatement(sql)) {
+
+        stm.setInt(1, serviceID);
+        try (ResultSet rs = stm.executeQuery()) {
+            if (rs.next()) {
+                totalAmount = rs.getInt("total_count"); // Lấy giá trị tổng Amount
+            }
+        }
+    } catch (SQLException ex) {
+        Logger.getLogger(ReservationDBContext.class.getName()).log(Level.SEVERE, "Error fetching total amount by serviceID", ex);
+    }
+    return totalAmount;
+}
+
+    public List<Feedback> getFeedbacksByServiceID1(int serviceID) {
+        List<Feedback> feedbackList = new ArrayList<>();
+        String sql = "SELECT f.FeedbackID, f.FeedbackDetail, f.CustomerID, f.Rated, f.imglink, "
+                + "f.serviceID, s.ServiceName, f.CreationDate, f.Status, u.UserID, u.Name AS UserName, u.Email, u.Phone "
+                + "FROM Feedbacks f "
+                + "INNER JOIN Users u ON f.CustomerID = u.UserID "
+                + "INNER JOIN Services s ON f.serviceID = s.ServiceID "
+                + "WHERE f.serviceID = ?";
+
+        try (Connection connection = DBContext.getConnection(); PreparedStatement stm = connection.prepareStatement(sql)) {
+
+            stm.setInt(1, serviceID);
+            try (ResultSet rs = stm.executeQuery()) {
+                while (rs.next()) {
+                    Feedback feedback = new Feedback(
+                            rs.getInt("FeedbackID"),
+                            rs.getString("FeedbackDetail"),
+                            rs.getInt("CustomerID"),
+                            rs.getInt("Rated"),
+                            rs.getString("imglink"),
+                            new Service(rs.getInt("serviceID"), rs.getString("ServiceName"), null, null, 0.0f, 0.0f, null, false, null),
+                            rs.getDate("CreationDate"),
+                            rs.getBoolean("Status"),
+                            new User(rs.getInt("UserID"), rs.getString("UserName"), false, rs.getString("Email"), null, null, rs.getString("Phone"), null, null)
+                    );
+                    feedbackList.add(feedback);
+                }
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(FeedbackDBContext.class.getName()).log(Level.SEVERE, "Error fetching feedbacks by serviceID", ex);
+        }
+        return feedbackList;
+    }
+
     public List<Feedback> getAllFeedbacks() {
         List<Feedback> feedbackList = new ArrayList<>();
         String sql = "SELECT f.FeedbackID, f.FeedbackDetail, f.CustomerID, f.Rated, f.imglink, "
@@ -163,9 +236,6 @@ public class FeedbackDBContext {
         }
         return feedback;
     }
-    
-
-    
 
     public void addFeedback(Feedback feedback) {
         String sql = "INSERT INTO Feedbacks (FeedbackDetail, CustomerID, Rated, imglink, ServiceID, CreationDate, Status) "

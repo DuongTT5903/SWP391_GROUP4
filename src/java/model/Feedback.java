@@ -52,6 +52,16 @@ public class Feedback {
         this.status = status;
         this.user = user;
     }
+    
+    public Feedback(String feedbackDetail, int rated, Service services, User user) {
+    this.feedbackDetail = feedbackDetail;
+    this.rated = rated;
+    this.services = services;
+    this.user = user;
+    this.customerID = user.getUserID(); // Lấy ID từ User
+    this.creationDate = new Date(); // Mặc định ngày hiện tại
+    this.status = true; // Mặc định trạng thái là true
+}
 
     // Getter and Setter methods
 

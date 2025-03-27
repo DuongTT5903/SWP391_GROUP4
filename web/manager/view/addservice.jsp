@@ -9,10 +9,26 @@
         <title>Add New Service</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <style>
-            .required::after { content: " *"; color: red; }
-            .error-message { color: red; font-size: 14px; display: none; }
-            .image-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; position: relative; }
-            .remove-btn { position: absolute; top: 10px; right: 10px; }
+            .required::after {
+                content: " *";
+                color: red;
+            }
+            .error-message {
+                color: red;
+                font-size: 14px;
+                display: none;
+            }
+            .image-item {
+                border: 1px solid #ddd;
+                padding: 10px;
+                margin-bottom: 10px;
+                position: relative;
+            }
+            .remove-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
         </style>
     </head>
     <body class="bg-light">
@@ -88,89 +104,90 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            let imageIndex = 1;
+                                        let imageIndex = 0;
 
-            function addImageItem() {
-                let container = document.getElementById("imageItems");
-                let newItem = document.createElement("div");
-                newItem.className = "image-item";
-                newItem.innerHTML = `
-                    <button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeImageItem(this)">X</button>
-                    <input type="text" class="form-control" name="detailImage_${imageIndex}" placeholder="Enter image URL" required>
-                `;
-                container.appendChild(newItem);
-                imageIndex++;
-            }
+                                        function addImageItem() {
+                                            imageIndex++;
+                                            console.log("Current imageIndex:", imageIndex); // Debug
 
-            function removeImageItem(button) {
-                let imageItems = document.querySelectorAll(".image-item");
-                if (imageItems.length > 1) {
-                    button.parentElement.remove();
-                } else {
-                    alert("At least one image is required!");
-                }
-            }
+                                            let container = document.getElementById("imageItems");
+                                            let newItem = document.createElement("div");
+                                            newItem.className = "image-item";
+                                            newItem.innerHTML =
+                                                    '<button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeImageItem(this)">X</button>' +
+                                                    '<input type="text" class="form-control" name="detailImage_' + imageIndex + '" placeholder="Enter image URL" required>';
 
-            function validateForm() {
-                let isValid = true;
-                let serviceName = document.getElementById("serviceName").value.trim();
-                let detailText = document.getElementById("detailText").value.trim();
-                let servicePrice = parseFloat(document.getElementById("servicePrice").value);
-                let salePrice = document.getElementById("salePrice").value ? parseFloat(document.getElementById("salePrice").value) : null;
-                let imageURL = document.getElementById("imageURL").value.trim();
+                                            container.appendChild(newItem);
+                                        }
+                                        function removeImageItem(button) {
+                                            let imageItems = document.querySelectorAll(".image-item");
+                                            if (imageItems.length > 1) {
+                                                button.parentElement.remove();
+                                            } else {
+                                                alert("At least one image is required!");
+                                            }
+                                        }
 
-                document.getElementById("priceError").style.display = "none";
-                document.getElementById("salePriceError").style.display = "none";
+                                        function validateForm() {
+                                            let isValid = true;
+                                            let serviceName = document.getElementById("serviceName").value.trim();
+                                            let detailText = document.getElementById("detailText").value.trim();
+                                            let servicePrice = parseFloat(document.getElementById("servicePrice").value);
+                                            let salePrice = document.getElementById("salePrice").value ? parseFloat(document.getElementById("salePrice").value) : null;
+                                            let imageURL = document.getElementById("imageURL").value.trim();
 
-                if (serviceName === "") {
-                    alert("Service Name cannot be empty or contain only spaces!");
-                    isValid = false;
-                }
-                if (detailText === "") {
-                    alert("Service Detail cannot be empty or contain only spaces!");
-                    isValid = false;
-                }
-                if (isNaN(servicePrice) || servicePrice <= 0) {
-                    document.getElementById("priceError").style.display = "block";
-                    isValid = false;
-                }
-                if (salePrice !== null && (salePrice < 0 || salePrice >= servicePrice)) {
-                    document.getElementById("salePriceError").style.display = "block";
-                    isValid = false;
-                }
-                if (imageURL === "") {
-                    alert("Main Image URL cannot be empty!");
-                    isValid = false;
-                } else if (!isValidURL(imageURL)) {
-                    alert("Main Image URL is invalid. Please enter a valid URL!");
-                    isValid = false;
-                }
+                                            document.getElementById("priceError").style.display = "none";
+                                            document.getElementById("salePriceError").style.display = "none";
 
-                let imageInputs = document.querySelectorAll("[name^='detailImage_']");
-                for (let input of imageInputs) {
-                    let value = input.value.trim();
-                    if (value === "") {
-                        alert("Detail Image URL cannot be empty!");
-                        isValid = false;
-                    } else if (!isValidURL(value)) {
-                        alert("Detail Image URL is invalid. Please enter a valid URL!");
-                        isValid = false;
-                    }
-                }
+                                            if (serviceName === "") {
+                                                alert("Service Name cannot be empty or contain only spaces!");
+                                                isValid = false;
+                                            }
+                                            if (detailText === "") {
+                                                alert("Service Detail cannot be empty or contain only spaces!");
+                                                isValid = false;
+                                            }
+                                            if (isNaN(servicePrice) || servicePrice <= 0) {
+                                                document.getElementById("priceError").style.display = "block";
+                                                isValid = false;
+                                            }
+                                            if (salePrice !== null && (salePrice < 0 || salePrice >= servicePrice)) {
+                                                document.getElementById("salePriceError").style.display = "block";
+                                                isValid = false;
+                                            }
+                                            if (imageURL === "") {
+                                                alert("Main Image URL cannot be empty!");
+                                                isValid = false;
+                                            } else if (!isValidURL(imageURL)) {
+                                                alert("Main Image URL is invalid. Please enter a valid URL!");
+                                                isValid = false;
+                                            }
 
-                return isValid;
-            }
+                                            let imageInputs = document.querySelectorAll("[name^='detailImage_']");
+                                            for (let input of imageInputs) {
+                                                let value = input.value.trim();
+                                                if (value === "") {
+                                                    alert("Detail Image URL cannot be empty!");
+                                                    isValid = false;
+                                                } else if (!isValidURL(value)) {
+                                                    alert("Detail Image URL is invalid. Please enter a valid URL!");
+                                                    isValid = false;
+                                                }
+                                            }
 
-            function isValidURL(str) {
-                let pattern = new RegExp('^(https?:\\/\\/)?' +
-                    '((([a-zA-Z0-9$_.+!*\'(),-]+:\\S*)?@)?' +
-                    '(([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})|' +
-                    '((\\d{1,3}\\.){3}\\d{1,3}))' +
-                    '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+]*)*' +
-                    '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' +
-                    '(\\#[-a-zA-Z0-9_]*)?$', 'i');
-                return pattern.test(str);
-            }
+                                            return isValid;
+                                        }
+
+                                        function isValidURL(str) {
+                                            let pattern = new RegExp('^(https?:\\/\\/)?' +
+                                                    '((([a-zA-Z0-9$_.+!*\'(),-]+:\\S*)?@)?' +
+                                                    '(([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})|' +
+                                                    '((\\d{1,3}\\.){3}\\d{1,3}))' +
+                                                    '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+]*)*' +
+                                                    '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' +
+                                                    '(\\#[-a-zA-Z0-9_]*)?$', 'i');
+                                            return pattern.test(str);
+                                        }
         </script>
     </body>
 </html>
