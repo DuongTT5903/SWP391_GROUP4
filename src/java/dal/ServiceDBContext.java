@@ -25,6 +25,28 @@ import model.User;
  * @author admin
  */
 public class ServiceDBContext {
+    /**
+     *
+     * @return
+     */
+    public List<Service> getActiveMedicalServices() {
+        List<Service> services = new ArrayList<>();
+        String sql = "SELECT s.* FROM Services s WHERE s.Status = 1";
+
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Service service = new Service();
+                service.setServiceID(rs.getInt("ServiceID"));
+                service.setServiceName(rs.getString("ServiceName"));
+                // Set các thuộc tính khác nếu cần
+                services.add(service);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi truy vấn dịch vụ: " + e.getMessage());
+        }
+        return services;
+    }
 
     public List<ImgDetail> getDetailImages(int serviceID) {
         List<ImgDetail> images = new ArrayList<>();
