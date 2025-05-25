@@ -31,6 +31,11 @@
                         <%= reservation.getStatus() == 1 ? "Payment done" : "Not payment" %>
                     </span>
                 </p>
+                <p><strong>Status:</strong> 
+                    <span class="badge <%= reservation.getStatus() == 1 ? "bg-success" : "bg-secondary" %>">
+                        <%= reservation.getStatus() == 1 ? "Payment done" : "Not payment" %>
+                    </span>
+                </p>
             </div>
         </div>
 
